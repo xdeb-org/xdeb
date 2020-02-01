@@ -66,6 +66,7 @@ for arg in "$@"; do
 				XDEB_OPT_SYNC=true;;
 			d)
 				XDEB_OPT_DEPS=true
+				# Move this code to the bottom of the script?
 				if [ ! -r "$XDEB_SHLIBS" ]; then
 					echo "! Sync atleast once, before using the depencency option"
 					exit 1
@@ -116,6 +117,7 @@ ar -xf "$XDEB_BASEPKG"
 tar -xf "control.tar.gz" -C "$XDEB_DATADIR"
 tar -xf "data.tar.xz" -C "$XDEB_DESTDIR"
 
+# The variable names are the same as in the regular xbps-src package build
 pkgname=$(grep -Po "Package:[ \t]*\K.*" "$XDEB_DATADIR/control")
 version=$(grep -Po "Version:[ \t]*\K.*" "$XDEB_DATADIR/control")
 license=$(grep -Po "License:[ \t]*\K.*" "$XDEB_DATADIR/control")
@@ -124,6 +126,7 @@ maintainer=$(grep -Po "Maintainer:[ \t]*\K.*" "$XDEB_DATADIR/control")
 short_desc=$(grep -Po "Description:[ \t]*\K.*" "$XDEB_DATADIR/control")
 long_desc=$(grep -Pzo "Description:[ \t\n]*\K.*" "$XDEB_DATADIR/control")
 
+# It seems that debian packages don't have to provide a short_desc (XMind-ZEN didn't do it)
 if [ -z "$short_desc" ]; then short_desc=$long_desc; fi
 
 version=$(echo "$version" | grep -Po "^(\d|\.)*")
@@ -131,14 +134,9 @@ case "$archs" in
 	amd64) archs="x86_64"
 esac
 
-if [ $XDEB_BUILD = false ]; then
-	echo "> User disabled build, aborting"
-	exit 0
-fi
-
 if [ $XDEB_OPT_DEPS = true ]; then
-	echo "> Resolving dependencies"
 	XDEP_DEPENDENCIES="$(autodeps)"
+	echo "> Resolved dependencies"
 fi
 
 cd $XDEB_BINPKGS
