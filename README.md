@@ -52,6 +52,7 @@ usage: xdeb [-S] [-d] [-Sd] ... FILE
   -r            # Clean repodata (Use when rebuilding a package)
   -q            # Don't build the package at all
   -C            # Clean all files
+  -b            # No extract, just build files in destdir
 
 example:
   xdeb -Cq      # Remove all files and quit
