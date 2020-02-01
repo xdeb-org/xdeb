@@ -11,6 +11,7 @@ XDEB_SHLIBS="$XDEB_PKGROOT/shlibs"
 XDEB_OPT_DEPS=false
 XDEB_OPT_SYNC=false
 XDEB_OPT_QUIT=false
+XDEB_OPT_EXTRACT=true
 
 clean () {
 	rm -rf ./*.xbps-pkg-*
@@ -51,6 +52,7 @@ help () {
 	echo "  -r            # Clean repodata (Use when rebuilding a package)"
 	echo "  -q            # Don't build the package at all"
 	echo "  -C            # Clean all files"
+	echo "  -b            # No extract, just build files in destdir"
 	echo;
 	echo "example:"
 	echo "  xdeb -Cq      # Remove all files and quit"
@@ -84,6 +86,8 @@ for arg in "$@"; do
 				clean_repodata;;
 			q)
 				XDEB_OPT_QUIT=true;;
+			b)
+				XDEB_OPT_EXTRACT=false;;
 			*)
 				echo "! Unknown option -${first}"
 				help
@@ -117,15 +121,19 @@ if { test ! $? -eq 0 || test ! -r "$XDEB_BASEPKG"; }; then
 	exit 1
 fi
 
-clean
-mkdir -p "$XDEB_BINPKGS"
-mkdir -p "$XDEB_DATADIR"
-mkdir -p "$XDEB_DESTDIR"
+if [ $XDEB_OPT_EXTRACT = true ]; then
+	clean
+	mkdir -p "$XDEB_BINPKGS"
+	mkdir -p "$XDEB_DATADIR"
+	mkdir -p "$XDEB_DESTDIR"
 
-# Extract the packages
-ar -xf "$XDEB_BASEPKG"
-tar -xf control.tar.?z -C "$XDEB_DATADIR"
-tar -xf data.tar.?z -C "$XDEB_DESTDIR"
+	# Extract the packages
+	ar -xf "$XDEB_BASEPKG"
+	tar -xf control.tar.?z -C "$XDEB_DATADIR"
+	tar -xf data.tar.?z -C "$XDEB_DESTDIR"
+
+	echo "> Extracted files"
+fi
 
 # The variable names are the same as in the regular xbps-src package build
 pkgname=$(grep -Po "Package:[ \t]*\K.*" "$XDEB_DATADIR/control")
