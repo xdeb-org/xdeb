@@ -114,14 +114,14 @@ if [ $XDEB_OPT_QUIT = true ]; then exit 0; fi
 # find last argument
 for XDEB_BASEPKG in "$@"; do true; done
 
-# Does the filename end with .deb? Is the file readable?
-echo "$XDEB_BASEPKG" | grep -q "\.deb$"
-if { test ! $? -eq 0 || test ! -r "$XDEB_BASEPKG"; }; then
-	echo "! Last argument has to point to an existing deb package"
-	exit 1
-fi
-
 if [ $XDEB_OPT_EXTRACT = true ]; then
+	# Does the filename end with .deb? Is the file readable?
+	echo "$XDEB_BASEPKG" | grep -q "\.deb$"
+	if { test ! $? -eq 0 || test ! -r "$XDEB_BASEPKG"; }; then
+		echo "! Last argument has to point to an existing deb package"
+		exit 1
+	fi
+
 	clean
 	mkdir -p "$XDEB_BINPKGS"
 	mkdir -p "$XDEB_DATADIR"
@@ -162,3 +162,14 @@ echo "> 'Parsed' deb control file"
 cd "$XDEB_BINPKGS" || exit
 xbps-create -A "$archs" -n "$pkgname-${version}_1" -m "$maintainer" -s "$short_desc" -S "$long_desc" -l "$license" -D "$XDEP_DEPENDENCIES" "$XDEB_DESTDIR"
 xbps-rindex -a ./*.xbps
+
+find "$XDEB_DESTDIR" | while read -r file; do
+	file_root="$(echo "$file" | tail -c $((${#XDEB_DESTDIR}-${#file}-1)))"
+	if { test -L "$file_root" && test ! -L "$file"; }; then
+		echo '\033[31;1m! This package will break your system\033[0m'
+		echo "> Remove $file and rebuild with -rb flags"
+	elif { test -e "$file_root" && test ! -d "$file"; }; then
+		echo '\033[33;1m! File already present on main system\033[0m'
+		echo "> Consider removing $file and rebuild with -rb flags"
+	fi
+done
