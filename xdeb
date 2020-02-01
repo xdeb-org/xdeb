@@ -1,0 +1,139 @@
+#!/bin/sh
+
+# Directories and filenames
+XDEB_DESTDIR="destdir"
+XDEB_DATADIR="data"
+XDEB_BINPKGS="binpkgs"
+XDEB_SHLIBS="shlibs"
+
+# Options
+XDEB_AUTODEPS=false
+XDEB_BUILD=true
+
+clean () {
+	rm -rf ./*.xbps-pkg-*
+	rm -rf "$XDEB_DESTDIR"
+	rm -rf "$XDEB_DATADIR"
+
+	rm -rf "control.tar.gz"
+	rm -rf "data.tar.xz"
+	rm -rf "debian-binary"
+}
+
+clean_repodata () {
+	rm -rf "$XDEB_BINPKGS"/*-repodata
+}
+
+autodeps () {
+	find "$XDEB_DESTDIR" -type f -name "*.so" | while read -r file; do
+		dependency="$(grep -m 1 -Po "^$(basename "$file") \K.*" $XDEB_SHLIBS)"
+		if [ -n "$dependency" ]; then
+			rm -rf "$file"
+			echo -n "$dependency "
+		fi
+	done
+}
+
+help () {
+	echo "usage: xdeb [-S] [-d] [-h] [-c] [-C] ... FILE"
+	echo "  -d            # Automatic dependencies. Not advised for electron packages"
+	echo "  -S            # Sync runtime dependency file"
+	echo "  -h            # Show this page"
+	echo "  -c            # Clean everything except shlibs and binpkgs"
+	echo "  -r            # Clean repodata (Use when rebuilding a package)"
+	echo "  -e            # Only extract (for testing)"
+	echo;
+	echo "example:"
+	echo "  xdeb -Cc      # Remove all files created by this script"
+	echo "  xdeb -Sd FILE # Sync depdendency list and create package"
+}
+
+for arg in "$@"; do
+	# Does the current argument start with a dash
+	rest="${arg#?}"
+	first="${arg%"$rest"}"
+	tmp="$rest"
+	if [ "${first}" != "-" ]; then break; fi
+
+	while [ -n "$tmp" ]; do
+		rest="${tmp#?}"
+		first="${tmp%"$rest"}"
+		
+		case "$first" in
+			S)
+				curl "https://raw.githubusercontent.com/void-linux/void-packages/master/common/shlibs" \
+					-sSL > shlibs
+				echo "> Synced shlibs";;
+			d)
+				XDEB_AUTODEPS=true
+				if [ ! -r "$XDEB_SHLIBS" ]; then
+					echo "! Sync atleast once, before using the depencency option"
+					exit 1
+				fi;;
+			h)
+				help
+				exit 0;;
+			c)
+				clean
+				exit 0;;
+			e)
+				XDEB_BUILD=false;;
+			r)
+				clean_repodata;;
+			*)
+				echo "! Unknown option -${first}"
+				help
+				exit 1;;
+		esac
+
+		tmp="$rest"
+	done
+done
+
+# find last argument
+for XDEB_BASEPKG in "$@"; do true; done
+
+# Does the filename end with .deb? Is the file readable?
+echo "$XDEB_BASEPKG" | grep -q "\.deb$"
+if { test ! $? -eq 0 || test ! -r "$XDEB_BASEPKG"; }; then
+	echo "! Last argument has to point to an existing deb package"
+	exit 1
+fi
+
+clean
+mkdir -p "$XDEB_BINPKGS"
+mkdir -p "$XDEB_DATADIR"
+mkdir -p "$XDEB_DESTDIR"
+
+ar -xf "$XDEB_BASEPKG"
+tar -xf "control.tar.gz" -C "$XDEB_DATADIR"
+tar -xf "data.tar.xz" -C "$XDEB_DESTDIR"
+
+pkgname=$(grep -Po "Package:[ \t]*\K.*" "$XDEB_DATADIR/control")
+version=$(grep -Po "Version:[ \t]*\K.*" "$XDEB_DATADIR/control")
+license=$(grep -Po "License:[ \t]*\K.*" "$XDEB_DATADIR/control")
+archs=$(grep -Po "Architecture:[ \t]*\K.*" "$XDEB_DATADIR/control")
+maintainer=$(grep -Po "Maintainer:[ \t]*\K.*" "$XDEB_DATADIR/control")
+short_desc=$(grep -Po "Description:[ \t]*\K.*" "$XDEB_DATADIR/control")
+long_desc=$(grep -Pzo "Description:[ \t\n]*\K.*" "$XDEB_DATADIR/control")
+
+if [ -z "$short_desc" ]; then short_desc=$long_desc; fi
+
+version=$(echo "$version" | grep -Po "^(\d|\.)*")
+case "$archs" in
+	amd64) archs="x86_64"
+esac
+
+if [ $XDEB_BUILD = false ]; then
+	echo "> User disabled build, aborting"
+	exit 0
+fi
+
+if [ $XDEB_AUTODEPS = true ]; then
+	echo "> Resolving dependencies"
+	XDEP_DEPENDENCIES="$(autodeps)"
+fi
+
+xbps-create -A "$archs" -n "$pkgname-${version}_1" -m "$maintainer" -s "$short_desc" -S "$long_desc" -l "$license" -D "$XDEP_DEPENDENCIES" "$XDEB_DESTDIR"
+mv "$pkgname-${version}_1.$archs.xbps" "$XDEB_BINPKGS"
+xbps-rindex -a "$XDEB_BINPKGS"/*.xbps
