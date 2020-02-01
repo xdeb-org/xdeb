@@ -26,12 +26,18 @@ clean_repodata () {
 	rm -rf "$XDEB_BINPKGS"/*-repodata
 }
 
+clean_all () {
+	clean
+	rm -rf "$XDEB_BINPKGS"
+	rm -rf "$XDEB_SHLIBS"
+}
+
 autodeps () {
 	find "$XDEB_DESTDIR" -type f -name "*.so" | while read -r file; do
 		dependency="$(grep -m 1 -Po "^$(basename "$file") \K.*" "$XDEB_SHLIBS")"
 		if [ -n "$dependency" ]; then
 			rm -rf "$file"
-			echo -n "$dependency "
+			printf "%s " "$dependency"
 		fi
 	done
 }
@@ -44,9 +50,10 @@ help () {
 	echo "  -c            # Clean everything except shlibs and binpkgs"
 	echo "  -r            # Clean repodata (Use when rebuilding a package)"
 	echo "  -q            # Don't build the package at all"
+	echo "  -C            # Clean all files"
 	echo;
 	echo "example:"
-	echo "  xdeb -Cc      # Remove all files created by this script"
+	echo "  xdeb -Cq      # Remove all files and quit"
 	echo "  xdeb -Sd FILE # Sync depdendency list and create package"
 }
 
@@ -76,6 +83,8 @@ for arg in "$@"; do
 				exit 0;;
 			c)
 				clean;;
+			C)
+				clean_all;;
 			r)
 				clean_repodata;;
 			q)
@@ -137,7 +146,7 @@ esac
 
 if [ $XDEB_OPT_DEPS = true ]; then
 	XDEP_DEPENDENCIES="$(autodeps)"
-	echo "> Resolved dependencies"
+	echo "> Resolved dependencies ($XDEP_DEPENDENCIES)"
 fi
 
 echo "> 'Parsed' deb control file"
