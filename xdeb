@@ -74,7 +74,7 @@ for arg in "$@"; do
 			d)
 				XDEB_OPT_DEPS=true
 				# Move this code to the bottom of the script?
-				if [ ! -r "$XDEB_SHLIBS" ]; then
+				if { test ! -r "$XDEB_SHLIBS" && test $XDEB_OPT_SYNC = false; }; then
 					echo "! Sync atleast once, before using the depencency option"
 					exit 1
 				fi;;
