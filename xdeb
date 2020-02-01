@@ -28,7 +28,7 @@ clean_repodata () {
 
 autodeps () {
 	find "$XDEB_DESTDIR" -type f -name "*.so" | while read -r file; do
-		dependency="$(grep -m 1 -Po "^$(basename "$file") \K.*" $XDEB_SHLIBS)"
+		dependency="$(grep -m 1 -Po "^$(basename "$file") \K.*" "$XDEB_SHLIBS")"
 		if [ -n "$dependency" ]; then
 			rm -rf "$file"
 			echo -n "$dependency "
@@ -113,6 +113,7 @@ mkdir -p "$XDEB_BINPKGS"
 mkdir -p "$XDEB_DATADIR"
 mkdir -p "$XDEB_DESTDIR"
 
+# Extract the packages
 ar -xf "$XDEB_BASEPKG"
 tar -xf "control.tar.gz" -C "$XDEB_DATADIR"
 tar -xf "data.tar.xz" -C "$XDEB_DESTDIR"
@@ -139,6 +140,8 @@ if [ $XDEB_OPT_DEPS = true ]; then
 	echo "> Resolved dependencies"
 fi
 
-cd $XDEB_BINPKGS
+echo "> 'Parsed' deb control file"
+
+cd "$XDEB_BINPKGS" || exit
 xbps-create -A "$archs" -n "$pkgname-${version}_1" -m "$maintainer" -s "$short_desc" -S "$long_desc" -l "$license" -D "$XDEP_DEPENDENCIES" "$XDEB_DESTDIR"
 xbps-rindex -a ./*.xbps
