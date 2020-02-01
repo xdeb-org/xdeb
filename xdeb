@@ -36,7 +36,7 @@ autodeps () {
 }
 
 help () {
-	echo "usage: xdeb [-S] [-d] [-h] [-c] [-C] ... FILE"
+	echo "usage: xdeb [-S] [-d] [-Sd] ... FILE"
 	echo "  -d            # Automatic dependencies. Not advised for electron packages"
 	echo "  -S            # Sync runtime dependency file"
 	echo "  -h            # Show this page"
