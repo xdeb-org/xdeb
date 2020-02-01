@@ -1,14 +1,16 @@
 #!/bin/sh
 
 # Directories and filenames
-XDEB_DESTDIR="destdir"
-XDEB_DATADIR="data"
-XDEB_BINPKGS="binpkgs"
-XDEB_SHLIBS="shlibs"
+XDEB_PKGROOT="$PWD"
+XDEB_DESTDIR="$XDEB_PKGROOT/destdir"
+XDEB_DATADIR="$XDEB_PKGROOT/data"
+XDEB_BINPKGS="$XDEB_PKGROOT/binpkgs"
+XDEB_SHLIBS="$XDEB_PKGROOT/shlibs"
 
 # Options
-XDEB_AUTODEPS=false
-XDEB_BUILD=true
+XDEB_OPT_DEPS=false
+XDEB_OPT_SYNC=false
+XDEB_OPT_QUIT=false
 
 clean () {
 	rm -rf ./*.xbps-pkg-*
@@ -24,27 +26,34 @@ clean_repodata () {
 	rm -rf "$XDEB_BINPKGS"/*-repodata
 }
 
+clean_all () {
+	clean
+	rm -rf "$XDEB_BINPKGS"
+	rm -rf "$XDEB_SHLIBS"
+}
+
 autodeps () {
 	find "$XDEB_DESTDIR" -type f -name "*.so" | while read -r file; do
-		dependency="$(grep -m 1 -Po "^$(basename "$file") \K.*" $XDEB_SHLIBS)"
+		dependency="$(grep -m 1 -Po "^$(basename "$file") \K.*" "$XDEB_SHLIBS")"
 		if [ -n "$dependency" ]; then
 			rm -rf "$file"
-			echo -n "$dependency "
+			printf "%s " "$dependency"
 		fi
 	done
 }
 
 help () {
-	echo "usage: xdeb [-S] [-d] [-h] [-c] [-C] ... FILE"
+	echo "usage: xdeb [-S] [-d] [-Sd] ... FILE"
 	echo "  -d            # Automatic dependencies. Not advised for electron packages"
 	echo "  -S            # Sync runtime dependency file"
 	echo "  -h            # Show this page"
 	echo "  -c            # Clean everything except shlibs and binpkgs"
 	echo "  -r            # Clean repodata (Use when rebuilding a package)"
-	echo "  -e            # Only extract (for testing)"
+	echo "  -q            # Don't build the package at all"
+	echo "  -C            # Clean all files"
 	echo;
 	echo "example:"
-	echo "  xdeb -Cc      # Remove all files created by this script"
+	echo "  xdeb -Cq      # Remove all files and quit"
 	echo "  xdeb -Sd FILE # Sync depdendency list and create package"
 }
 
@@ -61,11 +70,10 @@ for arg in "$@"; do
 		
 		case "$first" in
 			S)
-				curl "https://raw.githubusercontent.com/void-linux/void-packages/master/common/shlibs" \
-					-sSL > shlibs
-				echo "> Synced shlibs";;
+				XDEB_OPT_SYNC=true;;
 			d)
-				XDEB_AUTODEPS=true
+				XDEB_OPT_DEPS=true
+				# Move this code to the bottom of the script?
 				if [ ! -r "$XDEB_SHLIBS" ]; then
 					echo "! Sync atleast once, before using the depencency option"
 					exit 1
@@ -74,12 +82,13 @@ for arg in "$@"; do
 				help
 				exit 0;;
 			c)
-				clean
-				exit 0;;
-			e)
-				XDEB_BUILD=false;;
+				clean;;
+			C)
+				clean_all;;
 			r)
 				clean_repodata;;
+			q)
+				XDEB_OPT_QUIT=true;;
 			*)
 				echo "! Unknown option -${first}"
 				help
@@ -89,6 +98,14 @@ for arg in "$@"; do
 		tmp="$rest"
 	done
 done
+
+if [ $XDEB_OPT_SYNC = true ]; then
+	curl -sSL "https://raw.githubusercontent.com/void-linux/void-packages/master/common/shlibs" > shlibs
+	echo "> Synced shlibs"
+fi
+
+# Quit after parsing every argument argument
+if [ $XDEB_OPT_QUIT = true ]; then exit 0; fi
 
 # find last argument
 for XDEB_BASEPKG in "$@"; do true; done
@@ -105,10 +122,12 @@ mkdir -p "$XDEB_BINPKGS"
 mkdir -p "$XDEB_DATADIR"
 mkdir -p "$XDEB_DESTDIR"
 
+# Extract the packages
 ar -xf "$XDEB_BASEPKG"
 tar -xf "control.tar.gz" -C "$XDEB_DATADIR"
 tar -xf "data.tar.xz" -C "$XDEB_DESTDIR"
 
+# The variable names are the same as in the regular xbps-src package build
 pkgname=$(grep -Po "Package:[ \t]*\K.*" "$XDEB_DATADIR/control")
 version=$(grep -Po "Version:[ \t]*\K.*" "$XDEB_DATADIR/control")
 license=$(grep -Po "License:[ \t]*\K.*" "$XDEB_DATADIR/control")
@@ -117,6 +136,7 @@ maintainer=$(grep -Po "Maintainer:[ \t]*\K.*" "$XDEB_DATADIR/control")
 short_desc=$(grep -Po "Description:[ \t]*\K.*" "$XDEB_DATADIR/control")
 long_desc=$(grep -Pzo "Description:[ \t\n]*\K.*" "$XDEB_DATADIR/control")
 
+# It seems that debian packages don't have to provide a short_desc (XMind-ZEN didn't do it)
 if [ -z "$short_desc" ]; then short_desc=$long_desc; fi
 
 version=$(echo "$version" | grep -Po "^(\d|\.)*")
@@ -124,16 +144,13 @@ case "$archs" in
 	amd64) archs="x86_64"
 esac
 
-if [ $XDEB_BUILD = false ]; then
-	echo "> User disabled build, aborting"
-	exit 0
-fi
-
-if [ $XDEB_AUTODEPS = true ]; then
-	echo "> Resolving dependencies"
+if [ $XDEB_OPT_DEPS = true ]; then
 	XDEP_DEPENDENCIES="$(autodeps)"
+	echo "> Resolved dependencies ($XDEP_DEPENDENCIES)"
 fi
 
+echo "> 'Parsed' deb control file"
+
+cd "$XDEB_BINPKGS" || exit
 xbps-create -A "$archs" -n "$pkgname-${version}_1" -m "$maintainer" -s "$short_desc" -S "$long_desc" -l "$license" -D "$XDEP_DEPENDENCIES" "$XDEB_DESTDIR"
-mv "$pkgname-${version}_1.$archs.xbps" "$XDEB_BINPKGS"
-xbps-rindex -a "$XDEB_BINPKGS"/*.xbps
+xbps-rindex -a ./*.xbps
