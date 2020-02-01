@@ -72,12 +72,7 @@ for arg in "$@"; do
 			S)
 				XDEB_OPT_SYNC=true;;
 			d)
-				XDEB_OPT_DEPS=true
-				# Move this code to the bottom of the script?
-				if { test ! -r "$XDEB_SHLIBS" && test $XDEB_OPT_SYNC = false; }; then
-					echo "! Sync atleast once, before using the depencency option"
-					exit 1
-				fi;;
+				XDEB_OPT_DEPS=true;;
 			h)
 				help
 				exit 0;;
@@ -102,6 +97,11 @@ done
 if [ $XDEB_OPT_SYNC = true ]; then
 	curl -sSL "https://raw.githubusercontent.com/void-linux/void-packages/master/common/shlibs" > shlibs
 	echo "> Synced shlibs"
+fi
+
+if { test $XDEB_OPT_DEPS = true && test ! -r "$XDEB_SHLIBS"; }; then
+	echo "! Sync atleast once, before using the depencency option"
+	exit 1
 fi
 
 # Quit after parsing every argument argument
