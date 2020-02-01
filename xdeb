@@ -17,8 +17,8 @@ clean () {
 	rm -rf "$XDEB_DESTDIR"
 	rm -rf "$XDEB_DATADIR"
 
-	rm -rf "control.tar.gz"
-	rm -rf "data.tar.xz"
+	rm -rf control.tar.?z
+	rm -rf data.tar.?z
 	rm -rf "debian-binary"
 }
 
@@ -124,8 +124,8 @@ mkdir -p "$XDEB_DESTDIR"
 
 # Extract the packages
 ar -xf "$XDEB_BASEPKG"
-tar -xf "control.tar.gz" -C "$XDEB_DATADIR"
-tar -xf "data.tar.xz" -C "$XDEB_DESTDIR"
+tar -xf control.tar.?z -C "$XDEB_DATADIR"
+tar -xf data.tar.?z -C "$XDEB_DESTDIR"
 
 # The variable names are the same as in the regular xbps-src package build
 pkgname=$(grep -Po "Package:[ \t]*\K.*" "$XDEB_DATADIR/control")
