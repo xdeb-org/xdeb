@@ -8,8 +8,9 @@ XDEB_BINPKGS="$XDEB_PKGROOT/binpkgs"
 XDEB_SHLIBS="$XDEB_PKGROOT/shlibs"
 
 # Options
-XDEB_AUTODEPS=false
-XDEB_BUILD=true
+XDEB_OPT_DEPS=false
+XDEB_OPT_SYNC=false
+XDEB_OPT_QUIT=false
 
 clean () {
 	rm -rf ./*.xbps-pkg-*
@@ -42,7 +43,7 @@ help () {
 	echo "  -h            # Show this page"
 	echo "  -c            # Clean everything except shlibs and binpkgs"
 	echo "  -r            # Clean repodata (Use when rebuilding a package)"
-	echo "  -e            # Only extract (for testing)"
+	echo "  -q            # Don't build the package at all"
 	echo;
 	echo "example:"
 	echo "  xdeb -Cc      # Remove all files created by this script"
@@ -62,11 +63,9 @@ for arg in "$@"; do
 		
 		case "$first" in
 			S)
-				curl "https://raw.githubusercontent.com/void-linux/void-packages/master/common/shlibs" \
-					-sSL > shlibs
-				echo "> Synced shlibs";;
+				XDEB_OPT_SYNC=true;;
 			d)
-				XDEB_AUTODEPS=true
+				XDEB_OPT_DEPS=true
 				if [ ! -r "$XDEB_SHLIBS" ]; then
 					echo "! Sync atleast once, before using the depencency option"
 					exit 1
@@ -75,12 +74,11 @@ for arg in "$@"; do
 				help
 				exit 0;;
 			c)
-				clean
-				exit 0;;
-			e)
-				XDEB_BUILD=false;;
+				clean;;
 			r)
 				clean_repodata;;
+			q)
+				XDEB_OPT_QUIT=true;;
 			*)
 				echo "! Unknown option -${first}"
 				help
@@ -90,6 +88,14 @@ for arg in "$@"; do
 		tmp="$rest"
 	done
 done
+
+if [ $XDEB_OPT_SYNC = true ]; then
+	curl -sSL "https://raw.githubusercontent.com/void-linux/void-packages/master/common/shlibs" > shlibs
+	echo "> Synced shlibs"
+fi
+
+# Quit after parsing every argument argument
+if [ $XDEB_OPT_QUIT = true ]; then exit 0; fi
 
 # find last argument
 for XDEB_BASEPKG in "$@"; do true; done
@@ -130,7 +136,7 @@ if [ $XDEB_BUILD = false ]; then
 	exit 0
 fi
 
-if [ $XDEB_AUTODEPS = true ]; then
+if [ $XDEB_OPT_DEPS = true ]; then
 	echo "> Resolving dependencies"
 	XDEP_DEPENDENCIES="$(autodeps)"
 fi
