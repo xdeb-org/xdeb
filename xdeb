@@ -1,10 +1,11 @@
 #!/bin/sh
 
 # Directories and filenames
-XDEB_DESTDIR="destdir"
-XDEB_DATADIR="data"
-XDEB_BINPKGS="binpkgs"
-XDEB_SHLIBS="shlibs"
+XDEB_PKGROOT="$PWD"
+XDEB_DESTDIR="$XDEB_PKGROOT/destdir"
+XDEB_DATADIR="$XDEB_PKGROOT/data"
+XDEB_BINPKGS="$XDEB_PKGROOT/binpkgs"
+XDEB_SHLIBS="$XDEB_PKGROOT/shlibs"
 
 # Options
 XDEB_AUTODEPS=false
@@ -134,6 +135,6 @@ if [ $XDEB_AUTODEPS = true ]; then
 	XDEP_DEPENDENCIES="$(autodeps)"
 fi
 
+cd $XDEB_BINPKGS
 xbps-create -A "$archs" -n "$pkgname-${version}_1" -m "$maintainer" -s "$short_desc" -S "$long_desc" -l "$license" -D "$XDEP_DEPENDENCIES" "$XDEB_DESTDIR"
-mv "$pkgname-${version}_1.$archs.xbps" "$XDEB_BINPKGS"
-xbps-rindex -a "$XDEB_BINPKGS"/*.xbps
+xbps-rindex -a ./*.xbps
