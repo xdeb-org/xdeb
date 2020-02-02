@@ -1,5 +1,6 @@
+#### Don't ignore the logs! XDEB will notify you about package conflicts
+
 # XDEB
-### Don't ignore the logs! XDEB will notify you about package conflicts
 
 Simple utility to convert deb(ian) packages to xbps packages. Written in posix compliant shell.
 
