@@ -1,4 +1,6 @@
 # XDEB
+### Don't ignore the logs! XDEB will notify you about package conflicts
+
 Simple utility to convert deb(ian) packages to xbps packages. Written in posix compliant shell.
 
 ## Contents
@@ -45,7 +47,7 @@ sudo xbps-install -R binpkgs <name>
 
 ### Help Page
 ```sh
-usage: xdeb [-S] [-d] [-Sd] [--md] ... FILE
+usage: xdeb [-S] [-d] [-Sd] [--deps] ... FILE
   -d                       # Automatic dependencies. Generally not needed
   -S                       # Sync runtime dependency file
   -h                       # Show this page

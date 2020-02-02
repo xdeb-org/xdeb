@@ -44,8 +44,24 @@ autodeps () {
 	done
 }
 
+log_message () {
+	echo '\033[1m[\033[36mi\033[0;1m]\033[0m' "$@"
+}
+
+log_success () {
+	echo '\033[1m[\033[32m+\033[0;1m]\033[0m' "$@"
+}
+
+log_failure () {
+	echo '\033[1m[\033[33m-\033[0;1m]\033[0m' "$@"
+}
+
+log_critical () {
+	echo '\033[1m[\033[31m!\033[0;1m]\033[31m' "$@"'\033[0m'
+}
+
 help () {
-	echo "usage: xdeb [-S] [-d] [-Sd] [--md] ... FILE"
+	echo "usage: xdeb [-S] [-d] [-Sd] [--deps] ... FILE"
 	echo "  -d                       # Automatic dependencies. Generally not needed"
 	echo "  -S                       # Sync runtime dependency file"
 	echo "  -h                       # Show this page"
@@ -101,7 +117,7 @@ for arg in "$@"; do
 			e)
 				XDEB_OPT_CLEAN_DIR=true;;
 			*)
-				echo "! Unknown option -${first}"
+				log_failure "Unknown option -${first}"
 				help
 				exit 1;;
 		esac
@@ -112,16 +128,19 @@ done
 
 if [ $XDEB_OPT_SYNC = true ]; then
 	curl -sSL "https://raw.githubusercontent.com/void-linux/void-packages/master/common/shlibs" > shlibs
-	echo "> Synced shlibs"
+	log_success "Synced shlibs"
 fi
 
 if { test $XDEB_OPT_DEPS = true && test ! -r "$XDEB_SHLIBS"; }; then
-	echo "! Sync atleast once, before using the depencency option"
+	log_warning "Sync atleast once, before using the depencency option"
 	exit 1
 fi
 
 # Quit after parsing every argument argument
-if [ $XDEB_OPT_QUIT = true ]; then exit 0; fi
+if [ $XDEB_OPT_QUIT = true ]; then
+	log_message "Quitting before building"
+	exit 0;
+fi
 
 # find last argument
 for XDEB_BASEPKG in "$@"; do true; done
@@ -130,7 +149,7 @@ if [ $XDEB_OPT_EXTRACT = true ]; then
 	# Does the filename end with .deb? Is the file readable?
 	echo "$XDEB_BASEPKG" | grep -q "\.deb$"
 	if { test ! $? -eq 0 || test ! -r "$XDEB_BASEPKG"; }; then
-		echo "! Last argument has to point to an existing deb package"
+		log_failure "Last argument has to point to an existing deb package"
 		exit 1
 	fi
 
@@ -144,7 +163,7 @@ if [ $XDEB_OPT_EXTRACT = true ]; then
 	tar -xf control.tar.?z -C "$XDEB_DATADIR"
 	tar -xf data.tar.?z -C "$XDEB_DESTDIR"
 
-	echo "> Extracted files"
+	log_success "Extracted files"
 fi
 
 # The variable names are the same as in the regular xbps-src package build
@@ -157,7 +176,10 @@ short_desc=$(grep -Po "Description:[ \t]*\K.*" "$XDEB_DATADIR/control")
 long_desc=$(grep -Pzo "Description:[ \t\n]*\K.*" "$XDEB_DATADIR/control")
 
 # It seems that debian packages don't have to provide a short_desc (XMind-ZEN didn't do it)
-if [ -z "$short_desc" ]; then short_desc=$long_desc; fi
+if [ -z "$short_desc" ]; then
+	log_message "short_desc not found, using long_desc instead"
+	short_desc=$long_desc
+fi
 
 version=$(echo "$version" | grep -Po "^(\d|\.)*")
 case "$archs" in
@@ -168,18 +190,18 @@ if [ $XDEB_OPT_DEPS = true ]; then
 	XDEB_DEPENDENCIES="$XDEB_DEPENDENCIES $(autodeps)"
 fi
 
-if [ ! -z "$XDEB_DEPENDENCIES" ]; then
-	echo "> Resolved dependencies ($XDEB_DEPENDENCIES)"
+if [ -n "$XDEB_DEPENDENCIES" ]; then
+	log_success "Resolved dependencies ($XDEB_DEPENDENCIES)"
 fi
 
-echo "> 'Parsed' deb control file"
+log_success "'Parsed' deb control file"
 
 find "$XDEB_DESTDIR" | while read -r file; do
 	# Remove empty directories
 	if [ $XDEB_OPT_CLEAN_DIR = true ]; then
 		if [ ! "$(ls -A "$file")" ]; then
 			rm -rf "$file"
-			echo "> Removed empty directory $file"
+			log_success "Removed empty directory \033[1m$file\033[0m"
 			continue
 		fi
 	fi
@@ -187,14 +209,14 @@ find "$XDEB_DESTDIR" | while read -r file; do
 	# Check for conflicts
 	file_root="$(echo "$file" | tail -c $((${#XDEB_DESTDIR}-${#file}-1)))"
 	if { test -e "$file_root" && { test -f "$file" || test -L "$file_root"; }; }; then
-		echo '\033[31;1m! This package conflicts with another package on your system\033[0m'
-		echo " | Consider removing $file and rebuilding with '-rb' flags"
-		echo " | 'xlocate $file_root' to find out which one"
+		log_critical "This package conflicts with another package on your system"
+		log_message "\033[1mxlocate $file_root\033[0m to find out which one"
+		log_message "Consider removing \033[1m$file\033[0m and rebuild with '-rb'"
 	fi
 done
 
 cd "$XDEB_BINPKGS" || exit
 xbps-create -q -A "$archs" -n "$pkgname-${version}_1" -m "$maintainer" -s "$short_desc" -S "$long_desc" -l "$license" -D "$XDEB_DEPENDENCIES" "$XDEB_DESTDIR"
-echo "> Created Package"
+log_success "\033[1mCreated Package\033[0m"
 xbps-rindex -a ./*.xbps
-echo "> Indexed package"
+log_success "Indexed package"
