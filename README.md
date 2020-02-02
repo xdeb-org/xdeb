@@ -44,20 +44,22 @@ sudo xbps-install -R binpkgs <name>
 
 ### Help Page
 ```sh
-usage: xdeb [-S] [-d] [-Sd] ... FILE
-  -d            # Automatic dependencies. Not advised for electron packages
-  -S            # Sync runtime dependency file
-  -h            # Show this page
-  -c            # Clean everything except shlibs and binpkgs
-  -r            # Clean repodata (Use when rebuilding a package)
-  -q            # Don't build the package at all
-  -C            # Clean all files
-  -b            # No extract, just build files in destdir
-  -e            # Remove empty directories
+usage: xdeb [-S] [-d] [-Sd] [--md] ... FILE
+  -d                       # Automatic dependencies. Generally not needed
+  -S                       # Sync runtime dependency file
+  -h                       # Show this page
+  -c                       # Clean everything except shlibs and binpkgs
+  -r                       # Clean repodata (Use when rebuilding a package)
+  -q                       # Don't build the package at all
+  -C                       # Clean all files
+  -b                       # No extract, just build files in destdir
+  -e                       # Remove empty directories
+  --deps                   # Add manual dependencies
 
 example:
-  xdeb -Cq      # Remove all files and quit
-  xdeb -Sd FILE # Sync depdendency list and create package
+  xdeb -Cq                 # Remove all files and quit
+  xdeb -Sd FILE            # Sync depdendency list and create package
+  xdeb --deps 'ar>0' FILE  # Add ar as a manual dependency and create package
 ```
 
 ## Explanation
