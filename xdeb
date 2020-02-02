@@ -12,6 +12,7 @@ XDEB_OPT_DEPS=false
 XDEB_OPT_SYNC=false
 XDEB_OPT_QUIT=false
 XDEB_OPT_EXTRACT=true
+XDEB_OPT_CLEAN_DIR=false
 
 clean () {
 	rm -rf ./*.xbps-pkg-*
@@ -53,6 +54,7 @@ help () {
 	echo "  -q            # Don't build the package at all"
 	echo "  -C            # Clean all files"
 	echo "  -b            # No extract, just build files in destdir"
+	echo "  -e            # Remove empty directories"
 	echo;
 	echo "example:"
 	echo "  xdeb -Cq      # Remove all files and quit"
@@ -88,6 +90,8 @@ for arg in "$@"; do
 				XDEB_OPT_QUIT=true;;
 			b)
 				XDEB_OPT_EXTRACT=false;;
+			e)
+				XDEB_OPT_CLEAN_DIR=true;;
 			*)
 				echo "! Unknown option -${first}"
 				help
@@ -159,17 +163,27 @@ fi
 
 echo "> 'Parsed' deb control file"
 
-cd "$XDEB_BINPKGS" || exit
-xbps-create -A "$archs" -n "$pkgname-${version}_1" -m "$maintainer" -s "$short_desc" -S "$long_desc" -l "$license" -D "$XDEP_DEPENDENCIES" "$XDEB_DESTDIR"
-xbps-rindex -a ./*.xbps
-
 find "$XDEB_DESTDIR" | while read -r file; do
+	# Remove empty directories
+	if [ $XDEB_OPT_CLEAN_DIR = true ]; then
+		if [ ! "$(ls -A "$file")" ]; then
+			rm -rf "$file"
+			echo "> Removed empty directory $file"
+			continue
+		fi
+	fi
+
+ # Check for conflicts
 	file_root="$(echo "$file" | tail -c $((${#XDEB_DESTDIR}-${#file}-1)))"
-	if { test -L "$file_root" && test ! -L "$file"; }; then
-		echo '\033[31;1m! This package will break your system\033[0m'
-		echo "> Remove $file and rebuild with -rb flags"
-	elif { test -e "$file_root" && test ! -d "$file"; }; then
-		echo '\033[33;1m! File already present on main system\033[0m'
-		echo "> Consider removing $file and rebuild with -rb flags"
+	if { test -e "$file_root" && { test -f "$file" || test -L "$file_root"; }; }; then
+		echo '\033[31;1m! This package conflicts with another package on your system\033[0m'
+		echo " | Consider removing $file and rebuilding with '-rb' flags"
+		echo " | 'xlocate $file_root' to find out which one"
 	fi
 done
+
+cd "$XDEB_BINPKGS" || exit
+xbps-create -q -A "$archs" -n "$pkgname-${version}_1" -m "$maintainer" -s "$short_desc" -S "$long_desc" -l "$license" -D "$XDEP_DEPENDENCIES" "$XDEB_DESTDIR"
+echo "> Created Package"
+xbps-rindex -a ./*.xbps
+echo "> Indexed package"
