@@ -53,6 +53,7 @@ usage: xdeb [-S] [-d] [-Sd] ... FILE
   -q            # Don't build the package at all
   -C            # Clean all files
   -b            # No extract, just build files in destdir
+  -e            # Remove empty directories
 
 example:
   xdeb -Cq      # Remove all files and quit
