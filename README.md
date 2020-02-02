@@ -8,6 +8,7 @@ Simple utility to convert deb(ian) packages to xbps packages. Written in posix c
      - [Manually](#Manually)
      - [With commands](#With%20commands)
    - [Help Page](#Help%20Page)
+     - [Using Manual dependencies](#Using%20Manual%20dependencies)
  - [Explanation](#Explanation)
    - [Reasons to use](#Reasons%20to%20use)
    - [Why DEB packages?](#Why%20DEB%20packages%3F)
@@ -61,6 +62,34 @@ example:
   xdeb -Sd FILE            # Sync depdendency list and create package
   xdeb --deps 'ar>0' FILE  # Add ar as a manual dependency and create package
 ```
+
+#### Using Manual dependencies
+Converting `Minecraft.deb`:
+```sh
+$ ./xdeb --deps 'oracle-jre>8' Minecraft.deb
+# > Extracted files
+# > Resolved dependencies (oracle-jre>8)
+# > 'Parsed' deb control file
+# > Created Package
+# index: skipping `fsearch-trunk-20200122_1' (x86_64), already registered.
+# index: skipping `libpcre3-2_1' (x86_64), already registered.
+# index: added `minecraft-launcher-2.1.11314_1' (x86_64).
+# index: 3 packages registered.
+# > Indexed package
+$ sudo xbps-install -R binpkgs minecraft-launcher
+# Name               Action    Version           New version            Download size
+# wget               install   -                 1.20.3_2               - 
+# oracle-jre         install   -                 8u202_1                82KB 
+# minecraft-launcher install   -                 2.1.11314_1            - 
+# 
+# Size to download:               83KB
+# Size required on disk:         177MB
+# Space available on disk:       416GB
+# 
+# Do you want to continue? [Y/n] n
+# Aborting!
+```
+If the package just depends on a package with no specific version, you have to add `>0` to match any version (i.e. `--deps 'ar>0 base-system>0 curl>0'`)
 
 ## Explanation
 ### Reasons to use
