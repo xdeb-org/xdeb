@@ -45,27 +45,35 @@ autodeps () {
 }
 
 help () {
-	echo "usage: xdeb [-S] [-d] [-Sd] ... FILE"
-	echo "  -d            # Automatic dependencies. Not advised for electron packages"
-	echo "  -S            # Sync runtime dependency file"
-	echo "  -h            # Show this page"
-	echo "  -c            # Clean everything except shlibs and binpkgs"
-	echo "  -r            # Clean repodata (Use when rebuilding a package)"
-	echo "  -q            # Don't build the package at all"
-	echo "  -C            # Clean all files"
-	echo "  -b            # No extract, just build files in destdir"
-	echo "  -e            # Remove empty directories"
+	echo "usage: xdeb [-S] [-d] [-Sd] [--md] ... FILE"
+	echo "  -d                       # Automatic dependencies. Generally not needed"
+	echo "  -S                       # Sync runtime dependency file"
+	echo "  -h                       # Show this page"
+	echo "  -c                       # Clean everything except shlibs and binpkgs"
+	echo "  -r                       # Clean repodata (Use when rebuilding a package)"
+	echo "  -q                       # Don't build the package at all"
+	echo "  -C                       # Clean all files"
+	echo "  -b                       # No extract, just build files in destdir"
+	echo "  -e                       # Remove empty directories"
+	echo "  --deps                   # Add manual dependencies"
 	echo;
 	echo "example:"
-	echo "  xdeb -Cq      # Remove all files and quit"
-	echo "  xdeb -Sd FILE # Sync depdendency list and create package"
+	echo "  xdeb -Cq                 # Remove all files and quit"
+	echo "  xdeb -Sd FILE            # Sync depdendency list and create package"
+	echo "  xdeb --deps 'ar>0' FILE  # Add ar as a manual dependency and create package"
 }
 
+i=0
 for arg in "$@"; do
-	# Does the current argument start with a dash
+	i=$((i + 1))
+	# Does the current argument start with a dash?
 	rest="${arg#?}"
 	first="${arg%"$rest"}"
 	tmp="$rest"
+	if [ "${arg}" = "--deps" ]; then
+		XDEB_DEPENDENCIES="$(eval echo "\${$((i + 1))}")"
+		continue;
+	fi
 	if [ "${first}" != "-" ]; then break; fi
 
 	while [ -n "$tmp" ]; do
@@ -157,8 +165,11 @@ case "$archs" in
 esac
 
 if [ $XDEB_OPT_DEPS = true ]; then
-	XDEP_DEPENDENCIES="$(autodeps)"
-	echo "> Resolved dependencies ($XDEP_DEPENDENCIES)"
+	XDEB_DEPENDENCIES="$XDEB_DEPENDENCIES $(autodeps)"
+fi
+
+if [ ! -z "$XDEB_DEPENDENCIES" ]; then
+	echo "> Resolved dependencies ($XDEB_DEPENDENCIES)"
 fi
 
 echo "> 'Parsed' deb control file"
@@ -183,7 +194,7 @@ find "$XDEB_DESTDIR" | while read -r file; do
 done
 
 cd "$XDEB_BINPKGS" || exit
-xbps-create -q -A "$archs" -n "$pkgname-${version}_1" -m "$maintainer" -s "$short_desc" -S "$long_desc" -l "$license" -D "$XDEP_DEPENDENCIES" "$XDEB_DESTDIR"
+xbps-create -q -A "$archs" -n "$pkgname-${version}_1" -m "$maintainer" -s "$short_desc" -S "$long_desc" -l "$license" -D "$XDEB_DEPENDENCIES" "$XDEB_DESTDIR"
 echo "> Created Package"
 xbps-rindex -a ./*.xbps
 echo "> Indexed package"
