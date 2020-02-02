@@ -173,7 +173,7 @@ find "$XDEB_DESTDIR" | while read -r file; do
 		fi
 	fi
 
- # Check for conflicts
+	# Check for conflicts
 	file_root="$(echo "$file" | tail -c $((${#XDEB_DESTDIR}-${#file}-1)))"
 	if { test -e "$file_root" && { test -f "$file" || test -L "$file_root"; }; }; then
 		echo '\033[31;1m! This package conflicts with another package on your system\033[0m'
