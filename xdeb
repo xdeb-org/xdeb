@@ -45,19 +45,19 @@ autodeps () {
 }
 
 log_message () {
-	echo '\033[1m[\033[36mi\033[0;1m]\033[0m' "$@"
+	echo "$(tput bold)[$(tput setaf 6)i$(tput setaf 7)]$(tput sgr0) $*"
 }
 
 log_success () {
-	echo '\033[1m[\033[32m+\033[0;1m]\033[0m' "$@"
+	echo "$(tput bold)[$(tput setaf 2)+$(tput setaf 7)]$(tput sgr0) $*"
 }
 
 log_failure () {
-	echo '\033[1m[\033[33m-\033[0;1m]\033[0m' "$@"
+	echo "$(tput bold)[$(tput setaf 3)i$(tput setaf 7)]$(tput sgr0) $*"
 }
 
 log_critical () {
-	echo '\033[1m[\033[31m!\033[0;1m]\033[31m' "$@"'\033[0m'
+	echo "$(tput bold)[$(tput setaf 1)!$(tput setaf 7)]$(tput sgr0) $*"
 }
 
 help () {
@@ -201,7 +201,7 @@ find "$XDEB_DESTDIR" | while read -r file; do
 	if [ $XDEB_OPT_CLEAN_DIR = true ]; then
 		if [ ! "$(ls -A "$file")" ]; then
 			rm -rf "$file"
-			log_success "Removed empty directory \033[1m$file\033[0m"
+			log_success "Removed empty directory $file"
 			continue
 		fi
 	fi
@@ -210,13 +210,13 @@ find "$XDEB_DESTDIR" | while read -r file; do
 	file_root="$(echo "$file" | tail -c $((${#XDEB_DESTDIR}-${#file}-1)))"
 	if { test -e "$file_root" && { test -f "$file" || test -L "$file_root"; }; }; then
 		log_critical "This package conflicts with another package on your system"
-		log_message "\033[1mxlocate $file_root\033[0m to find out which one"
-		log_message "Consider removing \033[1m$file\033[0m and rebuild with '-rb'"
+		log_message "xlocate $file_root to find out which one"
+		log_message "Consider removing $file and rebuild with '-rb'"
 	fi
 done
 
 cd "$XDEB_BINPKGS" || exit
 xbps-create -q -A "$archs" -n "$pkgname-${version}_1" -m "$maintainer" -s "$short_desc" -S "$long_desc" -l "$license" -D "$XDEB_DEPENDENCIES" "$XDEB_DESTDIR"
-log_success "\033[1mCreated Package\033[0m"
+log_success "Created Package"
 xbps-rindex -a ./*.xbps
-log_success "Indexed package"
+log_success "Registered package"
