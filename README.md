@@ -59,6 +59,7 @@ usage: xdeb [-S] [-d] [-Sd] [--deps] ... FILE
   -b                       # No extract, just build files in destdir
   -e                       # Remove empty directories
   --deps                   # Add manual dependencies
+  --arch                   # Add an arch for the package to run on
 
 example:
   xdeb -Cq                 # Remove all files and quit
@@ -70,15 +71,14 @@ example:
 Converting `Minecraft.deb`:
 ```sh
 $ ./xdeb --deps 'oracle-jre>8' Minecraft.deb
-# > Extracted files
-# > Resolved dependencies (oracle-jre>8)
-# > 'Parsed' deb control file
-# > Created Package
-# index: skipping `fsearch-trunk-20200122_1' (x86_64), already registered.
-# index: skipping `libpcre3-2_1' (x86_64), already registered.
+# [+] Extracted files
+# ./xdeb: line 182: warning: command substitution: ignored null byte in input
+# [+] Resolved dependencies (oracle-jre>8)
+# [+] 'Parsed' deb control file
+# [+] Created Package
 # index: added `minecraft-launcher-2.1.11314_1' (x86_64).
-# index: 3 packages registered.
-# > Indexed package
+# index: 1 packages registered.
+# [+] Registered package
 $ sudo xbps-install -R binpkgs minecraft-launcher
 # Name               Action    Version           New version            Download size
 # wget               install   -                 1.20.3_2               - 
