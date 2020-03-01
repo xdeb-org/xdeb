@@ -176,7 +176,9 @@ fi
 pkgname=$(grep -Po "Package:[ \t]*\K.*" "$XDEB_DATADIR/control")
 version=$(grep -Po "Version:[ \t]*\K.*" "$XDEB_DATADIR/control")
 license=$(grep -Po "License:[ \t]*\K.*" "$XDEB_DATADIR/control")
-[ -z "${archs}" ] && archs=$(grep -Po "Architecture:[ \t]*\K.*" "$XDEB_DATADIR/control")
+if [ -z "${archs}" ]; then
+	archs=$(grep -Po "Architecture:[ \t]*\K.*" "$XDEB_DATADIR/control")
+fi
 maintainer=$(grep -Po "Maintainer:[ \t]*\K.*" "$XDEB_DATADIR/control")
 short_desc=$(grep -Po "Description:[ \t]*\K.*" "$XDEB_DATADIR/control")
 long_desc=$(grep -Pzo "Description:[ \t\n]*\K.*" "$XDEB_DATADIR/control")
