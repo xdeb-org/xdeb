@@ -72,6 +72,7 @@ help () {
 	echo "  -b                       # No extract, just build files in destdir"
 	echo "  -e                       # Remove empty directories"
 	echo "  --deps                   # Add manual dependencies"
+	echo "  --arch                   # Add an arch for the package to run on"
 	echo;
 	echo "example:"
 	echo "  xdeb -Cq                 # Remove all files and quit"
@@ -86,11 +87,16 @@ for arg in "$@"; do
 	rest="${arg#?}"
 	first="${arg%"$rest"}"
 	tmp="$rest"
-	if [ "${arg}" = "--deps" ]; then
-		XDEB_DEPENDENCIES="$(eval echo "\${$((i + 1))}")"
-		continue;
-	fi
 	if [ "${first}" != "-" ]; then break; fi
+	
+	case "$arg" in
+		--deps)
+			XDEB_DEPENDENCIES="$(eval echo "\${$((i + 1))}")"
+			continue;;
+		--arch)
+			archs="$(eval echo "\${$((i + 1))}")"
+			continue;;
+	esac
 
 	while [ -n "$tmp" ]; do
 		rest="${tmp#?}"
@@ -170,7 +176,7 @@ fi
 pkgname=$(grep -Po "Package:[ \t]*\K.*" "$XDEB_DATADIR/control")
 version=$(grep -Po "Version:[ \t]*\K.*" "$XDEB_DATADIR/control")
 license=$(grep -Po "License:[ \t]*\K.*" "$XDEB_DATADIR/control")
-archs=$(grep -Po "Architecture:[ \t]*\K.*" "$XDEB_DATADIR/control")
+[ -z "${archs}" ] && archs=$(grep -Po "Architecture:[ \t]*\K.*" "$XDEB_DATADIR/control")
 maintainer=$(grep -Po "Maintainer:[ \t]*\K.*" "$XDEB_DATADIR/control")
 short_desc=$(grep -Po "Description:[ \t]*\K.*" "$XDEB_DATADIR/control")
 long_desc=$(grep -Pzo "Description:[ \t\n]*\K.*" "$XDEB_DATADIR/control")
