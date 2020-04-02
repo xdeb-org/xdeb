@@ -25,7 +25,7 @@ clean () {
 }
 
 clean_repodata () {
-	rm -rf "$XDEB_BINPKGS"/*-repodata
+	xbps-rindex -c "$XDEB_BINPKGS"
 }
 
 clean_all () {
