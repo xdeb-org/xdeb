@@ -60,6 +60,13 @@ log_critical () {
 	echo "$(tput bold)[$(tput setaf 1)!$(tput setaf 7)]$(tput sgr0) $*"
 }
 
+check_command() {
+	if ! command -v "$1" > /dev/null 2>&1; then
+		log_critical "Dependency '$1' not found"
+		exit 1
+	fi
+}
+
 help () {
 	echo "usage: xdeb [-S] [-d] [-Sd] [--deps] ... FILE"
 	echo "  -d                       # Automatic dependencies. Generally not needed"
@@ -79,6 +86,12 @@ help () {
 	echo "  xdeb -Sd FILE            # Sync depdendency list and create package"
 	echo "  xdeb --deps 'ar>0' FILE  # Add ar as a manual dependency and create package"
 }
+
+check_command ar
+check_command tar
+check_command curl
+check_command xbps-rindex
+check_command xbps-create
 
 i=0
 for arg in "$@"; do
