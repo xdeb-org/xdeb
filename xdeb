@@ -45,19 +45,19 @@ autodeps () {
 }
 
 log_message () {
-	echo "$(tput bold)[$(tput setaf 6)i$(tput setaf 7)]$(tput sgr0) $*"
+	echo "$(tput bold)[$(tput setaf 6)i$(tput sgr0)$(tput bold)]$(tput sgr0) $*"
 }
 
 log_success () {
-	echo "$(tput bold)[$(tput setaf 2)+$(tput setaf 7)]$(tput sgr0) $*"
+	echo "$(tput bold)[$(tput setaf 2)+$(tput sgr0)$(tput bold)]$(tput sgr0) $*"
 }
 
 log_failure () {
-	echo "$(tput bold)[$(tput setaf 3)i$(tput setaf 7)]$(tput sgr0) $*"
+	echo "$(tput bold)[$(tput setaf 3)i$(tput sgr0)$(tput bold)]$(tput sgr0) $*"
 }
 
 log_critical () {
-	echo "$(tput bold)[$(tput setaf 1)!$(tput setaf 7)]$(tput sgr0) $*"
+	echo "$(tput bold)[$(tput setaf 1)!$(tput sgr0)$(tput bold)]$(tput sgr0) $*"
 }
 
 check_command() {
