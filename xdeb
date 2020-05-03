@@ -1,11 +1,11 @@
 #!/bin/sh
 
 # Directories and filenames
-XDEB_PKGROOT="$PWD"
-XDEB_DESTDIR="$XDEB_PKGROOT/destdir"
-XDEB_DATADIR="$XDEB_PKGROOT/data"
-XDEB_BINPKGS="$XDEB_PKGROOT/binpkgs"
-XDEB_SHLIBS="$XDEB_PKGROOT/shlibs"
+XDEB_PKGROOT="${PWD}"
+XDEB_DESTDIR="${XDEB_PKGROOT}/destdir"
+XDEB_DATADIR="${XDEB_PKGROOT}/data"
+XDEB_BINPKGS="${XDEB_PKGROOT}/binpkgs"
+XDEB_SHLIBS="${XDEB_PKGROOT}/shlibs"
 
 # Options
 XDEB_OPT_DEPS=false
@@ -16,8 +16,8 @@ XDEB_OPT_CLEAN_DIR=false
 
 clean () {
 	rm -rf ./*.xbps-pkg-*
-	rm -rf "$XDEB_DESTDIR"
-	rm -rf "$XDEB_DATADIR"
+	rm -rf "${XDEB_DESTDIR}"
+	rm -rf "${XDEB_DATADIR}"
 
 	rm -rf control.tar.?z
 	rm -rf data.tar.?z
@@ -25,44 +25,44 @@ clean () {
 }
 
 clean_repodata () {
-	rm -rf "$XDEB_BINPKGS"/*-repodata
+	rm -rf "${XDEB_BINPKGS}"/*-repodata
 }
 
 clean_all () {
 	clean
-	rm -rf "$XDEB_BINPKGS"
-	rm -rf "$XDEB_SHLIBS"
+	rm -rf "${XDEB_BINPKGS}"
+	rm -rf "${XDEB_SHLIBS}"
 }
 
 autodeps () {
-	find "$XDEB_DESTDIR" -type f -name "*.so" | while read -r file; do
-		dependency="$(grep -m 1 -Po "^$(basename "$file") \K.*" "$XDEB_SHLIBS")"
-		if [ -n "$dependency" ]; then
-			rm -rf "$file"
-			printf "%s " "$dependency"
+	find "${XDEB_DESTDIR}" -type f -name "*.so" | while read -r file; do
+		dependency="$(grep -m 1 -Po "^$(basename "${file}") \K.*" "${XDEB_SHLIBS}")"
+		if [ -n "${dependency}" ]; then
+			rm -rf "${file}"
+			printf "%s " "${dependency}"
 		fi
 	done
 }
 
 log_message () {
-	echo "$(tput bold)[$(tput setaf 6)i$(tput sgr0)$(tput bold)]$(tput sgr0) $*"
+	echo "$(tput bold)[$(tput setaf 6)i$(tput sgr0)$(tput bold)]$(tput sgr0) ${*}"
 }
 
 log_success () {
-	echo "$(tput bold)[$(tput setaf 2)+$(tput sgr0)$(tput bold)]$(tput sgr0) $*"
+	echo "$(tput bold)[$(tput setaf 2)+$(tput sgr0)$(tput bold)]$(tput sgr0) ${*}"
 }
 
 log_failure () {
-	echo "$(tput bold)[$(tput setaf 3)i$(tput sgr0)$(tput bold)]$(tput sgr0) $*"
+	echo "$(tput bold)[$(tput setaf 3)i$(tput sgr0)$(tput bold)]$(tput sgr0) ${*}"
 }
 
 log_critical () {
-	echo "$(tput bold)[$(tput setaf 1)!$(tput sgr0)$(tput bold)]$(tput sgr0) $*"
+	echo "$(tput bold)[$(tput setaf 1)!$(tput sgr0)$(tput bold)]$(tput sgr0) ${*}"
 }
 
 check_command() {
 	if ! command -v "$1" > /dev/null 2>&1; then
-		log_critical "Dependency '$1' not found"
+		log_critical "Dependency '${1}' not found"
 		exit 1
 	fi
 }
@@ -96,15 +96,15 @@ check_command xbps-rindex
 check_command xbps-create
 
 i=0
-for arg in "$@"; do
+for arg in "${@}"; do
 	i=$((i + 1))
 	# Does the current argument start with a dash?
 	rest="${arg#?}"
-	first="${arg%"$rest"}"
-	tmp="$rest"
+	first="${arg%"${rest}"}"
+	tmp="${rest}"
 	if [ "${first}" != "-" ]; then break; fi
 	
-	case "$arg" in
+	case "${arg}" in
 		--deps)
 			XDEB_DEPENDENCIES="$(eval echo "\${$((i + 1))}")"
 			continue;;
@@ -113,11 +113,11 @@ for arg in "$@"; do
 			continue;;
 	esac
 
-	while [ -n "$tmp" ]; do
+	while [ -n "${tmp}" ]; do
 		rest="${tmp#?}"
-		first="${tmp%"$rest"}"
+		first="${tmp%"${rest}"}"
 		
-		case "$first" in
+		case "${first}" in
 			S)
 				XDEB_OPT_SYNC=true;;
 			d)
@@ -143,22 +143,22 @@ for arg in "$@"; do
 				exit 1;;
 		esac
 
-		tmp="$rest"
+		tmp="${rest}"
 	done
 done
 
-if [ $XDEB_OPT_SYNC = true ]; then
+if [ "${XDEB_OPT_SYNC}" = true ]; then
 	curl -sSL "https://raw.githubusercontent.com/void-linux/void-packages/master/common/shlibs" > shlibs
 	log_success "Synced shlibs"
 fi
 
-if { test $XDEB_OPT_DEPS = true && test ! -r "$XDEB_SHLIBS"; }; then
+if { test "${XDEB_OPT_DEPS}" = true && test ! -r "${XDEB_SHLIBS}"; }; then
 	log_warning "Sync atleast once, before using the depencency option"
 	exit 1
 fi
 
 # Quit after parsing every argument argument
-if [ $XDEB_OPT_QUIT = true ]; then
+if [ "${XDEB_OPT_QUIT}" = true ]; then
 	log_message "Quitting before building"
 	exit 0;
 fi
@@ -166,85 +166,85 @@ fi
 # find last argument
 for XDEB_BASEPKG in "$@"; do true; done
 
-if [ $XDEB_OPT_EXTRACT = true ]; then
+if [ "${XDEB_OPT_EXTRACT}" = true ]; then
 	# Does the filename end with .deb? Is the file readable?
-	echo "$XDEB_BASEPKG" | grep -q "\.deb$"
-	if { test ! $? -eq 0 || test ! -r "$XDEB_BASEPKG"; }; then
+	echo "${XDEB_BASEPKG}" | grep -q "\.deb$"
+	if { test ! $? -eq 0 || test ! -r "${XDEB_BASEPKG}"; }; then
 		log_failure "Last argument has to point to an existing deb package"
 		exit 1
 	fi
 
 	clean
-	mkdir -p "$XDEB_BINPKGS"
-	mkdir -p "$XDEB_DATADIR"
-	mkdir -p "$XDEB_DESTDIR"
+	mkdir -p "${XDEB_BINPKGS}"
+	mkdir -p "${XDEB_DATADIR}"
+	mkdir -p "${XDEB_DESTDIR}"
 
 	# Extract the packages
-	ar -xf "$XDEB_BASEPKG"
-	tar -xf control.tar.?z -C "$XDEB_DATADIR"
-	tar -xf data.tar.?z -C "$XDEB_DESTDIR"
+	ar -xf "${XDEB_BASEPKG}"
+	tar -xf control.tar.?z -C "${XDEB_DATADIR}"
+	tar -xf data.tar.?z -C "${XDEB_DESTDIR}"
 
 	log_success "Extracted files"
 fi
 
 # The variable names are the same as in the regular xbps-src package build
-pkgname=$(grep -Po "Package:[ \t]*\K.*" "$XDEB_DATADIR/control")
-version=$(grep -Po "Version:[ \t]*\K.*" "$XDEB_DATADIR/control")
-license=$(grep -Po "License:[ \t]*\K.*" "$XDEB_DATADIR/control")
+pkgname=$(grep -Po "Package:[ \t]*\K.*" "${XDEB_DATADIR}/control")
+version=$(grep -Po "Version:[ \t]*\K.*" "${XDEB_DATADIR}/control")
+license=$(grep -Po "License:[ \t]*\K.*" "${XDEB_DATADIR}/control")
 if [ -z "${archs}" ]; then
-	archs=$(grep -Po "Architecture:[ \t]*\K.*" "$XDEB_DATADIR/control")
+	archs=$(grep -Po "Architecture:[ \t]*\K.*" "${XDEB_DATADIR}/control")
 fi
-maintainer=$(grep -Po "Maintainer:[ \t]*\K.*" "$XDEB_DATADIR/control")
-short_desc=$(grep -Po "Description:[ \t]*\K.*" "$XDEB_DATADIR/control")
-long_desc=$(grep -Pzo "Description:[ \t\n]*\K.*" "$XDEB_DATADIR/control")
+maintainer=$(grep -Po "Maintainer:[ \t]*\K.*" "${XDEB_DATADIR}/control")
+short_desc=$(grep -Po "Description:[ \t]*\K.*" "${XDEB_DATADIR}/control")
+long_desc=$(grep -Pzo "Description:[ \t\n]*\K.*" "${XDEB_DATADIR}/control")
 
 # It seems that debian packages don't have to provide a short_desc (XMind-ZEN didn't do it)
-if [ -z "$short_desc" ]; then
+if [ -z "${short_desc}" ]; then
 	log_message "short_desc not found, using long_desc instead"
-	short_desc=$long_desc
+	short_desc="${long_desc}"
 fi
 
-version=$(echo "$version" | grep -Po "^(\d|\.)*")
-case "$archs" in
+version=$(echo "${version}" | grep -Po "^(\d|\.)*")
+case "${archs}" in
 	amd64) archs="x86_64"
 esac
 
-if [ $XDEB_OPT_DEPS = true ]; then
-	XDEB_DEPENDENCIES="$XDEB_DEPENDENCIES $(autodeps)"
+if [ "${XDEB_OPT_DEPS}" = true ]; then
+	XDEB_DEPENDENCIES="${XDEB_DEPENDENCIES} $(autodeps)"
 fi
 
-if [ -n "$XDEB_DEPENDENCIES" ]; then
-	log_success "Resolved dependencies ($XDEB_DEPENDENCIES)"
+if [ -n "${XDEB_DEPENDENCIES}" ]; then
+	log_success "Resolved dependencies (${XDEB_DEPENDENCIES})"
 fi
 
 log_success "'Parsed' deb control file"
 
 warned=false
-find "$XDEB_DESTDIR" | while read -r file; do
+find "${XDEB_DESTDIR}" | while read -r file; do
 	# Remove empty directories
-	if [ $XDEB_OPT_CLEAN_DIR = true ]; then
-		if [ ! "$(ls -A "$file")" ]; then
-			rm -rf "$file"
-			log_success "Removed empty directory $file"
+	if [ "${XDEB_OPT_CLEAN_DIR}" = true ]; then
+		if [ ! "$(ls -A "${file}")" ]; then
+			rm -rf "${file}"
+			log_success "Removed empty directory ${file}"
 			continue
 		fi
 	fi
 
 	# Check for conflicts
-	file_root="$(echo "$file" | tail -c $((${#XDEB_DESTDIR}-${#file}-1)))"
-	if { test -e "$file_root" && { test -f "$file" || test -L "$file_root"; }; }; then
-		if [ $warned = false ]; then
+	file_root="$(echo "${file}" | tail -c $((${#XDEB_DESTDIR}-${#file}-1)))"
+	if { test -e "${file_root}" && { test -f "${file}" || test -L "${file_root}"; }; }; then
+		if [ "${warned}" = false ]; then
 			log_critical "This package conflicts with another package on your system"
-			log_message "xlocate $file_root to find out which one"
+			log_message "xlocate ${file_root} to find out which one"
 			warned=true
 		fi
 		
-		log_message "Consider removing $file and rebuild with '-rb'"
+		log_message "Consider removing ${file} and rebuild with '-rb'"
 	fi
 done
 
-cd "$XDEB_BINPKGS" || exit
-xbps-create -q -A "$archs" -n "$pkgname-${version}_1" -m "$maintainer" -s "$short_desc" -S "$long_desc" -l "$license" -D "$XDEB_DEPENDENCIES" "$XDEB_DESTDIR"
+cd "${XDEB_BINPKGS}" || exit
+xbps-create -q -A "${archs}" -n "${pkgname}-${version}_1" -m "${maintainer}" -s "${short_desc}" -S "${long_desc}" -l "${license}" -D "${XDEB_DEPENDENCIES}" "${XDEB_DESTDIR}"
 log_success "Created Package"
 xbps-rindex -a ./*.xbps
 log_success "Registered package"
