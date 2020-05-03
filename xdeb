@@ -68,23 +68,25 @@ check_command() {
 }
 
 help () {
-	echo "usage: xdeb [-S] [-d] [-Sd] [--deps] ... FILE"
-	echo "  -d                       # Automatic dependencies. Generally not needed"
-	echo "  -S                       # Sync runtime dependency file"
-	echo "  -h                       # Show this page"
-	echo "  -c                       # Clean everything except shlibs and binpkgs"
-	echo "  -r                       # Clean repodata (Use when rebuilding a package)"
-	echo "  -q                       # Don't build the package at all"
-	echo "  -C                       # Clean all files"
-	echo "  -b                       # No extract, just build files in destdir"
-	echo "  -e                       # Remove empty directories"
-	echo "  --deps                   # Add manual dependencies"
-	echo "  --arch                   # Add an arch for the package to run on"
-	echo;
-	echo "example:"
-	echo "  xdeb -Cq                 # Remove all files and quit"
-	echo "  xdeb -Sd FILE            # Sync depdendency list and create package"
-	echo "  xdeb --deps 'ar>0' FILE  # Add ar as a manual dependency and create package"
+	cat << EOF
+usage: xdeb [-S] [-d] [-Sd] [--deps] ... FILE
+  -d                       # Automatic dependencies. Generally not needed
+  -S                       # Sync runtime dependency file
+  -h                       # Show this page
+  -c                       # Clean everything except shlibs and binpkgs
+  -r                       # Clean repodata (Use when rebuilding a package)
+  -q                       # Don't build the package at all
+  -C                       # Clean all files
+  -b                       # No extract, just build files in destdir
+  -e                       # Remove empty directories
+  --deps                   # Add manual dependencies
+  --arch                   # Add an arch for the package to run on
+
+example:
+  xdeb -Cq                 # Remove all files and quit
+  xdeb -Sd FILE            # Sync depdendency list and create package
+  xdeb --deps 'ar>0' FILE  # Add ar as a manual dependency and create package
+EOF
 }
 
 check_command ar
