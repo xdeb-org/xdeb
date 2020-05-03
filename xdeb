@@ -111,6 +111,10 @@ for arg in "${@}"; do
 		--arch)
 			archs="$(eval echo "\${$((i + 1))}")"
 			continue;;
+		*)
+			log_failure "Unknown option -${arg}"
+			help
+			exit 1
 	esac
 
 	while [ -n "${tmp}" ]; do
@@ -206,7 +210,8 @@ fi
 
 version=$(echo "${version}" | grep -Po "^(\d|\.)*")
 case "${archs}" in
-	amd64) archs="x86_64"
+	amd64) archs="x86_64";;
+	*);;
 esac
 
 if [ "${XDEB_OPT_DEPS}" = true ]; then
