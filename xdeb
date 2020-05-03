@@ -219,6 +219,7 @@ fi
 
 log_success "'Parsed' deb control file"
 
+warned=false
 find "$XDEB_DESTDIR" | while read -r file; do
 	# Remove empty directories
 	if [ $XDEB_OPT_CLEAN_DIR = true ]; then
@@ -232,8 +233,12 @@ find "$XDEB_DESTDIR" | while read -r file; do
 	# Check for conflicts
 	file_root="$(echo "$file" | tail -c $((${#XDEB_DESTDIR}-${#file}-1)))"
 	if { test -e "$file_root" && { test -f "$file" || test -L "$file_root"; }; }; then
-		log_critical "This package conflicts with another package on your system"
-		log_message "xlocate $file_root to find out which one"
+		if [ $warned = false ]; then
+			log_critical "This package conflicts with another package on your system"
+			log_message "xlocate $file_root to find out which one"
+			warned=true
+		fi
+		
 		log_message "Consider removing $file and rebuild with '-rb'"
 	fi
 done
