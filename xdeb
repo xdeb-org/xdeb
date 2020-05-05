@@ -13,6 +13,7 @@ XDEB_OPT_SYNC=false
 XDEB_OPT_QUIT=false
 XDEB_OPT_EXTRACT=true
 XDEB_OPT_CLEAN_DIR=false
+XDEB_SUFFIX=""
 
 clean () {
 	rm -rf ./*.xbps-pkg-*
@@ -41,7 +42,7 @@ autodeps () {
 		ldd "${f}" 2> /dev/null | grep -Po "^[ \t]*\K[^\/]*(?= \=\>)" | while read -r lib; do
 			dependency="$(grep -m1 -Po "^${lib} \K[^ ]*(?=-)" "${XDEB_SHLIBS}" | tr -d '\n')"
 			if [ -z "${dependency}" ]; then continue; fi
-			echo "${dependency}>=0"
+			echo "${dependency}${XDEB_SUFFIX}>=0"
 		done
 	done | sort -u | tr '\n' ' '
 }
@@ -81,6 +82,7 @@ usage: xdeb [-S] [-d] [-Sd] [--deps] ... FILE
   -C                       # Clean all files
   -b                       # No extract, just build files in destdir
   -e                       # Remove empty directories
+  -m                       # Add the -32bit suffix
   --deps                   # Add manual dependencies
   --arch                   # Add an arch for the package to run on
 
@@ -140,6 +142,8 @@ for arg in "${@}"; do
 				XDEB_OPT_EXTRACT=false;;
 			e)
 				XDEB_OPT_CLEAN_DIR=true;;
+			m)
+				XDEB_SUFFIX="-32bit";;
 			*)
 				log_failure "Unknown option -${first}"
 				help
@@ -249,7 +253,7 @@ find "${XDEB_DESTDIR}" | while read -r file; do
 done
 
 cd "${XDEB_BINPKGS}" || exit
-xbps-create -q -A "${archs}" -n "${pkgname}-${version}_1" -m "${maintainer}" -s "${short_desc}" -S "${long_desc}" -l "${license}" -D "${XDEB_DEPENDENCIES}" "${XDEB_DESTDIR}"
+xbps-create -q -A "${archs}" -n "${pkgname}${XDEB_SUFFIX}-${version}_1" -m "${maintainer}" -s "${short_desc}" -S "${long_desc}" -l "${license}" -D "${XDEB_DEPENDENCIES}" "${XDEB_DESTDIR}"
 log_success "Created Package"
 xbps-rindex -a ./*.xbps
 log_success "Registered package"
