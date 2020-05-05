@@ -10,6 +10,7 @@ Simple utility to convert deb(ian) packages to xbps packages. Written in posix c
    - [Installation](#Installation)
    - [Converting your package](#Converting%20your%20package)
      - [Automatic Dependencies](#Automatic%20Dependencies)
+			  - [Converting i386 package](#Multilib)
    - [Help Page](#Help%20Page)
      - [Using Manual dependencies](#Using%20Manual%20dependencies)
  - [Explanation](#Explanation)
@@ -33,6 +34,14 @@ However if you like to install it, copy it to `/usr/local/bin/`.
 xdeb can now resolve the runtime dependencies.\
 This allows reliably conversion for nearly all deb packages.
 
+#### Multilib
+The `-m` flag adds the `-32bit` suffix to the package and all dependencies.
+You need to enable the multilib repositories first.\
+The example shows how to convert a `32bit` package.
+```sh
+./xdeb -Sedm --arch x86_64 ~/Downloads/Simplenote-linux-1.16.0-beta1-i386.deb
+```
+
 ### Help Page
 ```sh
 usage: xdeb [-S] [-d] [-Sd] [--deps] ... FILE
@@ -45,6 +54,7 @@ usage: xdeb [-S] [-d] [-Sd] [--deps] ... FILE
   -C                       # Clean all files
   -b                       # No extract, just build files in destdir
   -e                       # Remove empty directories
+  -m                       # Add the -32bit suffix
   --deps                   # Add manual dependencies
   --arch                   # Add an arch for the package to run on
 
@@ -52,7 +62,6 @@ example:
   xdeb -Cq                 # Remove all files and quit
   xdeb -Sd FILE            # Sync depdendency list and create package
   xdeb --deps 'ar>0' FILE  # Add ar as a manual dependency and create package
-
 ```
 
 #### Using Manual dependencies
