@@ -8,6 +8,7 @@ Simple utility to convert deb(ian) packages to xbps packages. Written in posix c
  - [Usage](#Usage)
    - [Installation](#Installation)
    - [Converting your package](#Converting%20your%20package)
+     - [Automatic Dependencies](#Automatic%20Dependencies)
      - [Manually](#Manually)
      - [With commands](#With%20commands)
    - [Help Page](#Help%20Page)
@@ -24,6 +25,11 @@ There is no need to install this script, because it is not meant to be installed
 However if you like to install it, copy it to `/usr/local/bin/`.
 
 ### Converting your package
+#### Automatic Dependencies
+xdeb can now resolve the runtime dependencies.\
+
+This allows reliably conversion for nearly all deb packages.
+
 #### Manually
 1. Clone this repository into any directory you like.
 2. Create a new directory (Your working directory will be altered) (for example `$HOME/.xdeb`).
@@ -49,7 +55,7 @@ sudo xbps-install -R binpkgs <name>
 ### Help Page
 ```sh
 usage: xdeb [-S] [-d] [-Sd] [--deps] ... FILE
-  -d                       # Automatic dependencies. Generally not needed
+  -d                       # Automatic dependencies
   -S                       # Sync runtime dependency file
   -h                       # Show this page
   -c                       # Clean everything except shlibs and binpkgs
@@ -65,6 +71,7 @@ example:
   xdeb -Cq                 # Remove all files and quit
   xdeb -Sd FILE            # Sync depdendency list and create package
   xdeb --deps 'ar>0' FILE  # Add ar as a manual dependency and create package
+
 ```
 
 #### Using Manual dependencies
