@@ -34,14 +34,16 @@ clean_all () {
 	rm -rf "${XDEB_SHLIBS}"
 }
 
-autodeps() {
+autodeps () {
 	find "${XDEB_DESTDIR}" -type f | while read -r f; do
 		if ! file -b "${f}" | grep -i "ELF" > /dev/null 2>&1; then continue; fi
 
 		ldd "${f}" 2> /dev/null | grep -Po "^[ \t]*\K[^\/]*(?= \=\>)" | while read -r lib; do
-			grep -m1 -Po "^${lib} \K.*\$" "${XDEB_SHLIBS}"
+			dependency="$(grep -m1 -Po "^${lib} \K[^ ]*(?=-)" "${XDEB_SHLIBS}" | tr -d '\n')"
+			if [ -z "${dependency}" ]; then continue; fi
+			echo "${dependency}>=0"
 		done
-	done | sort -u
+	done | sort -u | tr '\n' ' '
 }
 
 log_message () {
