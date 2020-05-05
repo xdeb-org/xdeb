@@ -199,7 +199,7 @@ if [ -z "${archs}" ]; then
 fi
 maintainer=$(grep -Po "Maintainer:[ \t]*\K.*" "${XDEB_DATADIR}/control")
 short_desc=$(grep -Po "Description:[ \t]*\K.*" "${XDEB_DATADIR}/control")
-long_desc=$(grep -Pzo "Description:[ \t\n]*\K.*" "${XDEB_DATADIR}/control")
+long_desc=$(grep -Pzo "Description:[ \t\n]*\K.*" "${XDEB_DATADIR}/control" | tr '\0' '\n')
 
 # It seems that debian packages don't have to provide a short_desc (XMind-ZEN didn't do it)
 if [ -z "${short_desc}" ]; then
