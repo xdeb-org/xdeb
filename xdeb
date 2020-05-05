@@ -111,10 +111,7 @@ for arg in "${@}"; do
 		--arch)
 			archs="$(eval echo "\${$((i + 1))}")"
 			continue;;
-		*)
-			log_failure "Unknown option -${arg}"
-			help
-			exit 1
+		*);;
 	esac
 
 	while [ -n "${tmp}" ]; do
