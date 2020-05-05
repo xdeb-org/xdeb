@@ -1,4 +1,5 @@
 #### Don't ignore the logs! XDEB will notify you about package conflicts
+#### The code pushed to master might not fully work. Please use releases instead
 
 # XDEB
 
@@ -9,8 +10,6 @@ Simple utility to convert deb(ian) packages to xbps packages. Written in posix c
    - [Installation](#Installation)
    - [Converting your package](#Converting%20your%20package)
      - [Automatic Dependencies](#Automatic%20Dependencies)
-     - [Manually](#Manually)
-     - [With commands](#With%20commands)
    - [Help Page](#Help%20Page)
      - [Using Manual dependencies](#Using%20Manual%20dependencies)
  - [Explanation](#Explanation)
@@ -25,32 +24,14 @@ There is no need to install this script, because it is not meant to be installed
 However if you like to install it, copy it to `/usr/local/bin/`.
 
 ### Converting your package
+1. Download the latest release
+2. Make the xdeb script executable (`chmod 0744 xdeb`)
+3. Convert the package (`./xdeb -Sde <name>_<version>_<arch>.deb`)
+4. Install the package (`xbps-install -R binpkgs <name>`)
+
 #### Automatic Dependencies
 xdeb can now resolve the runtime dependencies.\
-
 This allows reliably conversion for nearly all deb packages.
-
-#### Manually
-1. Clone this repository into any directory you like.
-2. Create a new directory (Your working directory will be altered) (for example `$HOME/.xdeb`).
-3. Open a terminal in the newly created directory
-4. Convert your package using  `./xdeb <path>/<name>-<version>-<arch>.deb`
-
-To get help on converting a package, use `./xdeb -h`\
-\
-When building a package multiple times (for example if you forgot to add the `-d` flag),\
-**You have to** supply the `-r` flag, or delete the repodata manually.\
-\
-Your package will be located at `binpkgs/<name>-<version>.<arch>.xbps`.\
-Install the package using `sudo xbps-install -R binpkgs <name>`.
-
-#### With commands
-```sh
-git clone https://github.com/toluschr/xdeb
-cd xdeb
-./xdeb <name>-<version>-<arch>.deb
-sudo xbps-install -R binpkgs <name>
-```
 
 ### Help Page
 ```sh
