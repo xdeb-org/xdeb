@@ -34,14 +34,14 @@ clean_all () {
 	rm -rf "${XDEB_SHLIBS}"
 }
 
-autodeps () {
-	find "${XDEB_DESTDIR}" -type f -name "*.so" | while read -r file; do
-		dependency="$(grep -m 1 -Po "^$(basename "${file}") \K.*" "${XDEB_SHLIBS}")"
-		if [ -n "${dependency}" ]; then
-			rm -rf "${file}"
-			printf "%s " "${dependency}"
-		fi
-	done
+autodeps() {
+	find "${XDEB_DESTDIR}" -type f | while read -r f; do
+		if ! file -b "${f}" | grep -i "ELF" > /dev/null 2>&1; then continue; fi
+
+		ldd "${f}" 2> /dev/null | grep -Po "^[ \t]*\K[^\/]*(?= \=\>)" | while read -r lib; do
+			grep -m1 -Po "^${lib} \K.*\$" "${XDEB_SHLIBS}"
+		done
+	done | sort -u
 }
 
 log_message () {
@@ -225,7 +225,7 @@ warned=false
 find "${XDEB_DESTDIR}" | while read -r file; do
 	# Remove empty directories
 	if [ "${XDEB_OPT_CLEAN_DIR}" = true ]; then
-		if [ ! "$(ls -A "${file}")" ]; then
+		if [ -z "$(ls -A "${file}")" ]; then
 			rm -rf "${file}"
 			log_success "Removed empty directory ${file}"
 			continue
