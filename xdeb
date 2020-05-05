@@ -149,7 +149,7 @@ for arg in "${@}"; do
 done
 
 if [ "${XDEB_OPT_SYNC}" = true ]; then
-	curl -sSL "https://raw.githubusercontent.com/void-linux/void-packages/master/common/shlibs" > shlibs
+	curl -sO "https://raw.githubusercontent.com/void-linux/void-packages/master/common/shlibs"
 	log_success "Synced shlibs"
 fi
 
