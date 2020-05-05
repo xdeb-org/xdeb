@@ -70,7 +70,7 @@ check_command() {
 help () {
 	cat << EOF
 usage: xdeb [-S] [-d] [-Sd] [--deps] ... FILE
-  -d                       # Automatic dependencies. Generally not needed
+  -d                       # Automatic dependencies
   -S                       # Sync runtime dependency file
   -h                       # Show this page
   -c                       # Clean everything except shlibs and binpkgs
