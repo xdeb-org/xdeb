@@ -84,7 +84,7 @@ usage: xdeb [-S] [-d] [-Sd] [--deps] ... FILE
   -b                       # No extract, just build files in destdir
   -e                       # Remove empty directories
   -m                       # Add the -32bit suffix
-		-i                       # Ignore file conflicts
+  -i                       # Ignore file conflicts
   --deps                   # Add manual dependencies
   --arch                   # Add an arch for the package to run on
 
