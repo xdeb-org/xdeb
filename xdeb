@@ -13,6 +13,7 @@ XDEB_OPT_SYNC=false
 XDEB_OPT_QUIT=false
 XDEB_OPT_EXTRACT=true
 XDEB_OPT_CLEAN_DIR=false
+XDEB_OPT_WARN_CONFLICT=true
 XDEB_SUFFIX=""
 
 clean () {
@@ -83,6 +84,7 @@ usage: xdeb [-S] [-d] [-Sd] [--deps] ... FILE
   -b                       # No extract, just build files in destdir
   -e                       # Remove empty directories
   -m                       # Add the -32bit suffix
+		-i                       # Ignore file conflicts
   --deps                   # Add manual dependencies
   --arch                   # Add an arch for the package to run on
 
@@ -144,6 +146,8 @@ for arg in "${@}"; do
 				XDEB_OPT_CLEAN_DIR=true;;
 			m)
 				XDEB_SUFFIX="-32bit";;
+			i)
+				XDEB_OPT_WARN_CONFLICT=false;;
 			*)
 				log_failure "Unknown option -${first}"
 				help
@@ -228,7 +232,6 @@ fi
 
 log_success "'Parsed' deb control file"
 
-warned=false
 find "${XDEB_DESTDIR}" | while read -r file; do
 	# Remove empty directories
 	if [ "${XDEB_OPT_CLEAN_DIR}" = true ]; then
@@ -240,16 +243,11 @@ find "${XDEB_DESTDIR}" | while read -r file; do
 	fi
 
 	# Check for conflicts
-	file_root="$(echo "${file}" | tail -c $((${#XDEB_DESTDIR}-${#file}-1)))"
-	if { test -e "${file_root}" && { test -f "${file}" || test -L "${file_root}"; }; }; then
-		if [ "${warned}" = false ]; then
-			log_critical "This package conflicts with another package on your system"
-			log_message "xlocate ${file_root} to find out which one"
-			warned=true
-		fi
-		
-		log_message "Consider removing ${file} and rebuild with '-rb'"
-	fi
+	if [ "${XDEB_OPT_WARN_CONFLICT}" != true ]; then continue; fi
+
+	file_root="${file#${XDEB_DESTDIR}*}"
+	[ -e "${file_root}" ] || [ -d "${file_root}" ] && [ -d "${file}" ] && continue
+	log_critical "CONFLICT: \"${file}\" (Consider removing and rebuild with -rb)"
 done
 
 cd "${XDEB_BINPKGS}" || exit
