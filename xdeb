@@ -246,7 +246,8 @@ find "${XDEB_DESTDIR}" | while read -r file; do
 	if [ "${XDEB_OPT_WARN_CONFLICT}" != true ]; then continue; fi
 
 	file_root="${file#${XDEB_DESTDIR}*}"
-	[ -e "${file_root}" ] || [ -d "${file_root}" ] && [ -d "${file}" ] && continue
+	[ -e "${file_root}" ] || continue
+	[ -d "${file_root}" ] && [ -d "${file}" ] && continue
 	log_critical "CONFLICT: \"${file}\" (Consider removing and rebuild with -rb)"
 done
 
