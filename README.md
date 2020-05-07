@@ -9,6 +9,7 @@ Simple utility to convert deb(ian) packages to xbps packages. Written in posix c
  - [Usage](#Usage)
    - [Installation](#Installation)
    - [Converting your package](#Converting-your-package)
+					- [Which flags to use?](#Flags)
      - [Automatic Dependencies](#Automatic-Dependencies)
      - [Converting i386 package](#Multilib)
      - [File Conflicts](#File-Conflicts)
@@ -30,6 +31,9 @@ However if you like to install it, copy it to `/usr/local/bin/`.
 2. Make the xdeb script executable (`chmod 0744 xdeb`)
 3. Convert the package (`./xdeb -Sde <name>_<version>_<arch>.deb`)
 4. Install the package (`xbps-install -R binpkgs <name>`)
+
+#### Flags
+You should generally run xdeb with `-Sde`,which stands for "Sync dependency file, enable dependencies, Remove empty directories".
 
 #### Automatic Dependencies
 xdeb can now resolve the runtime dependencies.\
