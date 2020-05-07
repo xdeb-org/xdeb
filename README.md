@@ -77,15 +77,16 @@ example:
 #### Using Manual dependencies
 Converting `Minecraft.deb`:
 ```sh
-$ ./xdeb --deps 'oracle-jre>8' Minecraft.deb
+$ ./xdeb -Sedr --deps 'oracle-jre>=8' ~/Downloads/Minecraft.deb
+# [+] Synced shlibs
 # [+] Extracted files
-# ./xdeb: line 182: warning: command substitution: ignored null byte in input
-# [+] Resolved dependencies (oracle-jre>8)
+# [+] Resolved dependencies (oracle-jre>=8 alsa-lib>=0 atk>=0 at-spi2-atk>=0 at-spi2-core>=0 avahi-libs>=0 bzip2>=0 cairo>=0 dbus-glib>=0 dbus-libs>=0 expat>=0 fontconfig>=0 freetype>=0 fribidi>=0 GConf>=0 gdk-pixbuf>=0 glib>=0 glibc>=0 gmp>=0 gnutls>=0 graphite>=0 gtk+>=0 gtk+3>=0 libblkid>=0 libcups>=0 libdatrie>=0 libEGL>=0 libepoxy>=0 libffi>=0 libgcc>=0 libGL>=0 libglvnd>=0 libharfbuzz>=0 libidn2>=0 libmount>=0 libpcre>=0 libpng>=0 libtasn1>=0 libthai>=0 libunistring>=0 libuuid>=0 libX11>=0 libXau>=0 libxcb>=0 libXcomposite>=0 libXcursor>=0 libXdamage>=0 libXdmcp>=0 libXext>=0 libXfixes>=0 libXi>=0 libXinerama>=0 libxkbcommon>=0 libXrandr>=0 libXrender>=0 libXScrnSaver>=0 libXtst>=0 nettle>=0 nspr>=0 nss>=0 p11-kit>=0 pango>=0 pixman>=0 wayland>=0 zlib>=0)
 # [+] 'Parsed' deb control file
 # [+] Created Package
-# index: added `minecraft-launcher-2.1.11314_1' (x86_64).
+# index: added `minecraft-launcher-2.1.13829_1' (x86_64).
 # index: 1 packages registered.
 # [+] Registered package
+
 $ sudo xbps-install -R binpkgs minecraft-launcher
 # Name               Action    Version           New version            Download size
 # wget               install   -                 1.20.3_2               - 
