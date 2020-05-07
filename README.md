@@ -118,3 +118,4 @@ You can expect nearly every Linux application to provide a binary deb package.
  - Convert a package
  - Restore changes made by this script
  - Dependency resolving (`xdeb -Sd`)
+ - Show conflicting files
