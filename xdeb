@@ -71,10 +71,10 @@ autodeps () {
 }
 
 check_command() {
-	if ! command -v "$1" > /dev/null 2>&1; then
-		log_critical "Dependency '${1}' not found"
-		exit 1
-	fi
+	command -v "$1" > /dev/null 2>&1 && return 0
+
+	log_critical "Dependency '${1}' not found"
+	exit 1
 }
 
 help () {
@@ -185,11 +185,10 @@ for XDEB_BASEPKG in "$@"; do true; done
 
 if [ "${XDEB_OPT_EXTRACT}" = true ]; then
 	# Does the filename end with .deb? Is the file readable?
-	echo "${XDEB_BASEPKG}" | grep -q "\.deb$"
-	if { test ! $? -eq 0 || test ! -r "${XDEB_BASEPKG}"; }; then
+	echo "${XDEB_BASEPKG}" | grep -q "\.deb$" || [ -r "${XDEB_BASEPKG}" ] || {
 		log_failure "Last argument has to point to an existing deb package"
 		exit 1
-	fi
+	}
 
 	clean
 	mkdir -p "${XDEB_BINPKGS}"
