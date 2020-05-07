@@ -119,7 +119,9 @@ The deb package format is undoubtedly the most commonly used format, since Debia
 You can expect nearly every Linux application to provide a binary deb package.
 
 ### Features
- - Convert a package
- - Restore changes made by this script
- - Dependency resolving (`xdeb -Sd`)
- - Show conflicting files
+* [x] Convert a package
+* [x] Restore changes made by this script
+* [x] Dependency resolving (`xdeb -Sd`)
+* [x] Show conflicting files
+* [ ] Remove bundled shlibs
+* [ ] Exclude dependencies
