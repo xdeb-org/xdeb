@@ -16,6 +16,22 @@ XDEB_OPT_CLEAN_DIR=false
 XDEB_OPT_WARN_CONFLICT=true
 XDEB_SUFFIX=""
 
+log_message () {
+	echo "$(tput bold)[$(tput setaf 6)i$(tput sgr0)$(tput bold)]$(tput sgr0) ${*}"
+}
+
+log_success () {
+	echo "$(tput bold)[$(tput setaf 2)+$(tput sgr0)$(tput bold)]$(tput sgr0) ${*}"
+}
+
+log_failure () {
+	echo "$(tput bold)[$(tput setaf 3)-$(tput sgr0)$(tput bold)]$(tput sgr0) ${*}"
+}
+
+log_critical () {
+	echo "$(tput bold)[$(tput setaf 1)!$(tput sgr0)$(tput bold)]$(tput sgr0) ${*}"
+}
+
 clean () {
 	rm -rf ./*.xbps-pkg-*
 	rm -rf "${XDEB_DESTDIR}"
@@ -42,26 +58,13 @@ autodeps () {
 
 		ldd "${f}" 2> /dev/null | grep -Po "^[ \t]*\K[^\/]*(?= \=\>)" | while read -r lib; do
 			dependency="$(grep -m1 -Po "^${lib} \K[^ ]*(?=-)" "${XDEB_SHLIBS}" | tr -d '\n')"
-			if [ -z "${dependency}" ]; then continue; fi
+			if [ -z "${dependency}" ]; then
+				>&2 log_failure "Unable to find dependency for ${lib}"
+				continue
+			fi
 			echo "${dependency}${XDEB_SUFFIX}>=0"
 		done
 	done | sort -u | tr '\n' ' '
-}
-
-log_message () {
-	echo "$(tput bold)[$(tput setaf 6)i$(tput sgr0)$(tput bold)]$(tput sgr0) ${*}"
-}
-
-log_success () {
-	echo "$(tput bold)[$(tput setaf 2)+$(tput sgr0)$(tput bold)]$(tput sgr0) ${*}"
-}
-
-log_failure () {
-	echo "$(tput bold)[$(tput setaf 3)i$(tput sgr0)$(tput bold)]$(tput sgr0) ${*}"
-}
-
-log_critical () {
-	echo "$(tput bold)[$(tput setaf 1)!$(tput sgr0)$(tput bold)]$(tput sgr0) ${*}"
 }
 
 check_command() {
