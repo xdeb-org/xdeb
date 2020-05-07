@@ -8,14 +8,15 @@ Simple utility to convert deb(ian) packages to xbps packages. Written in posix c
 ## Contents
  - [Usage](#Usage)
    - [Installation](#Installation)
-   - [Converting your package](#Converting%20your%20package)
-     - [Automatic Dependencies](#Automatic%20Dependencies)
+   - [Converting your package](#Converting-your-package)
+     - [Automatic Dependencies](#Automatic-Dependencies)
      - [Converting i386 package](#Multilib)
-   - [Help Page](#Help%20Page)
-     - [Using Manual dependencies](#Using%20Manual%20dependencies)
+					- [File Conflicts](#File-Conflicts)
+   - [Help Page](#Help-Page)
+     - [Using Manual dependencies](#Using-Manual-dependencies)
  - [Explanation](#Explanation)
-   - [Reasons to use](#Reasons%20to%20use)
-   - [Why DEB packages?](#Why%20DEB%20packages%3F)
+   - [Reasons to use](#Reasons-to-use)
+   - [Why DEB packages?](#Why-DEB-packages%3F)
    - [Features](#Features)
 
 ## Usage
@@ -41,6 +42,14 @@ The example shows how to convert a `32bit` package.
 ```sh
 ./xdeb -Sedm --arch x86_64 ~/Downloads/Simplenote-linux-1.16.0-beta1-i386.deb
 ```
+
+#### File Conflicts
+By default, xdeb will show a warning if a file is already present on your system (And not a directory).
+This behavior ensures that the converting package won't break the system.\
+If xdeb complains about conflicting files,
+manually removing them from the destdir directory and rebuilding with `-rb` might help.\
+Having a package already installed (For example when updating it) will output a lot of conflicts.
+To counteract this, xdeb has the `-i` flag, which silences file conflicts.
 
 ### Help Page
 ```sh
