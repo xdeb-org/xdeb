@@ -11,7 +11,7 @@ Simple utility to convert deb(ian) packages to xbps packages. Written in posix c
    - [Converting your package](#Converting-your-package)
      - [Automatic Dependencies](#Automatic-Dependencies)
      - [Converting i386 package](#Multilib)
-					- [File Conflicts](#File-Conflicts)
+     - [File Conflicts](#File-Conflicts)
    - [Help Page](#Help-Page)
      - [Using Manual dependencies](#Using-Manual-dependencies)
  - [Explanation](#Explanation)
