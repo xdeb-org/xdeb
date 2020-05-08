@@ -224,6 +224,7 @@ version=$(echo "${version}" | grep -Po "^(\d|\.)*")
 case "${archs}" in
 	amd64) archs="x86_64";;
 	i386) archs="i686";;
+	all) archs="noarch";;
 	*);;
 esac
 
