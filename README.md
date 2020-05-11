@@ -2,7 +2,6 @@
 #### The code pushed to master might not fully work. Please use releases instead
 
 # XDEB
-
 Simple utility to convert deb(ian) packages to xbps packages. Written in posix compliant shell.
 
 ## Contents
@@ -23,8 +22,7 @@ Simple utility to convert deb(ian) packages to xbps packages. Written in posix c
 ## Usage
 
 ### Installation
-There is no need to install this script, because it is not meant to be installed.\
-However if you like to install it, copy it to `/usr/local/bin/`.
+If you like to install xdeb, copy the script to `/usr/local/bin/`.
 
 ### Converting your package
 1. Download the latest release
@@ -33,22 +31,22 @@ However if you like to install it, copy it to `/usr/local/bin/`.
 4. Install the package (`xbps-install -R binpkgs <name>`)
 
 #### Flags
-You should generally run xdeb with `-Sde`,which stands for "Sync dependency file, enable dependencies, Remove empty directories".
+You should generally run xdeb with `-Sde`, which stands for "Sync dependency file, enable dependencies, remove empty directories".
 
 #### Automatic Dependencies
 xdeb can now resolve the runtime dependencies.\
-This allows reliably conversion for nearly all deb packages.
+This allows reliable conversion for nearly all deb packages.
 
 #### Multilib
-The `-m` flag adds the `-32bit` suffix to the package and all dependencies.
-You need to enable the multilib repositories first.\
+The `-m` flag adds the `-32bit` suffix to the package and all it's dependencies.
 The example shows how to convert a `32bit` package.
 ```sh
 ./xdeb -Sedm --arch x86_64 ~/Downloads/Simplenote-linux-1.16.0-beta1-i386.deb
 ```
+Installing the newly converted package requires the multilib repositories to be installed.
 
 #### File Conflicts
-By default, xdeb will show a warning if a file is already present on your system (And not a directory).
+By default, xdeb will show a warning if a file is already present on the system (And not a directory).
 This behavior ensures that the converting package won't break the system.\
 If xdeb complains about conflicting files,
 manually removing them from the destdir directory and rebuilding with `-rb` might help.\
@@ -107,7 +105,7 @@ $ sudo xbps-install -R binpkgs minecraft-launcher
 # Do you want to continue? [Y/n] n
 # Aborting!
 ```
-If the package just depends on a package with no specific version, you have to add `>0` to match any version (i.e. `--deps 'ar>0 base-system>0 curl>0'`)
+If the package just depends on a package with no specific version, add `>0` to match any version (i.e. `--deps 'ar>0 base-system>0 curl>0'`)
 
 ## Explanation
 ### Reasons to use
@@ -115,8 +113,9 @@ If the package just depends on a package with no specific version, you have to a
 - Electron based applications, like [Simplenote](https://simplenote.com/)
 - Proprietary applications like [Discord](https://discord.gg) or [Minecraft](https://minecraft.net).
 
-If you want to use these packages, you would have to build them yourself. This requires getting to know the build system, cloning the (~150MB) [void-packages](https://github.com/void-linux/void-packages) repository, etc.
-This script handles everything for you, without accessing the internet by default.
+Using one of the packages listed above on VoidLinux, requires having to build them yourself.\
+This requires getting to know the build system, cloning the (~150MB) [void-packages](https://github.com/void-linux/void-packages) repository, etc.
+This script handles everything automatically, without accessing the internet by default.
 
 ### Why deb packages?
 The deb package format is undoubtedly the most commonly used format, since Debian is the most popular Linux distro.\
