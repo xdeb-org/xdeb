@@ -66,10 +66,10 @@ autodeps () {
 		if [ -z "${dependency}" ]; then
 			>&2 log_failure "Unable to find dependency for ${lib}"
 			continue
-		else
-			echo "${dependency}${XDEB_SUFFIX}>=0"
 		fi
-	done | tr '\n' ' '
+
+		printf "%s " "${dependency}${XDEB_SUFFIX}>=0"
+	done
 }
 
 check_command() {
