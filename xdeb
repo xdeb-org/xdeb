@@ -57,17 +57,19 @@ autodeps () {
 		if ! file -b "${f}" | grep -i "ELF" > /dev/null 2>&1; then continue; fi
 
 		ldd "${f}" 2> /dev/null | grep -Po "^[ \t]*\K[^\/]*(?= \=\>)" | while read -r lib; do
-			escaped="$(printf '%s' "${lib}" | sed 's/[^A-Za-z0-9]/\\\0/g')"
-			dependency="$(grep -m1 -Po "^${escaped} \K[^ ]*(?=-)" "${XDEB_SHLIBS}" | tr -d '\n')"
-
-			if [ -z "${dependency}" ]; then
-				>&2 log_failure "Unable to find dependency for ${lib}"
-				continue
-			fi
-
-			echo "${dependency}${XDEB_SUFFIX}>=0"
+			echo "${lib}"
 		done
-	done | sort -u | tr '\n' ' '
+	done | sort -u | while read -r lib; do
+		escaped="$(printf '%s' "${lib}" | sed 's/[^A-Za-z0-9]/\\\0/g')"
+		dependency="$(grep -m1 -Po "^${escaped} \K[^ ]*(?=-)" "${XDEB_SHLIBS}" | tr -d '\n')"
+
+		if [ -z "${dependency}" ]; then
+			>&2 log_failure "Unable to find dependency for ${lib}"
+			continue
+		else
+			echo "${dependency}${XDEB_SUFFIX}>=0"
+		fi
+	done | tr '\n' ' '
 }
 
 check_command() {
