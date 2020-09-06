@@ -23,6 +23,8 @@ Simple utility to convert deb(ian) packages to xbps packages. Written in posix c
 
 ### Installation
 If you like to install xdeb, copy the script to `/usr/local/bin/`.
+In addition to copying the script, a couple of dependencies are needed.
+Install them using `xbps-install -S binutils tar curl xbps`.
 
 ### Converting your package
 1. Download the latest release
