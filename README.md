@@ -24,7 +24,7 @@ Simple utility to convert deb(ian) packages to xbps packages. Written in posix c
 ### Installation
 If you like to install xdeb, copy the script to `/usr/local/bin/`.
 In addition to copying the script, a couple of dependencies are needed.
-Install them using `xbps-install -S binutils tar curl xbps`.
+Install them using `xbps-install binutils tar curl xbps`.
 
 ### Converting your package
 1. Download the latest release
@@ -36,7 +36,7 @@ Install them using `xbps-install -S binutils tar curl xbps`.
 You should generally run xdeb with `-Sde`, which stands for "Sync dependency file, enable dependencies, remove empty directories".
 
 #### Automatic Dependencies
-xdeb can now resolve the runtime dependencies.\
+xdeb can now resolve the runtime dependencies.<br>
 This allows reliable conversion for nearly all deb packages.
 
 #### Multilib
@@ -49,9 +49,9 @@ Installing the newly converted package requires the multilib repositories to be 
 
 #### File Conflicts
 By default, xdeb will show a warning if a file is already present on the system (And not a directory).
-This behavior ensures that the converting package won't break the system.\
+This behavior ensures that the converting package won't break the system.<br>
 If xdeb complains about conflicting files,
-manually removing them from the destdir directory and rebuilding with `-rb` might help.\
+manually removing them from the destdir directory and rebuilding with `-rb` might help.<br>
 Having a package already installed (For example when updating it) will output a lot of conflicts.
 To counteract this, xdeb has the `-i` flag, which silences file conflicts.
 
@@ -115,12 +115,12 @@ If the package just depends on a package with no specific version, add `>0` to m
 - Electron based applications, like [Simplenote](https://simplenote.com/)
 - Proprietary applications like [Discord](https://discord.gg) or [Minecraft](https://minecraft.net).
 
-Using one of the packages listed above on VoidLinux, requires having to build them yourself.\
+Using one of the packages listed above on VoidLinux, requires having to build them yourself.<br>
 This requires getting to know the build system, cloning the (~150MB) [void-packages](https://github.com/void-linux/void-packages) repository, etc.
 This script handles everything automatically, without accessing the internet by default.
 
 ### Why deb packages?
-The deb package format is undoubtedly the most commonly used format, since Debian is the most popular Linux distro.\
+The deb package format is undoubtedly the most commonly used format, since Debian is the most popular Linux distro.<br>
 You can expect nearly every Linux application to provide a binary deb package.
 
 ### Features
