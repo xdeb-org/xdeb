@@ -33,13 +33,14 @@ log_critical () {
 }
 
 clean () {
-	rm -rf ./*.xbps-pkg-*
-	rm -rf "${XDEB_DESTDIR}"
-	rm -rf "${XDEB_DATADIR}"
+	rm -rf "${XDEB_PKGROOT}"/control.tar.?z
+	rm -rf "${XDEB_PKGROOT}"/data.tar.?z
+	rm -rf "${XDEB_PKGROOT}"/debian-binary
 
-	rm -rf control.tar.?z
-	rm -rf data.tar.?z
-	rm -rf "debian-binary"
+	rm -rf "${XDEB_PKGROOT}"/*.xbps-pkg-*
+
+	rm -rf "${XDEB_DATADIR}"
+	rm -rf "${XDEB_DESTDIR}"
 }
 
 clean_repodata () {
@@ -48,6 +49,7 @@ clean_repodata () {
 
 clean_all () {
 	clean
+	clean_repodata
 	rm -rf "${XDEB_BINPKGS}"
 	rm -rf "${XDEB_SHLIBS}"
 }
@@ -109,6 +111,8 @@ check_command curl
 check_command xbps-rindex
 check_command xbps-create
 
+mkdir -p "${XDEB_PKGROOT}"
+
 i=0
 for arg in "${@}"; do
 	i=$((i + 1))
@@ -167,7 +171,9 @@ for arg in "${@}"; do
 done
 
 if [ "${XDEB_OPT_SYNC}" = true ]; then
-	curl -sO "https://raw.githubusercontent.com/void-linux/void-packages/master/common/shlibs"
+	curl \
+		-s "https://raw.githubusercontent.com/void-linux/void-packages/master/common/shlibs" \
+		-o "${XDEB_SHLIBS}"
 	log_success "Synced shlibs"
 fi
 
@@ -197,10 +203,13 @@ if [ "${XDEB_OPT_EXTRACT}" = true ]; then
 	mkdir -p "${XDEB_DATADIR}"
 	mkdir -p "${XDEB_DESTDIR}"
 
-	# Extract the packages
-	ar -xf "${XDEB_BASEPKG}"
-	tar -xf control.tar.?z -C "${XDEB_DATADIR}"
-	tar -xf data.tar.?z -C "${XDEB_DESTDIR}"
+	# Extract the packages, every operation has to succeed
+	ar -xf "${XDEB_BASEPKG}" --output "${XDEB_PKGROOT}" &&
+	tar -xf "${XDEB_PKGROOT}"/control.tar.?z -C "${XDEB_DATADIR}" &&
+	tar -xf "${XDEB_PKGROOT}"/data.tar.?z -C "${XDEB_DESTDIR}" || {
+		log_failure "Not a valid deb file"
+		exit 1
+	}
 
 	log_success "Extracted files"
 fi
