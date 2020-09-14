@@ -172,7 +172,7 @@ if [ "${XDEB_OPT_SYNC}" = true ]; then
 fi
 
 if { test "${XDEB_OPT_DEPS}" = true && test ! -r "${XDEB_SHLIBS}"; }; then
-	log_warning "Sync atleast once, before using the depencency option"
+	log_failure "Sync atleast once, before using the depencency option"
 	exit 1
 fi
 
