@@ -32,21 +32,24 @@ log_critical () {
 	echo "$(tput bold)[$(tput setaf 1)!$(tput sgr0)$(tput bold)]$(tput sgr0) ${*}"
 }
 
+# clean : Removes old package data, without removing any binpkgs
 clean () {
 	rm -rf "${XDEB_PKGROOT}"/control.tar.?z
 	rm -rf "${XDEB_PKGROOT}"/data.tar.?z
 	rm -rf "${XDEB_PKGROOT}"/debian-binary
 
-	rm -rf "${XDEB_PKGROOT}"/*.xbps-pkg-*
+	rm -rf "${XDEB_BINPKGS}"/.xbps-pkg-*
 
 	rm -rf "${XDEB_DATADIR}"
 	rm -rf "${XDEB_DESTDIR}"
 }
 
+# clean_repodata : Removes the repodata file. Needed to rebuild a package with the same version
 clean_repodata () {
 	rm -rf "${XDEB_BINPKGS}"/*-repodata
 }
 
+# clean_all : Remove everything, this script created
 clean_all () {
 	clean
 	clean_repodata
@@ -56,7 +59,7 @@ clean_all () {
 
 autodeps () {
 	find "${XDEB_DESTDIR}" -type f | while read -r f; do
-		if ! file -b "${f}" | grep -i "ELF" > /dev/null 2>&1; then continue; fi
+		[ "$(head -c 4 "${f}")" = "$(printf "\177ELF")" ] || continue
 
 		ldd "${f}" 2> /dev/null | grep -Po "^[ \t]*\K[^\/]*(?= \=\>)" | while read -r lib; do
 			echo "${lib}"
@@ -66,7 +69,7 @@ autodeps () {
 		dependency="$(grep -m1 -Po "^${escaped} \K[^ ]*(?=-)" "${XDEB_SHLIBS}" | tr -d '\n')"
 
 		if [ -z "${dependency}" ]; then
-			>&2 log_failure "Unable to find dependency for ${lib}"
+			log_failure "Unable to find dependency for ${lib}" >&2
 			continue
 		fi
 
