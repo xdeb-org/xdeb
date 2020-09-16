@@ -16,6 +16,8 @@ XDEB_OPT_CLEAN_DIR=false
 XDEB_OPT_WARN_CONFLICT=true
 XDEB_SUFFIX=""
 
+alias pkgrep="grep -Po -m1"
+
 log_message () {
 	echo "$(tput bold)[$(tput setaf 6)i$(tput sgr0)$(tput bold)]$(tput sgr0) ${*}"
 }
@@ -66,7 +68,7 @@ autodeps () {
 		done
 	done | sort -u | while read -r lib; do
 		escaped="$(printf '%s' "${lib}" | sed 's/[^A-Za-z0-9]/\\\0/g')"
-		dependency="$(grep -m1 -Po "^${escaped} \K[^ ]*(?=-)" "${XDEB_SHLIBS}" | tr -d '\n')"
+		dependency="$(pkgrep "^${escaped} \K[^ ]*(?=-)" "${XDEB_SHLIBS}" | tr -d '\n')"
 
 		[ -z "${dependency}" ] && {
 			log_failure "Unable to find dependency for ${lib}" >&2
@@ -99,6 +101,7 @@ usage: xdeb [-S] [-d] [-Sd] [--deps] ... FILE
   -i                       # Ignore file conflicts
   --deps                   # Add manual dependencies
   --arch                   # Add an arch for the package to run on
+  --revision               # Set package revision. Alternative to -R, to not remove the repodata
   --help | -h              # Show this page
 
 example:
@@ -131,6 +134,9 @@ for arg in "${@}"; do
 			continue;;
 		--arch)
 			archs="$(eval echo "\${$((i + 1))}")"
+			continue;;
+		--revision)
+			revision="$(eval echo "\${$((i + 1))}")"
 			continue;;
 		--help)
 			help
@@ -167,7 +173,7 @@ for arg in "${@}"; do
 			i)
 				XDEB_OPT_WARN_CONFLICT=false;;
 			*)
-				log_failure "Unknown option -${first}"
+				log_failure "Unknown option ${arg}"
 				help
 				exit 1;;
 		esac
@@ -220,21 +226,18 @@ for XDEB_BASEPKG in "$@"; do true; done
 	log_success "Extracted files"
 }
 
-alias pkgrep="grep -Po -m1"
 # The variable names are the same as in the regular xbps-src package build
 pkgname=$(pkgrep "Package:[ \t]*\K.*" "${XDEB_DATADIR}/control")
 version=$(pkgrep "Version:[ \t]*\K.*" "${XDEB_DATADIR}/control")
 license=$(pkgrep "License:[ \t]*\K.*" "${XDEB_DATADIR}/control")
 maintainer=$(pkgrep "Maintainer:[ \t]*\K.*" "${XDEB_DATADIR}/control")
 short_desc=$(pkgrep "Description:[ \t]*\K.*" "${XDEB_DATADIR}/control")
-long_desc=$(pkgrep "Description:[ \t\n]*\K.*" "${XDEB_DATADIR}/control")
-[ -z "${archs}" ] && archs=$(pkgrep "Architecture:[ \t]*\K.*" "${XDEB_DATADIR}/control")
+long_desc=$(pkgrep -z "Description:[ \t\n]*\K.*" "${XDEB_DATADIR}/control" | tr '\0' '\n')
+archs=${archs-$(pkgrep "Architecture:[ \t]*\K.*" "${XDEB_DATADIR}/control")}
+revision="${revision-1}"
 
 # It seems that debian packages don't have to provide a short_desc (XMind-ZEN didn't do it)
-[ -z "${short_desc}" ] && {
-	log_message "short_desc not found, using long_desc instead"
-	short_desc="${long_desc}"
-}
+[ -z "${short_desc}" ] && short_desc="${long_desc}"
 
 version=$(echo "${version}" | grep -Po "^(\d|\.)*")
 case "${archs}" in
@@ -274,8 +277,12 @@ find "${XDEB_DESTDIR}" | {
 	return "${rc}"
 } || log_failure "Unless updating, consider removing conflicting files and rebuild with \"-rb\""
 
+# Simple way to shorten binpkgs
+short_binpkgs=${XDEB_BINPKGS##${PWD}/}
+
 cd "${XDEB_BINPKGS}" || exit
-xbps-create -q -A "${archs}" -n "${pkgname}${XDEB_SUFFIX}-${version}_1" -m "${maintainer}" -s "${short_desc}" -S "${long_desc}" -l "${license}" -D "${XDEB_DEPENDENCIES}" "${XDEB_DESTDIR}"
-log_success "Created Package"
-xbps-rindex -a ./*.xbps
-log_success "Registered package"
+
+out=${pkgname}${XDEB_SUFFIX}-${version}_${revision}
+xbps-create -q -A "${archs}" -n "${out}" -m "${maintainer}" -s "${short_desc}" -S "${long_desc}" -l "${license}" -D "${XDEB_DEPENDENCIES}" "${XDEB_DESTDIR}"
+xbps-rindex -a ${out}.${archs}.xbps
+log_success "Done. Install using \`xbps-install -R ${short_binpkgs} ${out}\`"

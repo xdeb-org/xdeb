@@ -73,6 +73,7 @@ usage: xdeb [-S] [-d] [-Sd] [--deps] ... FILE
   -i                       # Ignore file conflicts
   --deps                   # Add manual dependencies
   --arch                   # Add an arch for the package to run on
+  --revision               # Set package revision. Alternative to -R, to not remove the repodata
   --help | -h              # Show this page
 
 example:
@@ -85,30 +86,26 @@ example:
 Converting `Minecraft.deb`:
 ```sh
 $ ./xdeb -Sedr --deps 'oracle-jre>=8' ~/Downloads/Minecraft.deb
-# [+] Synced shlibs
-# [+] Extracted files
-# [-] Unable to find dependency for libGLdispatch.so.0
-# [-] Unable to find dependency for libcef.so
-# [-] Unable to find dependency for libGLdispatch.so.0
-# [+] Resolved dependencies (oracle-jre>=8 alsa-lib>=0 atk>=0 at-spi2-atk>=0 at-spi2-core>=0 avahi-libs>=0 bzip2>=0 cairo>=0 dbus-glib>=0 dbus-libs>=0 expat>=0 fontconfig>=0 freetype>=0 fribidi>=0 GConf>=0 gdk-pixbuf>=0 glib>=0 glibc>=0 gmp>=0 gnutls>=0 graphite>=0 gtk+>=0 gtk+3>=0 libblkid>=0 libcups>=0 libdatrie>=0 libEGL>=0 libepoxy>=0 libffi>=0 libgcc>=0 libGL>=0 libglvnd>=0 libharfbuzz>=0 libidn2>=0 libmount>=0 libpcre>=0 libpng>=0 libstdc++>=0 libtasn1>=0 libthai>=0 libunistring>=0 libuuid>=0 libX11>=0 libXau>=0 libxcb>=0 libXcomposite>=0 libXcursor>=0 libXdamage>=0 libXdmcp>=0 libXext>=0 libXfixes>=0 libXi>=0 libXinerama>=0 libxkbcommon>=0 libXrandr>=0 libXrender>=0 libXScrnSaver>=0 libXtst>=0 nettle>=0 nspr>=0 nss>=0 p11-kit>=0 pango>=0 pixman>=0 wayland>=0 zlib>=0 )
-# [+] 'Parsed' deb control file
-# [+] Created Package
-# index: added `minecraft-launcher-2.1.13829_1' (x86_64).
-# index: 1 packages registered.
-# [+] Registered package
+[+] Extracted files
+[-] Unable to find dependency for libcef.so
+[-] Unable to find dependency for libGLdispatch.so.0
+[+] Resolved dependencies (oracle-jre>=8 alsa-lib>=0 atk>=0 at-spi2-atk>=0 at-spi2-core>=0 avahi-libs>=0 avahi-libs>=0 libblkid>=0 bzip2>=0 cairo>=0 cairo>=0 glibc>=0 glibc>=0 libcups>=0 libdatrie>=0 dbus-libs>=0 glibc>=0 libEGL>=0 libepoxy>=0 expat>=0 libffi>=0 fontconfig>=0 freetype>=0 fribidi>=0 libgcc>=0 GConf>=0 gtk+3>=0 gdk-pixbuf>=0 gtk+>=0 glib>=0 glib>=0 libGL>=0 libglvnd>=0 glib>=0 gmp>=0 gnutls>=0 glib>=0 graphite>=0 gtk+3>=0 gtk+>=0 libharfbuzz>=0 nettle>=0 libidn2>=0 libmount>=0 glibc>=0 nettle>=0 nspr>=0 nss>=0 nss>=0 p11-kit>=0 pango>=0 pango>=0 pango>=0 libpcre>=0 pixman>=0 nspr>=0 nspr>=0 libpng>=0 glibc>=0 glibc>=0 glibc>=0 nss>=0 libstdc++>=0 libtasn1>=0 libthai>=0 libunistring>=0 libuuid>=0 wayland>=0 wayland>=0 wayland>=0 libX11>=0 libX11>=0 libXau>=0 libxcb>=0 libxcb>=0 libxcb>=0 libXcomposite>=0 libXcursor>=0 libXdamage>=0 libXdmcp>=0 libXext>=0 libXfixes>=0 libXinerama>=0 libXi>=0 libxkbcommon>=0 libXrandr>=0 libXrender>=0 libXScrnSaver>=0 libXtst>=0 zlib>=0 )
+[+] 'Parsed' deb control file
+[+] Created Package
+index: skipping `minecraft-launcher-2.1.17417_1' (x86_64), already registered.
+index: 5 packages registered.
+[+] Done. Install using `xbps-install -R binpkgs minecraft-launcher-2.1.17417_1`
 
-$ sudo xbps-install -R binpkgs minecraft-launcher
-# Name               Action    Version           New version            Download size
-# wget               install   -                 1.20.3_2               - 
-# oracle-jre         install   -                 8u202_1                82KB 
-# minecraft-launcher install   -                 2.1.11314_1            - 
-# 
-# Size to download:               83KB
-# Size required on disk:         177MB
-# Space available on disk:       416GB
-# 
-# Do you want to continue? [Y/n] n
-# Aborting!
+$ sudo xbps-install -R ./binpkgs minecraft-launcher-2.1.17417_1
+
+Name               Action    Version           New version            Download size
+GConf              install   -                 3.2.6_9                - 
+minecraft-launcher install   -                 2.1.17417_1            - 
+
+Size required on disk:         198MB
+Space available on disk:       276GB
+
+Do you want to continue? [Y/n] n
 ```
 If the package just depends on a package with no specific version, add `>0` to match any version (i.e. `--deps 'ar>0 base-system>0 curl>0'`)
 
