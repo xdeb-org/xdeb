@@ -60,7 +60,6 @@ To counteract this, xdeb has the `-i` flag, which silences file conflicts.
 usage: xdeb [-S] [-d] [-Sd] [--deps] ... FILE
   -d                       # Automatic dependencies
   -S                       # Sync runtime dependency file
-  -h                       # Show this page
   -c                       # Clean everything except shlibs and binpkgs
   -r                       # Clean repodata (Use when rebuilding a package)
   -q                       # Don't build the package at all
@@ -71,6 +70,7 @@ usage: xdeb [-S] [-d] [-Sd] [--deps] ... FILE
   -i                       # Ignore file conflicts
   --deps                   # Add manual dependencies
   --arch                   # Add an arch for the package to run on
+  --help | -h              # Show this page
 
 example:
   xdeb -Cq                 # Remove all files and quit
