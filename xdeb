@@ -68,10 +68,10 @@ autodeps () {
 		escaped="$(printf '%s' "${lib}" | sed 's/[^A-Za-z0-9]/\\\0/g')"
 		dependency="$(grep -m1 -Po "^${escaped} \K[^ ]*(?=-)" "${XDEB_SHLIBS}" | tr -d '\n')"
 
-		if [ -z "${dependency}" ]; then
+		[ -z "${dependency}" ] && {
 			log_failure "Unable to find dependency for ${lib}" >&2
 			continue
-		fi
+		}
 
 		printf "%s " "${dependency}${XDEB_SUFFIX}>=0"
 	done
@@ -123,7 +123,7 @@ for arg in "${@}"; do
 	rest="${arg#?}"
 	first="${arg%"${rest}"}"
 	tmp="${rest}"
-	if [ "${first}" != "-" ]; then break; fi
+	[ "${first}" != "-" ] && break
 	
 	case "${arg}" in
 		--deps)
@@ -132,6 +132,9 @@ for arg in "${@}"; do
 		--arch)
 			archs="$(eval echo "\${$((i + 1))}")"
 			continue;;
+		--help)
+			help
+			exit 0;;
 		*);;
 	esac
 
@@ -173,28 +176,28 @@ for arg in "${@}"; do
 	done
 done
 
-if [ "${XDEB_OPT_SYNC}" = true ]; then
+[ "${XDEB_OPT_SYNC}" = true ] && {
 	curl \
 		-s "https://raw.githubusercontent.com/void-linux/void-packages/master/common/shlibs" \
 		-o "${XDEB_SHLIBS}"
 	log_success "Synced shlibs"
-fi
+}
 
-if { test "${XDEB_OPT_DEPS}" = true && test ! -r "${XDEB_SHLIBS}"; }; then
+[ "${XDEB_OPT_DEPS}" = true ] && [ ! -r "${XDEB_SHLIBS}" ] && {
 	log_failure "Sync atleast once, before using the depencency option"
 	exit 1
-fi
+}
 
 # Quit after parsing every argument argument
-if [ "${XDEB_OPT_QUIT}" = true ]; then
+[ "${XDEB_OPT_QUIT}" = true ] && {
 	log_message "Quitting before building"
 	exit 0;
-fi
+}
 
 # find last argument
 for XDEB_BASEPKG in "$@"; do true; done
 
-if [ "${XDEB_OPT_EXTRACT}" = true ]; then
+[ "${XDEB_OPT_EXTRACT}" = true ] && {
 	# Does the filename end with .deb? Is the file readable?
 	echo "${XDEB_BASEPKG}" | grep -q "\.deb$" || [ -r "${XDEB_BASEPKG}" ] || {
 		log_failure "Last argument has to point to an existing deb package"
@@ -215,24 +218,23 @@ if [ "${XDEB_OPT_EXTRACT}" = true ]; then
 	}
 
 	log_success "Extracted files"
-fi
+}
 
+alias pkgrep="grep -Po -m1"
 # The variable names are the same as in the regular xbps-src package build
-pkgname=$(grep -Po "Package:[ \t]*\K.*" "${XDEB_DATADIR}/control")
-version=$(grep -Po "Version:[ \t]*\K.*" "${XDEB_DATADIR}/control")
-license=$(grep -Po "License:[ \t]*\K.*" "${XDEB_DATADIR}/control")
-if [ -z "${archs}" ]; then
-	archs=$(grep -Po "Architecture:[ \t]*\K.*" "${XDEB_DATADIR}/control")
-fi
-maintainer=$(grep -Po "Maintainer:[ \t]*\K.*" "${XDEB_DATADIR}/control")
-short_desc=$(grep -Po "Description:[ \t]*\K.*" "${XDEB_DATADIR}/control")
-long_desc=$(grep -Pzo "Description:[ \t\n]*\K.*" "${XDEB_DATADIR}/control" | tr '\0' '\n')
+pkgname=$(pkgrep "Package:[ \t]*\K.*" "${XDEB_DATADIR}/control")
+version=$(pkgrep "Version:[ \t]*\K.*" "${XDEB_DATADIR}/control")
+license=$(pkgrep "License:[ \t]*\K.*" "${XDEB_DATADIR}/control")
+maintainer=$(pkgrep "Maintainer:[ \t]*\K.*" "${XDEB_DATADIR}/control")
+short_desc=$(pkgrep "Description:[ \t]*\K.*" "${XDEB_DATADIR}/control")
+long_desc=$(pkgrep "Description:[ \t\n]*\K.*" "${XDEB_DATADIR}/control")
+[ -z "${archs}" ] && archs=$(pkgrep "Architecture:[ \t]*\K.*" "${XDEB_DATADIR}/control")
 
 # It seems that debian packages don't have to provide a short_desc (XMind-ZEN didn't do it)
-if [ -z "${short_desc}" ]; then
+[ -z "${short_desc}" ] && {
 	log_message "short_desc not found, using long_desc instead"
 	short_desc="${long_desc}"
-fi
+}
 
 version=$(echo "${version}" | grep -Po "^(\d|\.)*")
 case "${archs}" in
@@ -242,13 +244,10 @@ case "${archs}" in
 	*);;
 esac
 
-if [ "${XDEB_OPT_DEPS}" = true ]; then
+[ "${XDEB_OPT_DEPS}" = true ] && {
 	XDEB_DEPENDENCIES="${XDEB_DEPENDENCIES} $(autodeps)"
-fi
-
-if [ -n "${XDEB_DEPENDENCIES}" ]; then
 	log_success "Resolved dependencies (${XDEB_DEPENDENCIES})"
-fi
+}
 
 log_success "'Parsed' deb control file"
 
