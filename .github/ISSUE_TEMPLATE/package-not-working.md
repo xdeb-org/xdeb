@@ -8,16 +8,24 @@ assignees: toluschr
 ---
 
 # Information
-* version
-  *Which version of xdeb was used
-* cmdline
-  *Which command was used to convert the package?
-* [ ] Does the conversion work?
+
+* version:<br>
+  *either version, or commit id. ie: [9f69cf3, 1.2]*
+* cmdline:<br>
+  *command used to convert the package, including* `XDEB_PKGROOT`
+* [ ] build failed
+* [ ] installation failed
 
 # Package
-* name
-  *Name of the package
-* download
-  *Download link of the deb file
+
+* name:<br>
+  *name of the package*
+* download:<br>
+  *link to .deb file*
+
+# Script output
+<details>
+<!-- Run the command again, and paste here -->
+</details>
 
 # Describe the issue
