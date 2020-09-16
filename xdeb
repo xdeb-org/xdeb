@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Directories and filenames
-XDEB_PKGROOT="${XDEB_PKGROOT-${PWD}}"
+XDEB_PKGROOT="$(realpath "${XDEB_PKGROOT-${PWD}}")"
 XDEB_DESTDIR="${XDEB_PKGROOT}/destdir"
 XDEB_DATADIR="${XDEB_PKGROOT}/data"
 XDEB_BINPKGS="${XDEB_PKGROOT}/binpkgs"
@@ -252,24 +252,28 @@ fi
 
 log_success "'Parsed' deb control file"
 
-find "${XDEB_DESTDIR}" | while read -r file; do
-	# Remove empty directories
-	if [ "${XDEB_OPT_CLEAN_DIR}" = true ]; then
-		if [ -z "$(ls -A "${file}")" ]; then
+find "${XDEB_DESTDIR}" | {
+	rc=0
+
+	while read -r file; do
+		# Remove empty directories
+		[ "${XDEB_OPT_CLEAN_DIR}" = true ] && [ -z "$(ls -A "${file}")" ] && {
 			rm -rf "${file}"
 			log_success "Removed empty directory ${file}"
 			continue
-		fi
-	fi
+		}
 
-	# Check for conflicts
-	if [ "${XDEB_OPT_WARN_CONFLICT}" != true ]; then continue; fi
+		# Check for conflicts
+		[ "${XDEB_OPT_WARN_CONFLICT}" != true ] && continue
 
-	file_root="${file#${XDEB_DESTDIR}*}"
-	[ -e "${file_root}" ] || continue
-	[ -d "${file_root}" ] && [ -d "${file}" ] && continue
-	log_critical "CONFLICT: \"${file}\" (Consider removing and rebuild with -rb)"
-done
+		file_root="${file#${XDEB_DESTDIR}*}"
+		[ ! -e "${file_root}" ] || { [ -d "${file_root}" ] && [ -d "${file}" ]; } && continue
+		log_critical "Conflict: $(tput bold)${file}$(tput sgr0)"
+		rc=1
+	done
+
+	return "${rc}"
+} || log_failure "Unless updating, consider removing conflicting files and rebuild with \"-rb\""
 
 cd "${XDEB_BINPKGS}" || exit
 xbps-create -q -A "${archs}" -n "${pkgname}${XDEB_SUFFIX}-${version}_1" -m "${maintainer}" -s "${short_desc}" -S "${long_desc}" -l "${license}" -D "${XDEB_DEPENDENCIES}" "${XDEB_DESTDIR}"
