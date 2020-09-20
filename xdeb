@@ -61,11 +61,8 @@ clean_all () {
 
 autodeps () {
 	find "${XDEB_DESTDIR}" -type f | while read -r f; do
-		[ "$(head -c 4 "${f}")" = "$(printf "\177ELF")" ] || continue
-
-		ldd "${f}" 2> /dev/null | grep -Po "^[ \t]*\K[^\/]*(?= \=\>)" | while read -r lib; do
-			echo "${lib}"
-		done
+		[ "$(head -c 4 "${f}")" = "$(printf "\177ELF")" ] && continue
+		objdump -p "${f}" | grep NEEDED | awk '{print $2}'
 	done | sort -u | while read -r lib; do
 		escaped="$(printf '%s' "${lib}" | sed 's/[^A-Za-z0-9]/\\\0/g')"
 		dependency="$(pkgrep "^${escaped} \K[^ ]*(?=-)" "${XDEB_SHLIBS}" | tr -d '\n')"
@@ -111,11 +108,14 @@ example:
 EOF
 }
 
-check_command ar
-check_command tar
-check_command curl
-check_command xbps-rindex
-check_command xbps-create
+check_command tar # tar
+check_command curl # curl
+
+check_command ar # binutils
+check_command objdump # binutils
+
+check_command xbps-rindex # xbps
+check_command xbps-create # xbps
 
 mkdir -p "${XDEB_PKGROOT}"
 
