@@ -66,7 +66,7 @@ autodeps () {
 
 	done | sort -u | while read -r lib; do
 		_lib=$(echo "${lib}" | sed -E 's|\+|\\+|g')
-		rdep="$(grep -E "^${_lib}[[:blank:]]+.*$" ${XDEB_SHLIBS} | cut -d ' ' -f2)"
+		rdep="$(grep -E "^${_lib}[[:blank:]]+.*$" "${XDEB_SHLIBS}" | cut -d ' ' -f2)"
 
 		[ -z "${rdep}" ] && {
 			log_failure "Unable to find dependency for ${lib}" >&2
@@ -256,8 +256,6 @@ esac
 log_success "'Parsed' deb control file"
 
 find "${XDEB_DESTDIR}" | {
-	rc=0
-
 	while read -r file; do
 		# Remove empty directories
 		[ "${XDEB_OPT_CLEAN_DIR}" = true ] && [ -z "$(ls -A "${file}")" ] && {
@@ -275,7 +273,7 @@ find "${XDEB_DESTDIR}" | {
 		rc=1
 	done
 
-	return "${rc}"
+	return "${rc-0}"
 } || log_failure "Unless updating, consider removing conflicting files and rebuild with \"-rb\""
 
 # Simple way to shorten binpkgs
@@ -283,7 +281,7 @@ short_binpkgs=${XDEB_BINPKGS##${PWD}/}
 
 cd "${XDEB_BINPKGS}" || exit
 
-out=${pkgname}${XDEB_SUFFIX}-${version}_${revision}
+out="${pkgname}${XDEB_SUFFIX}-${version}_${revision}"
 xbps-create -q -A "${archs}" -n "${out}" -m "${maintainer}" -s "${short_desc}" -S "${long_desc}" -l "${license}" -D "${XDEB_DEPENDENCIES}" "${XDEB_DESTDIR}"
-xbps-rindex -a ${out}.${archs}.xbps
+xbps-rindex -a "${out}.${archs}.xbps"
 log_success "Done. Install using \`xbps-install -R ${short_binpkgs} ${out}\`"
