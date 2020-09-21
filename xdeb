@@ -61,18 +61,19 @@ clean_all () {
 
 autodeps () {
 	find "${XDEB_DESTDIR}" -type f | while read -r f; do
-		[ "$(head -c 4 "${f}")" = "$(printf "\177ELF")" ] && continue
+		[ "$(head -c 4 "${f}")" = "$(printf "\177ELF")" ] || continue
 		objdump -p "${f}" | grep NEEDED | awk '{print $2}'
-	done | sort -u | while read -r lib; do
-		escaped="$(printf '%s' "${lib}" | sed 's/[^A-Za-z0-9]/\\\0/g')"
-		dependency="$(pkgrep "^${escaped} \K[^ ]*(?=-)" "${XDEB_SHLIBS}" | tr -d '\n')"
 
-		[ -z "${dependency}" ] && {
+	done | sort -u | while read -r lib; do
+		_lib=$(echo "${lib}" | sed -E 's|\+|\\+|g')
+		rdep="$(grep -E "^${_lib}[[:blank:]]+.*$" ${XDEB_SHLIBS} | cut -d ' ' -f2)"
+
+		[ -z "${rdep}" ] && {
 			log_failure "Unable to find dependency for ${lib}" >&2
 			continue
 		}
 
-		printf "%s " "${dependency}${XDEB_SUFFIX}>=0"
+		printf "%s " "${rdep}${XDEB_SUFFIX}>=0"
 	done
 }
 
