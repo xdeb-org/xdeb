@@ -124,6 +124,7 @@ i=0
 for arg in "${@}"; do
 	i=$((i + 1))
 	# Does the current argument start with a dash?
+	XDEB_BASEPKG="${arg}"
 	rest="${arg#?}"
 	first="${arg%"${rest}"}"
 	tmp="${rest}"
@@ -200,9 +201,6 @@ done
 	log_message "Quitting before building"
 	exit 0;
 }
-
-# find last argument
-for XDEB_BASEPKG in "$@"; do true; done
 
 [ "${XDEB_OPT_EXTRACT}" = true ] && {
 	# Does the filename end with .deb? Is the file readable?
