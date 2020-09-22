@@ -59,12 +59,14 @@ clean_all() {
 	rm -rf "${XDEB_SHLIBS}"
 }
 
-autodeps() {
+genrdeps() {
 	find "${XDEB_DESTDIR}" -type f | while read -r f; do
 		[ "$(head -c 4 "${f}")" = "$(printf "\177ELF")" ] || continue
 		objdump -p "${f}" | grep NEEDED | awk '{print $2}'
-
 	done | sort -u | while read -r lib; do
+		# Ignore libraries provided by current package
+		[ ! -z "$(find "${XDEB_DESTDIR}" -name "${lib}")" ] && continue
+
 		_lib=$(echo "${lib}" | sed -E 's|\+|\\+|g')
 		rdep="$(grep -E "^${_lib}[[:blank:]]+.*$" "${XDEB_SHLIBS}" | cut -d ' ' -f2)"
 
@@ -247,7 +249,7 @@ case "${archs}" in
 esac
 
 [ "${XDEB_OPT_DEPS}" = true ] && {
-	XDEB_DEPENDENCIES="${XDEB_DEPENDENCIES} $(autodeps)"
+	XDEB_DEPENDENCIES="${XDEB_DEPENDENCIES} $(genrdeps)"
 	log_success "Resolved dependencies (${XDEB_DEPENDENCIES})"
 }
 
