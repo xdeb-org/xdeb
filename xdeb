@@ -68,14 +68,14 @@ genrdeps() {
 		[ ! -z "$(find "${XDEB_DESTDIR}" -name "${lib}")" ] && continue
 
 		_lib=$(echo "${lib}" | sed -E 's|\+|\\+|g')
-		rdep="$(grep -E "^${_lib}[[:blank:]]+.*$" "${XDEB_SHLIBS}" | cut -d ' ' -f2)"
+		rdep="$(grep -E -m1 "^${_lib}[[:blank:]]+.*$" "${XDEB_SHLIBS}" | cut -d ' ' -f2)"
 
 		[ -z "${rdep}" ] && {
 			log_failure "Unable to find dependency for ${lib}" >&2
 			continue
 		}
-		printf "%s " "${rdep}${XDEB_SUFFIX}>=0"
-	done
+		echo "${rdep}${XDEB_SUFFIX}"
+	done | sort -u | tr '\n' ' '
 }
 
 check_command() {
