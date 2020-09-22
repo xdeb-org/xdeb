@@ -74,7 +74,6 @@ genrdeps() {
 			log_failure "Unable to find dependency for ${lib}" >&2
 			continue
 		}
-
 		printf "%s " "${rdep}${XDEB_SUFFIX}>=0"
 	done
 }
@@ -253,31 +252,33 @@ esac
 	log_success "Resolved dependencies (${XDEB_DEPENDENCIES})"
 }
 
-log_success "'Parsed' deb control file"
+log_success "'Parsed' control file"
 
-find "${XDEB_DESTDIR}" | {
-	while read -r file; do
-		# Remove empty directories
-		[ "${XDEB_OPT_CLEAN_DIR}" = true ] && [ -z "$(ls -A "${file}")" ] && {
-			rm -rf "${file}"
-			log_success "Removed empty directory ${file}"
-			continue
-		}
+{ [ "${XDEB_OPT_CLEAN_DIR}" = true ] || [ "${XDEB_OPT_WARN_CONFLICT}" = true ]; } && {
+	find "${XDEB_DESTDIR}" | {
+		while read -r file; do
+			# Remove empty directories
+			[ "${XDEB_OPT_CLEAN_DIR}" = true ] && [ -z "$(ls -A "${file}")" ] && {
+				rm -rf "${file}"
+				log_success "Removed empty directory ${file}"
+				continue
+			}
 
-		# Check for conflicts
-		[ "${XDEB_OPT_WARN_CONFLICT}" != true ] && continue
+			# Check for conflicts
+			[ "${XDEB_OPT_WARN_CONFLICT}" != true ] && continue
 
-		file_root="${file#${XDEB_DESTDIR}*}"
-		[ ! -e "${file_root}" ] || { [ -d "${file_root}" ] && [ -d "${file}" ]; } && continue
-		log_critical "Conflict: $(tput bold)${file}$(tput sgr0)"
-		rc=1
-	done
+			file_root="${file#${XDEB_DESTDIR}}"
+			[ ! -e "${file_root}" ] || { [ -d "${file_root}" ] && [ -d "${file}" ]; } || {
+				log_critical "Conflict: $(tput bold)${file}$(tput sgr0)"
+				rc=1
+			}
+		done
 
-	return "${rc-0}"
-} || log_failure "Unless updating, consider removing conflicting files and rebuild with \"-rb\""
+		return "${rc-0}"
+	} || log_failure "Unless updating, consider removing conflicting files and rebuild with \"-rb\""
+}
 
-# Simple way to shorten binpkgs
-short_binpkgs=${XDEB_BINPKGS##${PWD}/}
+short_binpkgs="${XDEB_BINPKGS#${PWD}/}"
 
 cd "${XDEB_BINPKGS}" || exit
 
