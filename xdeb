@@ -18,24 +18,24 @@ XDEB_SUFFIX=""
 
 alias pkgrep="grep -Po -m1"
 
-log_message () {
+log_message() {
 	echo "$(tput bold)[$(tput setaf 6)i$(tput sgr0)$(tput bold)]$(tput sgr0) ${*}"
 }
 
-log_success () {
+log_success() {
 	echo "$(tput bold)[$(tput setaf 2)+$(tput sgr0)$(tput bold)]$(tput sgr0) ${*}"
 }
 
-log_failure () {
+log_failure() {
 	echo "$(tput bold)[$(tput setaf 3)-$(tput sgr0)$(tput bold)]$(tput sgr0) ${*}"
 }
 
-log_critical () {
+log_critical() {
 	echo "$(tput bold)[$(tput setaf 1)!$(tput sgr0)$(tput bold)]$(tput sgr0) ${*}"
 }
 
 # clean : Removes old package data, without removing any binpkgs
-clean () {
+clean() {
 	rm -rf "${XDEB_PKGROOT}"/control.tar.?z
 	rm -rf "${XDEB_PKGROOT}"/data.tar.?z
 	rm -rf "${XDEB_PKGROOT}"/debian-binary
@@ -47,19 +47,19 @@ clean () {
 }
 
 # clean_repodata : Removes the repodata file. Needed to rebuild a package with the same version
-clean_repodata () {
+clean_repodata() {
 	rm -rf "${XDEB_BINPKGS}"/*-repodata
 }
 
 # clean_all : Remove everything, this script created
-clean_all () {
+clean_all() {
 	clean
 	clean_repodata
 	rm -rf "${XDEB_BINPKGS}"
 	rm -rf "${XDEB_SHLIBS}"
 }
 
-autodeps () {
+autodeps() {
 	find "${XDEB_DESTDIR}" -type f | while read -r f; do
 		[ "$(head -c 4 "${f}")" = "$(printf "\177ELF")" ] || continue
 		objdump -p "${f}" | grep NEEDED | awk '{print $2}'
@@ -84,7 +84,7 @@ check_command() {
 	exit 1
 }
 
-help () {
+help() {
 	cat << EOF
 usage: xdeb [-S] [-d] [-Sd] [--deps] ... FILE
   -d                       # Automatic dependencies
@@ -129,7 +129,7 @@ for arg in "${@}"; do
 	first="${arg%"${rest}"}"
 	tmp="${rest}"
 	[ "${first}" != "-" ] && break
-	
+
 	case "${arg}" in
 		--deps)
 			XDEB_DEPENDENCIES="$(eval echo "\${$((i + 1))}")"
@@ -149,7 +149,7 @@ for arg in "${@}"; do
 	while [ -n "${tmp}" ]; do
 		rest="${tmp#?}"
 		first="${tmp%"${rest}"}"
-		
+
 		case "${first}" in
 			S)
 				XDEB_OPT_SYNC=true;;
