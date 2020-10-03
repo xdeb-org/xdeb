@@ -74,7 +74,8 @@ genrdeps() {
 			log_failure "Unable to find dependency for ${lib}" >&2
 			continue
 		}
-		echo "${rdep}${XDEB_SUFFIX}"
+
+		echo "${rdep%-*}${XDEB_SUFFIX}>=${rdep##*-}"
 	done | sort -u | tr '\n' ' '
 }
 
