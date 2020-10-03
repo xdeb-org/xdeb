@@ -270,7 +270,7 @@ log_success "'Parsed' control file"
 
 			file_root="${file#${XDEB_DESTDIR}}"
 			[ ! -e "${file_root}" ] || { [ -d "${file_root}" ] && [ -d "${file}" ]; } || {
-				log_critical "Conflict: $(tput bold)${file}$(tput sgr0)"
+				log_critical "Conflict: $(tput bold)${file#${PWD}/}$(tput sgr0)"
 				rc=1
 			}
 		done
