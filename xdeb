@@ -257,22 +257,24 @@ log_success "'Parsed' control file"
 
 { [ "${XDEB_OPT_CLEAN_DIR}" = true ] || [ "${XDEB_OPT_WARN_CONFLICT}" = true ]; } && {
 	find "${XDEB_DESTDIR}" | {
-		while read -r file; do
+		while read -r f; do
 			# Remove empty directories
-			[ "${XDEB_OPT_CLEAN_DIR}" = true ] && [ -z "$(ls -A "${file}")" ] && {
-				rm -rf "${file}"
-				log_success "Removed empty directory ${file}"
+			[ "${XDEB_OPT_CLEAN_DIR}" = true ] && [ -z "$(ls -A "${f}")" ] && {
+				rm -rf "${f}"
+				log_success "Removed empty directory ${f}"
 				continue
 			}
 
 			# Check for conflicts
 			[ "${XDEB_OPT_WARN_CONFLICT}" != true ] && continue
 
-			file_root="${file#${XDEB_DESTDIR}}"
-			[ ! -e "${file_root}" ] || { [ -d "${file_root}" ] && [ -d "${file}" ]; } || {
-				log_critical "Conflict: $(tput bold)${file#${PWD}/}$(tput sgr0)"
-				rc=1
-			}
+			fr="${f#${XDEB_DESTDIR}}"
+			[ ! -e "${fr}" ] && continue
+			[ ! -L "${fr}" ] && [ -d "${fr}" ] && [ ! -L "${f}" ] && [ -d "${f}" ] && \
+				continue
+
+			log_critical "Conflict: $(tput bold)${f#${PWD}/}$(tput sgr0)"
+			rc=1
 		done
 
 		return "${rc-0}"
