@@ -31,7 +31,7 @@ log_failure() {
 }
 
 log_critical() {
-	echo "$(tput bold)[$(tput setaf 1)!$(tput sgr0)$(tput bold)]$(tput sgr0) ${*}"
+	echo "$(tput bold)[$(tput setaf 1)!$(tput sgr0)$(tput bold)] ${*}$(tput sgr0)"
 }
 
 # clean : Removes old package data, without removing any binpkgs
@@ -122,68 +122,39 @@ check_command xbps-create # xbps
 
 mkdir -p "${XDEB_PKGROOT}"
 
-i=0
-for arg in "${@}"; do
-	i=$((i + 1))
-	# Does the current argument start with a dash?
-	XDEB_BASEPKG="${arg}"
-	rest="${arg#?}"
-	first="${arg%"${rest}"}"
-	tmp="${rest}"
-	[ "${first}" != "-" ] && break
-
-	case "${arg}" in
-		--deps)
-			XDEB_DEPENDENCIES="$(eval echo "\${$((i + 1))}")"
-			continue;;
-		--arch)
-			archs="$(eval echo "\${$((i + 1))}")"
-			continue;;
-		--revision)
-			revision="$(eval echo "\${$((i + 1))}")"
-			continue;;
-		--help)
-			usage
-			exit 0;;
-		*);;
+while [ "${#}" != "0" ]; do
+	case "${1}" in
+		--deps) shift; XDEB_DEPENDENCIES="${1}"; continue;;
+		--arch) shift; archs="${1}"; continue;;
+		--revision) shift; revision="${1}"; continue;;
+		--help) usage; exit 0;;
+		-*);; # Flag
+		*)
+			[ "${#}" = 1 ] && XDEB_BASEPKG="${1}"
+			break;;
 	esac
 
-	while [ -n "${tmp}" ]; do
-		rest="${tmp#?}"
-		first="${tmp%"${rest}"}"
-
-		case "${first}" in
-			S)
-				XDEB_OPT_SYNC=true;;
-			d)
-				XDEB_OPT_DEPS=true;;
-			h)
-				usage
-				exit 0;;
-			c)
-				clean;;
-			C)
-				clean_all;;
-			r)
-				clean_repodata;;
-			q)
-				XDEB_OPT_QUIT=true;;
-			b)
-				XDEB_OPT_EXTRACT=false;;
-			e)
-				XDEB_OPT_CLEAN_DIR=true;;
-			m)
-				XDEB_SUFFIX="-32bit";;
-			i)
-				XDEB_OPT_WARN_CONFLICT=false;;
-			*)
-				log_failure "Unknown option ${arg}"
-				usage
-				exit 1;;
+	flag="${1#?}"
+	while [ -n "${flag}" ]; do
+		case "${flag}" in
+			S*) XDEB_OPT_SYNC=true;;
+			d*) XDEB_OPT_DEPS=true;;
+			h*) usage exit 0;;
+			c*) clean;;
+			C*) clean_all;;
+			r*) clean_repodata;;
+			q*) XDEB_OPT_QUIT=true;;
+			b*) XDEB_OPT_EXTRACT=false;;
+			e*) XDEB_OPT_CLEAN_DIR=true;;
+			m*) XDEB_SUFFIX="-32bit";;
+			i*) XDEB_OPT_WARN_CONFLICT=false;;
+			*) log_failure "invalid option -- '${flag%"${flag#?}"}'"; usage; exit 1;;
 		esac
 
-		tmp="${rest}"
+		flag="${flag#?}"
 	done
+
+	shift
 done
 
 [ "${XDEB_OPT_SYNC}" = true ] && {
@@ -207,7 +178,7 @@ done
 [ "${XDEB_OPT_EXTRACT}" = true ] && {
 	# Does the filename end with .deb? Is the file readable?
 	echo "${XDEB_BASEPKG}" | grep -q "\.deb$" || [ -r "${XDEB_BASEPKG}" ] || {
-		log_failure "Last argument has to point to an existing deb package"
+		log_critical "Last argument has to point to an existing deb package"
 		exit 1
 	}
 
@@ -271,12 +242,12 @@ esac
 			[ ! -L "${fr}" ] && [ -d "${fr}" ] && [ ! -L "${f}" ] && [ -d "${f}" ] && \
 				continue
 
-			log_critical "Conflict: $(tput bold)${f#${PWD}/}$(tput sgr0)"
+			log_critical "Conflict: $(tput sgr0)'${f#${PWD}/}'"
 			rc=1
 		done
 
 		return "${rc-0}"
-	} || log_failure "Unless updating, consider removing conflicting files and rebuild with \"-rb\""
+	} || log_critical "Unless updating, consider removing conflicting files and rebuild with \"-rb\""
 }
 
 short_binpkgs="${XDEB_BINPKGS#${PWD}/}"
