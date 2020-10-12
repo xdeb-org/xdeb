@@ -128,10 +128,9 @@ while [ "${#}" != "0" ]; do
 		--arch) shift; archs="${1}"; continue;;
 		--revision) shift; revision="${1}"; continue;;
 		--help) usage; exit 0;;
-		-*);; # Flag
-		*)
-			[ "${#}" = 1 ] && XDEB_BASEPKG="${1}"
-			break;;
+		-*);;
+		# Posix getopt stops after first non-option
+		*) [ "${#}" = 1 ] && XDEB_BASEPKG="${1}"; break;;
 	esac
 
 	flag="${1#?}"
