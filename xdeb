@@ -86,7 +86,7 @@ check_command() {
 	exit 1
 }
 
-help() {
+usage() {
 	cat << EOF
 usage: xdeb [-S] [-d] [-Sd] [--deps] ... FILE
   -d                       # Automatic dependencies
@@ -143,7 +143,7 @@ for arg in "${@}"; do
 			revision="$(eval echo "\${$((i + 1))}")"
 			continue;;
 		--help)
-			help
+			usage
 			exit 0;;
 		*);;
 	esac
@@ -158,7 +158,7 @@ for arg in "${@}"; do
 			d)
 				XDEB_OPT_DEPS=true;;
 			h)
-				help
+				usage
 				exit 0;;
 			c)
 				clean;;
@@ -178,7 +178,7 @@ for arg in "${@}"; do
 				XDEB_OPT_WARN_CONFLICT=false;;
 			*)
 				log_failure "Unknown option ${arg}"
-				help
+				usage
 				exit 1;;
 		esac
 
@@ -252,8 +252,6 @@ esac
 	XDEB_DEPENDENCIES="${XDEB_DEPENDENCIES} $(genrdeps)"
 	log_success "Resolved dependencies (${XDEB_DEPENDENCIES})"
 }
-
-log_success "'Parsed' control file"
 
 { [ "${XDEB_OPT_CLEAN_DIR}" = true ] || [ "${XDEB_OPT_WARN_CONFLICT}" = true ]; } && {
 	find "${XDEB_DESTDIR}" | {
