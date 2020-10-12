@@ -2,7 +2,7 @@
 #### The code pushed to master might not fully work. Please use releases instead
 
 # XDEB
-Simple utility to convert deb(ian) packages to xbps packages. Written in posix compliant shell.
+Simple utility to convert deb(ian) packages to xbps packages. Written fully posix compliant.
 
 ## Contents
  - [Usage](#Usage)
