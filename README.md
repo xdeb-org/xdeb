@@ -46,9 +46,10 @@ This allows reliable conversion for nearly all deb packages.
 The `-m` flag adds the `-32bit` suffix to the package and all it's dependencies.
 The example shows how to convert a `32bit` package.
 ```sh
-./xdeb -Sedm --arch x86_64 ~/Downloads/Simplenote-linux-1.16.0-beta1-i386.deb
+./xdeb -Sedm --arch=x86_64 ~/Downloads/Simplenote-linux-1.16.0-beta1-i386.deb
 ```
 Installing the newly converted package requires the multilib repositories to be installed.
+Note, that `/lib` will not be converted to `/lib32`
 
 #### File Conflicts
 By default, xdeb will show a warning if a file is already present on the system (And not a directory).
@@ -61,40 +62,44 @@ To counteract this, xdeb has the `-i` flag, which silences file conflicts.
 ### Help Page
 ```sh
 usage: xdeb [-S] [-d] [-Sd] [--deps] ... FILE
-  -d                       # Automatic dependencies
-  -S                       # Sync runtime dependency file
-  -c                       # Clean everything except shlibs and binpkgs
-  -r                       # Clean repodata (Use when rebuilding a package)
-  -q                       # Don't build the package at all
-  -C                       # Clean all files
-  -b                       # No extract, just build files in destdir
-  -e                       # Remove empty directories
-  -m                       # Add the -32bit suffix
-  -i                       # Ignore file conflicts
-  --deps                   # Add manual dependencies
-  --arch                   # Add an arch for the package to run on
-  --revision               # Set package revision. Alternative to -R, to not remove the repodata
-  --help | -h              # Show this page
+  -d                         # Automatic dependencies
+  -S                         # Sync runtime dependency file
+  -c                         # Clean everything except shlibs and binpkgs
+  -r                         # Clean repodata (Use when rebuilding a package)
+  -q                         # Don't build the package at all
+  -C                         # Clean all files
+  -b                         # No extract, just build files in destdir
+  -e                         # Remove empty directories
+  -m                         # Add the -32bit suffix
+  -i                         # Ignore file conflicts
+  --deps=...                 # Add manual dependencies
+  --arch=...                 # Add an arch for the package to run on
+  --revision=... | --rev=... # Set package revision. Alternative to -r
+  --help | -h                # Show this page
 
 example:
-  xdeb -Cq                 # Remove all files and quit
-  xdeb -Sd FILE            # Sync depdendency list and create package
-  xdeb --deps 'ar>0' FILE  # Add ar as a manual dependency and create package
+  xdeb -Cq                   # Remove all files and quit
+  xdeb -Sd FILE              # Sync depdendency list and create package
+  xdeb --deps='ar>0' FILE    # Add ar as a manual dependency and create package
 ```
 
 #### Using Manual dependencies
 Converting `Minecraft.deb`:
 ```sh
-$ ./xdeb -Sedr --deps 'oracle-jre>=8' ~/Downloads/Minecraft.deb
+$ ./xdeb -Sedr --deps='oracle-jre>=8' ~/Downloads/Minecraft.deb
+[+] Synced shlibs
 [+] Extracted files
-[-] Unable to find dependency for libcef.so
-[-] Unable to find dependency for libGLdispatch.so.0
-[+] Resolved dependencies (oracle-jre>=8 alsa-lib>=0 atk>=0 at-spi2-atk>=0 at-spi2-core>=0 avahi-libs>=0 avahi-libs>=0 libblkid>=0 bzip2>=0 cairo>=0 cairo>=0 glibc>=0 glibc>=0 libcups>=0 libdatrie>=0 dbus-libs>=0 glibc>=0 libEGL>=0 libepoxy>=0 expat>=0 libffi>=0 fontconfig>=0 freetype>=0 fribidi>=0 libgcc>=0 GConf>=0 gtk+3>=0 gdk-pixbuf>=0 gtk+>=0 glib>=0 glib>=0 libGL>=0 libglvnd>=0 glib>=0 gmp>=0 gnutls>=0 glib>=0 graphite>=0 gtk+3>=0 gtk+>=0 libharfbuzz>=0 nettle>=0 libidn2>=0 libmount>=0 glibc>=0 nettle>=0 nspr>=0 nss>=0 nss>=0 p11-kit>=0 pango>=0 pango>=0 pango>=0 libpcre>=0 pixman>=0 nspr>=0 nspr>=0 libpng>=0 glibc>=0 glibc>=0 glibc>=0 nss>=0 libstdc++>=0 libtasn1>=0 libthai>=0 libunistring>=0 libuuid>=0 wayland>=0 wayland>=0 wayland>=0 libX11>=0 libX11>=0 libXau>=0 libxcb>=0 libxcb>=0 libxcb>=0 libXcomposite>=0 libXcursor>=0 libXdamage>=0 libXdmcp>=0 libXext>=0 libXfixes>=0 libXinerama>=0 libXi>=0 libxkbcommon>=0 libXrandr>=0 libXrender>=0 libXScrnSaver>=0 libXtst>=0 zlib>=0 )
-[+] 'Parsed' deb control file
-[+] Created Package
-index: skipping `minecraft-launcher-2.1.17417_1' (x86_64), already registered.
-index: 5 packages registered.
-[+] Done. Install using `xbps-install -R binpkgs minecraft-launcher-2.1.17417_1`
+[+] Resolved dependencies (oracle-jre>=8 alsa-lib>=1.0.20_1 atk>=1.26.0_1
+cairo>=1.8.6_1 dbus-libs>=1.2.10_1 expat>=2.0.0_1 fontconfig>=2.6.0_1
+gdk-pixbuf>=2.22.0_1 glib>=2.18.0_1 glibc>=2.29_1 gtk+>=2.16.0_1 gtk+3>=3.0.0_1
+libcups>=1.5.3_1 libgcc>=4.4.0_1 libstdc++>=4.4.0_1 libuuid>=2.18_1
+libX11>=1.2_1 libxcb>=1.2_1 libXcomposite>=0.4.0_1 libXcursor>=1.1.9_1
+libXdamage>=1.1.1_1 libXext>=1.0.5_1 libXfixes>=4.0.3_1 libXi>=1.2.1_1
+libXrandr>=1.3.0_1 libXrender>=0.9.4_1 libXScrnSaver>=1.1.3_1 libXtst>=1.0.3_1
+nspr>=4.8_1 nss>=3.12.4_1 pango>=1.24.0_1 zlib>=1.2.3_1)
+index: added `minecraft-launcher-2.1.17627_1' (x86_64).
+index: 1 packages registered.
+[+] Done. Install using `xbps-install -R binpkgs minecraft-launcher-2.1.17627_1`
 
 $ sudo xbps-install -R ./binpkgs minecraft-launcher-2.1.17417_1
 
@@ -107,7 +112,7 @@ Space available on disk:       276GB
 
 Do you want to continue? [Y/n] n
 ```
-If the package just depends on a package with no specific version, add `>0` to match any version (i.e. `--deps 'ar>0 base-system>0 curl>0'`)
+If the package just depends on a package with no specific version, add `>0` to match any version (i.e. `--deps='ar>0 base-system>0 curl>0'`)
 
 ## Explanation
 ### Reasons to use

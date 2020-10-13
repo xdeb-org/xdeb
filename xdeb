@@ -89,25 +89,25 @@ check_command() {
 usage() {
 	cat << EOF
 usage: xdeb [-S] [-d] [-Sd] [--deps] ... FILE
-  -d                       # Automatic dependencies
-  -S                       # Sync runtime dependency file
-  -c                       # Clean everything except shlibs and binpkgs
-  -r                       # Clean repodata (Use when rebuilding a package)
-  -q                       # Don't build the package at all
-  -C                       # Clean all files
-  -b                       # No extract, just build files in destdir
-  -e                       # Remove empty directories
-  -m                       # Add the -32bit suffix
-  -i                       # Ignore file conflicts
-  --deps=                  # Add manual dependencies
-  --arch=                  # Add an arch for the package to run on
-  --revision= | --rev=     # Set package revision. Alternative to -R, to not remove the repodata
-  --help | -h              # Show this page
+  -d                         # Automatic dependencies
+  -S                         # Sync runtime dependency file
+  -c                         # Clean everything except shlibs and binpkgs
+  -r                         # Clean repodata (Use when rebuilding a package)
+  -q                         # Don't build the package at all
+  -C                         # Clean all files
+  -b                         # No extract, just build files in destdir
+  -e                         # Remove empty directories
+  -m                         # Add the -32bit suffix
+  -i                         # Ignore file conflicts
+  --deps=...                 # Add manual dependencies
+  --arch=...                 # Add an arch for the package to run on
+  --revision=... | --rev=... # Set package revision. Alternative to -r
+  --help | -h                # Show this page
 
 example:
-  xdeb -Cq                 # Remove all files and quit
-  xdeb -Sd FILE            # Sync depdendency list and create package
-  xdeb --deps='ar>0' FILE  # Add ar as a manual dependency and create package
+  xdeb -Cq                   # Remove all files and quit
+  xdeb -Sd FILE              # Sync depdendency list and create package
+  xdeb --deps='ar>0' FILE    # Add ar as a manual dependency and create package
 EOF
 }
 
@@ -224,7 +224,7 @@ case "${archs}" in
 esac
 
 [ "${XDEB_OPT_DEPS}" = true ] && {
-	XDEB_DEPENDENCIES="${XDEB_DEPENDENCIES} $(genrdeps)"
+	XDEB_DEPENDENCIES="${XDEB_DEPENDENCIES}$(genrdeps)"
 }
 
 # Remove trailing space
