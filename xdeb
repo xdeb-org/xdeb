@@ -19,19 +19,19 @@ XDEB_SUFFIX=""
 alias pkgrep="grep -Po -m1"
 
 log_message() {
-	echo "$(tput bold)[$(tput setaf 6)i$(tput sgr0)$(tput bold)]$(tput sgr0) ${*}"
+	echo "\033[1m[\033[36mi\033[0;1m]\033[0m ${*}"
 }
 
 log_success() {
-	echo "$(tput bold)[$(tput setaf 2)+$(tput sgr0)$(tput bold)]$(tput sgr0) ${*}"
+	echo "\033[1m[\033[32m+\033[0;1m]\033[0m ${*}"
 }
 
 log_failure() {
-	echo "$(tput bold)[$(tput setaf 3)-$(tput sgr0)$(tput bold)]$(tput sgr0) ${*}"
+	echo "\033[1m[\033[33m-\033[0;1m]\033[0m ${*}"
 }
 
 log_critical() {
-	echo "$(tput bold)[$(tput setaf 1)!$(tput sgr0)$(tput bold)] ${*}$(tput sgr0)"
+	echo "\033[1m[\033[31m!\033[0;1m] ${*}\033[0m"
 }
 
 # clean : Removes old package data, without removing any binpkgs
@@ -241,7 +241,7 @@ esac
 			[ ! -L "${fr}" ] && [ -d "${fr}" ] && [ ! -L "${f}" ] && [ -d "${f}" ] && \
 				continue
 
-			log_critical "Conflict: $(tput sgr0)'${f#${PWD}/}'"
+			log_critical "Conflict: \033[0m'${f#${PWD}/}'"
 			rc=1
 		done
 
