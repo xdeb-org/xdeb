@@ -149,6 +149,7 @@ while [ "${#}" != "0" ]; do
 			C*) clean_all;;
 			r*) clean_repodata;;
 			q*) XDEB_OPT_QUIT=true;;
+			Q*) exit 0;;
 			b*) XDEB_OPT_EXTRACT=false;;
 			e*) XDEB_OPT_CLEAN_DIR=true;;
 			m*) XDEB_SUFFIX="-32bit";;
