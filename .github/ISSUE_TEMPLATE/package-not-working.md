@@ -9,6 +9,8 @@ assignees: toluschr
 
 # Information
 
+* options:<br>
+  *output of* `env | grep XDEB`
 * version:<br>
   *either version, or commit id. ie: [9f69cf3, 1.2]*
 * cmdline:<br>
