@@ -258,7 +258,7 @@ XDEB_DEPENDENCIES="${XDEB_DEPENDENCIES%* }"
 		done
 
 		return "${rc-0}"
-	} || log_critical "Unless updating, consider removing conflicting files and rebuild with \"-rb\""
+	} || log_critical "Unless updating, consider removing conflicting files and rebuild with '-rb'"
 }
 
 short_binpkgs="${XDEB_BINPKGS#${PWD}/}"
