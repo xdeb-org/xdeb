@@ -13,6 +13,7 @@ XDEB_OPT_SYNC=false
 XDEB_OPT_QUIT=false
 XDEB_OPT_EXTRACT=true
 XDEB_OPT_CLEAN_DIR=false
+XDEB_OPT_FIX_CONFLICT=false
 XDEB_OPT_WARN_CONFLICT=true
 XDEB_SUFFIX=""
 
@@ -78,6 +79,14 @@ genrdeps() {
 
 		echo "${rdep%-*}${XDEB_SUFFIX}>=${rdep##*-}"
 	done | sort -u | tr '\n' ' '
+}
+
+fix_conflict() {
+	[ ! -e "${XDEB_DESTDIR}/${1}" ] || [ ! -d "${XDEB_DESTDIR}/${1}" ] && return 1
+
+	mkdir -p "${XDEB_DESTDIR}/$(dirname "${2}")"
+	mv "${XDEB_DESTDIR}/${1}" "${XDEB_DESTDIR}/${2}";
+	return 0
 }
 
 check_command() {
@@ -154,6 +163,7 @@ while [ "${#}" != "0" ]; do
 			e*) XDEB_OPT_CLEAN_DIR=true;;
 			m*) XDEB_SUFFIX="-32bit";;
 			i*) XDEB_OPT_WARN_CONFLICT=false;;
+			f*) XDEB_OPT_FIX_CONFLICT=true;;
 			*) log_failure "invalid option -- '${flag%"${flag#?}"}'"; usage; exit 1;;
 		esac
 
@@ -233,6 +243,14 @@ esac
 XDEB_DEPENDENCIES="${XDEB_DEPENDENCIES%* }"
 [ -n "${XDEB_DEPENDENCIES}" ] && {
 	log_success "Resolved dependencies (${XDEB_DEPENDENCIES})"
+}
+
+[ "${XDEB_OPT_FIX_CONFLICT}" = true ] && {
+	fix_conflict bin   usr/bin
+	fix_conflict lib   usr/lib
+	fix_conflict lib32 usr/lib32
+	fix_conflict lib64 usr/lib64
+	fix_conflict sbin  usr/sbin
 }
 
 [ "${XDEB_OPT_CLEAN_DIR}" != true ] && [ "${XDEB_OPT_WARN_CONFLICT}" != true ] || {
