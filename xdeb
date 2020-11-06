@@ -111,6 +111,7 @@ usage: xdeb [-S] [-d] [-Sd] [--deps] ... FILE
   -e                         # Remove empty directories
   -m                         # Add the -32bit suffix
   -i                         # Ignore file conflicts
+  -f                         # Attempt to automatically fix common conflicts
   --deps=...                 # Add manual dependencies
   --arch=...                 # Add an arch for the package to run on
   --revision=... | --rev=... # Set package revision. Alternative to -r
@@ -121,6 +122,7 @@ example:
   xdeb -Sd FILE              # Sync depdendency list and create package
   xdeb --deps='ar>0' FILE    # Add ar as a manual dependency and create package
 EOF
+	exit ${1}
 }
 
 check_command tar # tar
@@ -143,8 +145,8 @@ while [ "${#}" != "0" ]; do
 		--arch=*) archs="${1#*=}"; shift; continue;;
 		--revision=*|--rev=*) revision="${1#*=}"; shift; continue;;
 
-		--help) usage; exit 0;;
-		--*) log_failure "invalid option '${1}'"; usage; exit 1;;
+		--help) usage 0;;
+		--*) log_failure "invalid option '${1}'"; usage 1; exit 1;;
 		-*);;
 		# Posix getopt stops after first non-option
 		*) [ "${#}" = 1 ] && XDEB_BASEPKG="${1}"; break;;
@@ -155,7 +157,7 @@ while [ "${#}" != "0" ]; do
 		case "${flag}" in
 			S*) XDEB_OPT_SYNC=true;;
 			d*) XDEB_OPT_DEPS=true;;
-			h*) usage exit 0;;
+			h*) usage 0;;
 			c*) clean;;
 			C*) clean_all;;
 			r*) clean_repodata;;
@@ -166,7 +168,7 @@ while [ "${#}" != "0" ]; do
 			m*) XDEB_SUFFIX="-32bit";;
 			i*) XDEB_OPT_WARN_CONFLICT=false;;
 			f*) XDEB_OPT_FIX_CONFLICT=true;;
-			*) log_failure "invalid option -- '${flag%"${flag#?}"}'"; usage; exit 1;;
+			*) log_failure "invalid option -- '${flag%"${flag#?}"}'"; usage 1;;
 		esac
 
 		flag="${flag#?}"
