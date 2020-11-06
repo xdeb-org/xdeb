@@ -254,7 +254,7 @@ XDEB_DEPENDENCIES="${XDEB_DEPENDENCIES%* }"
 }
 
 [ "${XDEB_OPT_CLEAN_DIR}" != true ] && [ "${XDEB_OPT_WARN_CONFLICT}" != true ] || {
-	find "${XDEB_DESTDIR}" | {
+	find "${XDEB_DESTDIR}" -depth | {
 		while read -r f; do
 			# Remove empty directories
 			[ "${XDEB_OPT_CLEAN_DIR}" = true ] && [ -z "$(ls -A "${f}")" ] && {
