@@ -37,6 +37,13 @@ The resulting binary will be exported to `${XDEB_PKGROOT}/binpkgs`. (`./binpkgs`
 
 #### Flags
 You should generally run xdeb with `-Sde`, which stands for "Sync dependency file, enable dependencies, remove empty directories".
+Alternatively, use your shells rc, to always run xdeb with the suggested options.
+```
+export XDEB_OPT_DEPS=true
+export XDEB_OPT_SYNC=true
+export XDEB_OPT_WARN_CONFLICT=true
+export XDEB_OPT_FIX_CONFLICT=true
+```
 
 #### Automatic Dependencies
 xdeb can now resolve the runtime dependencies.<br>
@@ -72,6 +79,7 @@ usage: xdeb [-S] [-d] [-Sd] [--deps] ... FILE
   -e                         # Remove empty directories
   -m                         # Add the -32bit suffix
   -i                         # Ignore file conflicts
+  -f                         # Attempt to automatically fix common conflicts
   --deps=...                 # Add manual dependencies
   --arch=...                 # Add an arch for the package to run on
   --revision=... | --rev=... # Set package revision. Alternative to -r
