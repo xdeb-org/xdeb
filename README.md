@@ -24,7 +24,7 @@ Simple utility to convert deb(ian) packages to xbps packages. Written in posix c
 ### Installation
 If you like to install xdeb, copy the script to `/usr/local/bin/`.
 In addition to copying the script, a couple of dependencies are needed:<br>
-Install them using `xbps-install binutils tar curl xbps`.
+Install them using `xbps-install binutils tar curl xbps xz`.
 
 Unless you set `XDEB_PKGROOT` yourself (ie. `${HOME}/.config/xdeb`), the script will operate in the current directory.
 The resulting binary will be exported to `${XDEB_PKGROOT}/binpkgs`. (`./binpkgs` by default)

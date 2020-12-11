@@ -125,6 +125,7 @@ EOF
 	exit "${1}"
 }
 
+check_command xz # xz
 check_command tar # tar
 check_command curl # curl
 
