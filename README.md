@@ -88,7 +88,7 @@ usage: xdeb [-S] [-d] [-Sd] [--deps] ... FILE
 example:
   xdeb -Cq                   # Remove all files and quit
   xdeb -Sd FILE              # Sync depdendency list and create package
-  xdeb --deps='ar>0' FILE    # Add ar as a manual dependency and create package
+  xdeb --deps='tar>0' FILE   # Add tar as manual dependency and create package
 ```
 
 #### Using Manual dependencies
@@ -120,7 +120,7 @@ Space available on disk:       276GB
 
 Do you want to continue? [Y/n] n
 ```
-If the package just depends on a package with no specific version, add `>0` to match any version (i.e. `--deps='ar>0 base-system>0 curl>0'`)
+If the package just depends on a package with no specific version, add `>0` to match any version (i.e. `--deps='tar>0 base-system>0 curl>0'`)
 
 ## Explanation
 ### Reasons to use

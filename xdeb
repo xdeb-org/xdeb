@@ -120,7 +120,7 @@ usage: xdeb [-S] [-d] [-Sd] [--deps] ... FILE
 example:
   xdeb -Cq                   # Remove all files and quit
   xdeb -Sd FILE              # Sync depdendency list and create package
-  xdeb --deps='ar>0' FILE    # Add ar as a manual dependency and create package
+  xdeb --deps='tar>0' FILE   # Add tar as manual dependency and create package
 EOF
 	exit "${1}"
 }
