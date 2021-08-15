@@ -235,6 +235,8 @@ revision="${revision-1}"
 version=$(echo "${version}" | grep -Po "^(\d|\.)*")
 case "${archs}" in
 	amd64) archs="x86_64";;
+	arm64) archs="aarch64";;
+	armhf) archs="armv7l";;
 	i386) archs="i686";;
 	all) archs="noarch";;
 	*);;
