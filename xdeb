@@ -2,6 +2,7 @@
 
 # Directories and filenames
 XDEB_PKGROOT="$(realpath "${XDEB_PKGROOT-${PWD}}")"
+XDEB_WORKDIR="${XDEB_PKGROOT}/workdir"
 XDEB_DESTDIR="${XDEB_PKGROOT}/destdir"
 XDEB_DATADIR="${XDEB_PKGROOT}/data"
 XDEB_BINPKGS="${XDEB_PKGROOT}/binpkgs"
@@ -37,11 +38,7 @@ log_critical() {
 
 # clean : Removes old package data, without removing any binpkgs
 clean() {
-	rm -f "${XDEB_PKGROOT}"/control.tar.?z
-	rm -f "${XDEB_PKGROOT}"/data.tar.?z
-	rm -f "${XDEB_PKGROOT}"/debian-binary
-	rm -f "${XDEB_PKGROOT}"/_gpgorigin
-
+	rm -rf "${XDEB_WORKDIR}"
 	rm -f "${XDEB_BINPKGS}"/.xbps-pkg-*
 
 	rm -rf "${XDEB_DATADIR}"
@@ -201,11 +198,11 @@ done
 	mkdir -p "${XDEB_BINPKGS}"
 	mkdir -p "${XDEB_DATADIR}"
 	mkdir -p "${XDEB_DESTDIR}"
+	mkdir -p "${XDEB_WORKDIR}"
 
-	# Extract the packages, every operation has to succeed
-	ar -xf "${XDEB_BASEPKG}" --output "${XDEB_PKGROOT}" &&
-	tar -xf "${XDEB_PKGROOT}"/control.tar.?z -C "${XDEB_DATADIR}" &&
-	tar -xf "${XDEB_PKGROOT}"/data.tar.?z -C "${XDEB_DESTDIR}" || {
+	ar -xf "${XDEB_BASEPKG}" --output "${XDEB_WORKDIR}" &&
+	tar -xf "${XDEB_WORKDIR}"/control.* -C "${XDEB_DATADIR}" &&
+	tar -xf "${XDEB_WORKDIR}"/data.* -C "${XDEB_DESTDIR}" || {
 		log_failure "Not a valid deb file"
 		exit 1
 	}
