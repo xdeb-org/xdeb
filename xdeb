@@ -4,7 +4,7 @@
 XDEB_PKGROOT="$(realpath "${XDEB_PKGROOT-${PWD}}")"
 XDEB_WORKDIR="${XDEB_PKGROOT}/workdir"
 XDEB_DESTDIR="${XDEB_PKGROOT}/destdir"
-XDEB_DATADIR="${XDEB_PKGROOT}/data"
+XDEB_DATADIR="${XDEB_PKGROOT}/datadir"
 XDEB_BINPKGS="${XDEB_PKGROOT}/binpkgs"
 XDEB_SHLIBS="${XDEB_PKGROOT}/shlibs"
 
@@ -38,9 +38,9 @@ log_critical() {
 
 # clean : Removes old package data, without removing any binpkgs
 clean() {
-	rm -rf "${XDEB_WORKDIR}"
 	rm -f "${XDEB_BINPKGS}"/.xbps-pkg-*
 
+	rm -rf "${XDEB_WORKDIR}"
 	rm -rf "${XDEB_DATADIR}"
 	rm -rf "${XDEB_DESTDIR}"
 }
