@@ -258,6 +258,8 @@ XDEB_DEPENDENCIES="${XDEB_DEPENDENCIES%* }"
 }
 
 [ "${XDEB_OPT_CLEAN_DIR}" != true ] && [ "${XDEB_OPT_WARN_CONFLICT}" != true ] || {
+	command -v xbps-query >/dev/null && ign="$(xbps-query -f "${pkgname}" | sed 's/ -> .*//')"
+
 	find "${XDEB_DESTDIR}" -depth | {
 		while read -r f; do
 			# Remove empty directories
@@ -272,15 +274,15 @@ XDEB_DEPENDENCIES="${XDEB_DEPENDENCIES%* }"
 
 			fr="${f#${XDEB_DESTDIR}}"
 			[ ! -e "${fr}" ] && continue
-			[ ! -L "${fr}" ] && [ -d "${fr}" ] && [ ! -L "${f}" ] && [ -d "${f}" ] && \
-				continue
+			[ ! -L "${fr}" ] && [ -d "${fr}" ] && [ ! -L "${f}" ] && [ -d "${f}" ] && continue
 
+			echo "${ign}" | grep -q -x -F "${fr}" && continue
 			log_critical "Conflict: \033[0m'${f#${PWD}/}'"
 			rc=1
 		done
 
 		return "${rc-0}"
-	} || log_critical "Unless updating, consider removing conflicting files and rebuild with '-rb'"
+	} || log_critical "Consider removing conflicting files and rebuild with '-rb'"
 }
 
 short_binpkgs="${XDEB_BINPKGS#${PWD}/}"
