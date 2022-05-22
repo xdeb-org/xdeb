@@ -78,12 +78,16 @@ genrdeps() {
 	done | sort -u | tr '\n' ' '
 }
 
+# If 2 arguments, move $1 to $2/$1
+# if 3 arguments, move $1 to $2/$3
 fix_conflict() {
 	[ ! -e "${XDEB_DESTDIR}/${1}" ] || [ ! -d "${XDEB_DESTDIR}/${1}" ] && return 1
 
+	src="${1}"
+	dst="${2}/${3-"${1}"}"
 	mkdir -p "${XDEB_DESTDIR}/${2}"
-	mv "${XDEB_DESTDIR}/${1}" "${XDEB_DESTDIR}/${2}/${3-"${1}"}";
-	log_success "Moved conflicting directory '${1}'"
+	mv "${XDEB_DESTDIR}/${src}" "${XDEB_DESTDIR}/${dst}";
+	log_success "Moved conflict '${src}' -> '${dst}'"
 
 	return 0
 }
@@ -255,6 +259,7 @@ XDEB_DEPENDENCIES="${XDEB_DEPENDENCIES%* }"
 	fix_conflict lib32 usr
 	fix_conflict lib64 usr
 	fix_conflict sbin  usr
+	fix_conflict usr/lib64 usr lib
 }
 
 [ "${XDEB_OPT_CLEAN_DIR}" != true ] && [ "${XDEB_OPT_WARN_CONFLICT}" != true ] || {
@@ -282,7 +287,7 @@ XDEB_DEPENDENCIES="${XDEB_DEPENDENCIES%* }"
 		done
 
 		return "${rc-0}"
-	} || log_critical "Consider removing conflicting files and rebuild with '-rb'"
+	} || log_critical "Consider (re)moving file(s) from '${XDEB_DESTDIR}' and run 'xdeb -rb'"
 }
 
 short_binpkgs="${XDEB_BINPKGS#${PWD}/}"
