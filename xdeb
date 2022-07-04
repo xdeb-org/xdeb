@@ -145,7 +145,6 @@ while [ "${#}" != "0" ]; do
 
 		--help) usage 0;;
 		--*) log_crit "invalid option '${1}'"; usage 1; exit 1;;
-		-*);;
 		# Posix getopt stops after first non-option
 		*) [ "${#}" = 1 ] && XDEB_BASEPKG="${1}"; break;;
 	esac
@@ -236,18 +235,13 @@ case "${archs}" in
 	armhf) archs="armv7l";;
 	i386) archs="i686";;
 	all) archs="noarch";;
-	*);;
 esac
 
-[ "${XDEB_OPT_DEPS}" = true ] && {
-	XDEB_DEPENDENCIES="${XDEB_DEPENDENCIES}$(genrdeps)"
-}
+[ "${XDEB_OPT_DEPS}" = true ] && XDEB_DEPENDENCIES="${XDEB_DEPENDENCIES}$(genrdeps)" 
 
 # Remove trailing space
 XDEB_DEPENDENCIES="${XDEB_DEPENDENCIES%* }"
-[ -n "${XDEB_DEPENDENCIES}" ] && {
-	log_info "Resolved dependencies (${XDEB_DEPENDENCIES})"
-}
+[ -n "${XDEB_DEPENDENCIES}" ] && log_info "Resolved dependencies (${XDEB_DEPENDENCIES})"
 
 [ "${XDEB_OPT_FIX_CONFLICT}" = true ] && {
 	fix_conflict bin   usr
