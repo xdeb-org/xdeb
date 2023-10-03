@@ -145,8 +145,8 @@ while [ "${#}" != "0" ]; do
 
 		--help) usage 0;;
 		--*) log_crit "invalid option '${1}'"; usage 1; exit 1;;
-		# Posix getopt stops after first non-option
 		-*);;
+		# Posix getopt stops after first non-option
 		*) [ "${#}" = 1 ] && XDEB_BASEPKG="${1}"; break;;
 	esac
 
