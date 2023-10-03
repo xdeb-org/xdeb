@@ -241,7 +241,7 @@ case "${archs}" in
 	all) archs="noarch";;
 esac
 
-[ "${XDEB_OPT_DEPS}" = true ] && XDEB_DEPENDENCIES="${XDEB_DEPENDENCIES}$(genrdeps)" 
+[ "${XDEB_OPT_DEPS}" = true ] && XDEB_DEPENDENCIES="${XDEB_DEPENDENCIES}$(genrdeps)"
 
 # Remove trailing space
 XDEB_DEPENDENCIES="${XDEB_DEPENDENCIES%* }"
