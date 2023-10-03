@@ -178,7 +178,11 @@ done
 [ "${XDEB_OPT_SYNC}" = true ] && {
 	curl \
 		-s "https://raw.githubusercontent.com/void-linux/void-packages/master/common/shlibs" \
-		-o "${XDEB_SHLIBS}"
+		-o "${XDEB_SHLIBS}" \
+		-f || {
+		log_crit "Unable to sync shlibs."
+		exit 1
+	}
 	log_info "Synced shlibs"
 }
 
