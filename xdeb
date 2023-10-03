@@ -183,14 +183,14 @@ done
 }
 
 [ "${XDEB_OPT_DEPS}" = true ] && [ ! -r "${XDEB_SHLIBS}" ] && {
-	log_crit "Sync atleast once, before using the depencency option"
+	log_crit "shlibs file not synced. Run xdeb with '-Sd' to fetch dependency file"
 	exit 1
 }
 
 [ "${XDEB_OPT_EXTRACT}" = true ] && {
 	# Does the filename end with .deb? Is the file readable?
 	echo "${XDEB_BASEPKG}" | grep -q "\.deb$" && [ -r "${XDEB_BASEPKG}" ] || {
-		log_crit "Last argument has to point to an existing deb package"
+		log_crit "Last argument is not a .deb file or does not exist"
 		exit 1
 	}
 
