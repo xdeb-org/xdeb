@@ -21,15 +21,15 @@ XDEB_SUFFIX=""
 alias pkgrep="grep -Po -m1"
 
 log_info() {
-	echo "\033[1;36mI\033[0m ${*}\033[0m"
+	printf "\033[1;36mI\033[0m %s\033[0m\n" "${*}"
 }
 
 log_warn() {
-	echo "\033[1;33mW\033[0m ${*}\033[0m"
+	printf "\033[1;33mW\033[0m %s\033[0m\n" "${*}"
 }
 
 log_crit() {
-	echo "\033[1;31mE\033[0;1m ${*}\033[0m"
+	printf "\033[1;31mE\033[0;1m %s\033[0m\n" "${*}"
 }
 
 # clean : Removes old package data, without removing any binpkgs
@@ -137,14 +137,14 @@ mkdir -p "${XDEB_PKGROOT}"
 while [ "${#}" != "0" ]; do
 	case "${1}" in
 		--deps|--arch|--revision)
-			log_crit "'${1}' invalid. Use ${1}=... instead"; exit 1; continue;;
+			log_crit "'${1}' invalid. Use ${1}=... instead"; exit 1;;
 
 		--deps=*) XDEB_DEPENDENCIES="${XDEB_DEPENDENCIES}${1#*=} "; shift; continue;;
 		--arch=*) archs="${1#*=}"; shift; continue;;
 		--revision=*|--rev=*) revision="${1#*=}"; shift; continue;;
 
 		--help) usage 0;;
-		--*) log_crit "invalid option '${1}'"; usage 1; exit 1;;
+		--*) log_crit "invalid option '${1}'"; usage 1;;
 		-*);;
 		# Posix getopt stops after first non-option
 		*) [ "${#}" = 1 ] && XDEB_BASEPKG="${1}"; break;;
@@ -272,12 +272,12 @@ XDEB_DEPENDENCIES="${XDEB_DEPENDENCIES%* }"
 			# Check for conflicts
 			[ "${XDEB_OPT_WARN_CONFLICT}" != true ] && continue
 
-			fr="${f#${XDEB_DESTDIR}}"
+			fr="${f#"${XDEB_DESTDIR}"}"
 			[ ! -e "${fr}" ] && continue
 			[ ! -L "${fr}" ] && [ -d "${fr}" ] && [ ! -L "${f}" ] && [ -d "${f}" ] && continue
 
 			echo "${ign}" | grep -q -x -F "${fr}" && continue
-			log_crit "Conflict: '${f#${PWD}/}'"
+			log_crit "Conflict: '${f#"${PWD}/"}'"
 			rc=1
 		done
 
@@ -285,7 +285,7 @@ XDEB_DEPENDENCIES="${XDEB_DEPENDENCIES%* }"
 	} || log_crit "Consider (re)moving file(s) from '${XDEB_DESTDIR}' and run \`xdeb -rb\`"
 }
 
-short_binpkgs="${XDEB_BINPKGS#${PWD}/}"
+short_binpkgs="${XDEB_BINPKGS#"${PWD}/"}"
 
 cd "${XDEB_BINPKGS}" || exit
 
