@@ -276,7 +276,11 @@ XDEB_DEPENDENCIES="${XDEB_DEPENDENCIES%* }"
 			[ ! -L "${fr}" ] && [ -d "${fr}" ] && [ ! -L "${f}" ] && [ -d "${f}" ] && continue
 
 			echo "${ign}" | grep -q -x -F "${fr}" && continue
-			log_crit "Conflict: '${f#"${PWD}/"}'"
+			[ -z "$(ls -A "${f}")" ] && {
+				log_crit "Conflict: '${f#"${PWD}/"}'. Use '-e' to remove automatically."
+			} || {
+				log_crit "Conflict: '${f#"${PWD}/"}'"
+			}
 			rc=1
 		done
 
