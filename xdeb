@@ -206,7 +206,7 @@ done
 	ar -xf "${XDEB_BASEPKG}" --output "${XDEB_WORKDIR}" &&
 	tar -xf "${XDEB_WORKDIR}"/control.* -C "${XDEB_DATADIR}" &&
 	tar -xf "${XDEB_WORKDIR}"/data.* -C "${XDEB_DESTDIR}" || {
-		log_crit "Not a valid deb file"
+		log_crit "Not a valid deb file, one of the extraction steps failed"
 		exit 1
 	}
 
