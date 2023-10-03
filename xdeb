@@ -248,11 +248,11 @@ XDEB_DEPENDENCIES="${XDEB_DEPENDENCIES%* }"
 [ -n "${XDEB_DEPENDENCIES}" ] && log_info "Resolved dependencies (${XDEB_DEPENDENCIES})"
 
 [ "${XDEB_OPT_FIX_CONFLICT}" = true ] && {
-	fix_conflict bin   usr
-	fix_conflict lib   usr
-	fix_conflict lib32 usr
-	fix_conflict lib64 usr
-	fix_conflict sbin  usr
+	fix_conflict bin       usr
+	fix_conflict lib       usr
+	fix_conflict lib32     usr
+	fix_conflict lib64     usr
+	fix_conflict sbin      usr
 	fix_conflict usr/lib64 usr lib
 }
 
