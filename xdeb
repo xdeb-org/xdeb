@@ -89,9 +89,9 @@ fix_conflict() {
 }
 
 check_command() {
-	command -v "$1" > /dev/null 2>&1 && return 0
+	command -v "${1}" > /dev/null 2>&1 && return 0
 
-	log_warn "Dependency '${1}' not found"
+	log_warn "Executable '${1}' from package '${2-"${1}"}' not found."
 	exit 1
 }
 
@@ -122,15 +122,15 @@ EOF
 	exit "${1}"
 }
 
-check_command xz # xz
-check_command tar # tar
-check_command curl # curl
+check_command xz
+check_command tar
+check_command curl
 
-check_command ar # binutils
-check_command objdump # binutils
+check_command ar binutils
+check_command objdump binutils
 
-check_command xbps-rindex # xbps
-check_command xbps-create # xbps
+check_command xbps-rindex xbps
+check_command xbps-create xbps
 
 mkdir -p "${XDEB_PKGROOT}"
 
