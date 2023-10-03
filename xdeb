@@ -192,7 +192,7 @@ done
 
 [ "${XDEB_OPT_EXTRACT}" = true ] && {
 	# Does the filename end with .deb? Is the file readable?
-	echo "${XDEB_BASEPKG}" | grep -q "\.deb$" && [ -r "${XDEB_BASEPKG}" ] || {
+	[ -z "${XDEB_BASEPKG##*.deb}" ] && [ -r "${XDEB_BASEPKG}" ] || {
 		log_crit "Last argument is not a .deb file or does not exist"
 		exit 1
 	}
