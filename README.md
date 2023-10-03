@@ -46,8 +46,10 @@ export XDEB_OPT_FIX_CONFLICT=true
 ```
 
 #### Automatic Dependencies
-xdeb can now resolve the runtime dependencies.<br>
-This allows reliable conversion for nearly all deb packages.
+Using the automatic dependency feature allows reliable conversion of nearly all deb packages.
+
+Simply use `-Sd` to sync the shlibs file (provided by the void-packages repository) and build with dependency mode enabled.
+Afterwards, each additional execution may omit the `-S` flag to use xdeb offline.
 
 #### Multilib
 The `-m` flag adds the `-32bit` suffix to the package and all it's dependencies.
