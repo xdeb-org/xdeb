@@ -252,7 +252,8 @@ XDEB_DEPENDENCIES="${XDEB_DEPENDENCIES%* }"
 	fix_conflict lib       usr
 	fix_conflict lib32     usr
 	fix_conflict lib64     usr
-	fix_conflict sbin      usr
+	fix_conflict sbin      usr bin
+	fix_conflict usr/sbin  usr bin
 	fix_conflict usr/lib64 usr lib
 }
 
