@@ -1,12 +1,12 @@
 #!/bin/sh
 
 # Directories and filenames
-XDEB_PKGROOT="$(realpath "${XDEB_PKGROOT-"$(pwd)"}")"
-XDEB_WORKDIR="$(realpath "${XDEB_WORKDIR-"${XDEB_PKGROOT}/workdir"}")"
-XDEB_DESTDIR="$(realpath "${XDEB_DESTDIR-"${XDEB_PKGROOT}/destdir"}")"
-XDEB_DATADIR="$(realpath "${XDEB_DATADIR-"${XDEB_PKGROOT}/datadir"}")"
-XDEB_BINPKGS="$(realpath "${XDEB_BINPKGS-"${XDEB_PKGROOT}/binpkgs"}")"
-XDEB_SHLIBS="$(realpath "${XDEB_SHLIBS-"${XDEB_PKGROOT}/shlibs"}")"
+XDEB_PKGROOT="$(realpath -m "${XDEB_PKGROOT-"$(pwd)"}")"
+XDEB_WORKDIR="$(realpath -m "${XDEB_WORKDIR-"${XDEB_PKGROOT}/workdir"}")"
+XDEB_DESTDIR="$(realpath -m "${XDEB_DESTDIR-"${XDEB_PKGROOT}/destdir"}")"
+XDEB_DATADIR="$(realpath -m "${XDEB_DATADIR-"${XDEB_PKGROOT}/datadir"}")"
+XDEB_BINPKGS="$(realpath -m "${XDEB_BINPKGS-"${XDEB_PKGROOT}/binpkgs"}")"
+XDEB_SHLIBS="$(realpath -m "${XDEB_SHLIBS-"${XDEB_PKGROOT}/shlibs"}")"
 
 # Options
 XDEB_OPT_DEPS="${XDEB_OPT_DEPS-false}"
