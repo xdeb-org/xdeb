@@ -1,72 +1,22 @@
-#### Don't ignore the logs! XDEB will notify you about package conflicts
-#### The code pushed to master might not fully work. Please use releases instead
+#### Ignoring the logs might break your system. Please use releases.
 
-# XDEB
-Simple utility to convert deb(ian) packages to xbps packages. Written in posix compliant shell.
-
-## Contents
- - [Usage](#Usage)
-   - [Installation](#Installation)
-   - [Converting your package](#Converting-your-package)
-     - [Which flags to use?](#Flags)
-     - [Automatic Dependencies](#Automatic-Dependencies)
-     - [Converting i386 package](#Multilib)
-     - [File Conflicts](#File-Conflicts)
-   - [Help Page](#Help-Page)
-     - [Using Manual dependencies](#Using-Manual-dependencies)
- - [Explanation](#Explanation)
-   - [Reasons to use](#Reasons-to-use)
-   - [Why DEB packages?](#Why-DEB-packages%3F)
-   - [Features](#Features)
+# xdeb
+xdeb is posix shell script for for converting deb(ian) packages to the xbps format.
 
 ## Usage
 
+Set `XDEB_PKGROOT=${HOME}/.config/xdeb` to avoid cluttering your current working directory.
+Binaries will be exported to `${XDEB_PKGROOT}/binpkgs`.
+
+### Converting packages
+1. Download xdeb: `curl -LO github.com/xdeb-org/xdeb/releases/latest/download/xdeb`
+2. Install dependencies: `xbps-install binutils tar curl xbps xz`
+3. Set executable bit: `chmod 0744 xdeb`
+4. Convert: `./xdeb -Sedf <name>_<version>_<arch>.deb`
+5. Install: `xbps-install -R ./binpkgs <name>`
+
 ### Installation
-If you like to install xdeb, copy the script to `/usr/local/bin/`.
-In addition to copying the script, a couple of dependencies are needed:<br>
-Install them using `xbps-install binutils tar curl xbps xz`.
-
-Unless you set `XDEB_PKGROOT` yourself (ie. `${HOME}/.config/xdeb`), the script will operate in the current directory.
-The resulting binary will be exported to `${XDEB_PKGROOT}/binpkgs`. (`./binpkgs` by default)
-
-### Converting your package
-1. Download the latest release
-2. Make the xdeb script executable (`chmod 0744 xdeb`)
-3. Convert the package (`./xdeb -Sde <name>_<version>_<arch>.deb`)
-4. Install the package (`xbps-install -R binpkgs <name>`)
-
-#### Flags
-You should generally run xdeb with `-Sde`, which stands for "Sync dependency file, enable dependencies, remove empty directories".
-Alternatively, use your shells rc, to always run xdeb with the suggested options.
-```
-export XDEB_OPT_DEPS=true
-export XDEB_OPT_SYNC=true
-export XDEB_OPT_WARN_CONFLICT=true
-export XDEB_OPT_FIX_CONFLICT=true
-```
-
-#### Automatic Dependencies
-Using the automatic dependency feature allows reliable conversion of nearly all deb packages.
-
-Simply use `-Sd` to sync the shlibs file (provided by the void-packages repository) and build with dependency mode enabled.
-Afterwards, each additional execution may omit the `-S` flag to use xdeb offline.
-
-#### Multilib
-The `-m` flag adds the `-32bit` suffix to the package and all it's dependencies.
-The example shows how to convert a `32bit` package.
-```sh
-./xdeb -Sedm --arch=x86_64 ~/Downloads/Simplenote-linux-1.16.0-beta1-i386.deb
-```
-Installing the newly converted package requires the multilib repositories to be installed.
-Note, that `/lib` will not be converted to `/lib32`
-
-#### File Conflicts
-By default, xdeb will show a warning if a file is already present on the system (And not a directory).
-This behavior ensures that the converting package won't break the system.<br>
-If xdeb complains about conflicting files,
-manually removing them from the destdir directory and rebuilding with `-rb` might help.<br>
-Having a package already installed (For example when updating it) will output a lot of conflicts.
-To counteract this, xdeb has the `-i` flag, which silences file conflicts.
+Copy the script to `/usr/local/bin/`.
 
 ### Help Page
 ```sh
@@ -93,8 +43,48 @@ example:
   xdeb --deps='tar>0' FILE   # Add tar as manual dependency and create package
 ```
 
+### Flags
+In short: Just use `-Sedf` (Sync dependency list, remove empty directories, enable dependency resolution, resolve conflicts = don't break system)
+
+Options can also be set via environment variables:
+```
+export XDEB_OPT_DEPS=true
+export XDEB_OPT_SYNC=true
+export XDEB_OPT_WARN_CONFLICT=true
+export XDEB_OPT_FIX_CONFLICT=true
+```
+
+#### Automatic Dependencies
+Using the automatic dependency feature allows reliable conversion of nearly all deb packages.
+
+Use `-Sd` to sync [the dependency list](https://raw.githubusercontent.com/void-linux/void-packages/master/common/shlibs) and build with dependency resolution enabled.
+Subsequent runs do not require `-S` and xdeb will not require internet. Just make sure to sync it once in a while.
+
+#### Multilib
+The `-m` (multilib) flag adds the suffix `-32bit` to the package and dependencies.
+Example with host arch `x86_64`:
+```sh
+./xdeb -Sedfm --arch=x86_64 ~/Downloads/Simplenote-linux-1.16.0-beta1-i386.deb
+```
+**`/lib` will not be rewritten to `/lib32`**
+
+#### File Conflicts
+Due to a missing check, the xbps package manager might break the system if a package contains a file that is already present on the system.
+As a workaround, xdeb shows warnings for conflicting files, **do not ignore them**.
+**This only works when installing packages on the same machine they were converted on!**
+
+Updating a package may show lots of unnecessary warnings. Disable using `-i` (s**i**lence).
+
+##### Resolving conflicts
+Conflicts can either be resolved automatically (`-f`) or manually.
+
+1. Build package: `xdeb ...`
+2. Observe warnings
+3. Fix files (Example: remove): `rm -rf ${XDEB_PKGROOT-.}/destdir/usr/lib`
+4. Build package without conflicts: `./xdeb -rb`
+
 #### Using Manual dependencies
-Converting `Minecraft.deb`:
+Converting `Minecraft.deb` with manual dependency `oracle-jre` (Version 8 or later):
 ```sh
 $ ./xdeb -Sedr --deps='oracle-jre>=8' ~/Downloads/Minecraft.deb
 [+] Synced shlibs
@@ -122,26 +112,13 @@ Space available on disk:       276GB
 
 Do you want to continue? [Y/n] n
 ```
-If the package just depends on a package with no specific version, add `>0` to match any version (i.e. `--deps='tar>0 base-system>0 curl>0'`)
+Add `>0` to match any version (i.e. `--deps='tar>0 base-system>0 curl>0'`)
 
-## Explanation
-### Reasons to use
+## Rationale
+
 - The VoidLinux-Team refuses to ship more chromium based browsers.
 - Electron based applications, like [Simplenote](https://simplenote.com/)
 - Proprietary applications like [Discord](https://discord.gg) or [Minecraft](https://minecraft.net).
 
-Using one of the packages listed above on VoidLinux, requires having to build them yourself.<br>
-This requires getting to know the build system, cloning the (~150MB) [void-packages](https://github.com/void-linux/void-packages) repository, etc.
-This script handles everything automatically, without accessing the internet by default.
-
-### Why deb packages?
-The deb package format is undoubtedly the most commonly used format, since Debian is the most popular Linux distro.<br>
-You can expect nearly every Linux application to provide a binary deb package.
-
-### Features
-* [x] Convert a package
-* [x] Restore changes made by this script
-* [x] Dependency resolving (`xdeb -Sd`)
-* [x] Show conflicting files
-* [ ] Remove bundled shlibs
-* [ ] Exclude dependencies
+Manually building packages is bothersome and would require learning the build system, cloning the (~150MB) [void-packages](https://github.com/void-linux/void-packages) repository, etc.<br>
+This script handles everything automatically and without even accessing the internet by default.
