@@ -35,6 +35,17 @@ log_crit() {
 	printf "\033[1;31mE\033[0;1m %s\033[0m\n" "${*}"
 }
 
+sync_shlibs() {
+	curl \
+		-s "https://raw.githubusercontent.com/void-linux/void-packages/master/common/shlibs" \
+		-o "${XDEB_SHLIBS}" \
+		-f || {
+		log_crit "Unable to sync shlibs."
+		exit 1
+	}
+	log_info "Synced shlibs"
+}
+
 # clean : Removes old package data, without removing any binpkgs
 clean() {
 	rm -f "${XDEB_BINPKGS}"/.xbps-pkg-*
@@ -155,7 +166,7 @@ while [ "${#}" != "0" ]; do
 	flag="${1#?}"
 	while [ -n "${flag}" ]; do
 		case "${flag}" in
-			S*) XDEB_OPT_SYNC=true;;
+			S*) sync_shlibs;;
 			d*) XDEB_OPT_DEPS=true;;
 			h*) usage 0;;
 			c*) clean;;
@@ -176,17 +187,6 @@ while [ "${#}" != "0" ]; do
 
 	shift
 done
-
-[ "${XDEB_OPT_SYNC}" = true ] && {
-	curl \
-		-s "https://raw.githubusercontent.com/void-linux/void-packages/master/common/shlibs" \
-		-o "${XDEB_SHLIBS}" \
-		-f || {
-		log_crit "Unable to sync shlibs."
-		exit 1
-	}
-	log_info "Synced shlibs"
-}
 
 [ "${XDEB_OPT_DEPS}" = true ] && [ ! -r "${XDEB_SHLIBS}" ] && {
 	log_crit "shlibs file not synced. Run xdeb with '-Sd' to fetch dependency file"
