@@ -5,10 +5,9 @@ xdeb is posix shell script for for converting deb(ian) packages to the xbps form
 
 ## Usage
 
-Set `XDEB_PKGROOT=${HOME}/.config/xdeb` to avoid cluttering your current working directory.
-Binaries will be exported to `${XDEB_PKGROOT}/binpkgs`.
-
 ### Converting packages
+Conversioni will create files in your current working directory. Refer to [the installation instruction](#Installation) for more information.
+
 1. Download xdeb: `curl -LO github.com/xdeb-org/xdeb/releases/latest/download/xdeb`
 2. Install dependencies: `xbps-install binutils tar curl xbps xz`
 3. Set executable bit: `chmod 0744 xdeb`
@@ -16,7 +15,8 @@ Binaries will be exported to `${XDEB_PKGROOT}/binpkgs`.
 5. Install: `xbps-install -R ./binpkgs <name>`
 
 ### Installation
-Copy the script to `/usr/local/bin/`.
+Copy the script to `/usr/local/bin/`and set `XDEB_PKGROOT=${HOME}/.config/xdeb` to avoid cluttering your current working directory.
+Binaries will then be exported to `${XDEB_PKGROOT-.}/binpkgs`.
 
 ### Help Page
 ```sh
