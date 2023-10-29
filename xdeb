@@ -59,7 +59,7 @@ clean_all() {
 
 genrdeps() {
 	find "${XDEB_DESTDIR}" -type f | while read -r f; do
-		[ "$(head -c 4 "${f}")" = "$(printf "\177ELF")" ] || continue
+		[ "$(head -c 4 "${f}" | tr -d '\0')" = "$(printf "\177ELF")" ] || continue
 		objdump -p "${f}" | grep NEEDED | awk '{print $2}'
 	done | sort -u | while read -r lib; do
 		# Ignore libraries provided by current package
