@@ -6,7 +6,7 @@ xdeb is posix shell script for for converting deb(ian) packages to the xbps form
 ## Usage
 
 ### Converting packages
-Conversioni will create files in your current working directory. Refer to [the installation instruction](#Installation) for more information.
+Conversion will create files in your current working directory. Refer to [the installation instruction](#Installation) for more information.
 
 1. Download xdeb: `curl -LO github.com/xdeb-org/xdeb/releases/latest/download/xdeb`
 2. Install dependencies: `xbps-install binutils tar curl xbps xz`
@@ -18,7 +18,18 @@ Conversioni will create files in your current working directory. Refer to [the i
 Copy the script to `/usr/local/bin/`and set `XDEB_PKGROOT=${HOME}/.config/xdeb` to avoid cluttering your current working directory.
 Binaries will then be exported to `${XDEB_PKGROOT-.}/binpkgs`.
 
-### Help Page
+### Flags
+In short: Just use `-Sedf` (Sync dependency list, remove empty directories, enable dependency resolution, resolve conflicts = don't break system)
+
+Options can also be set via environment variables:
+```
+export XDEB_OPT_DEPS=true
+export XDEB_OPT_SYNC=true
+export XDEB_OPT_WARN_CONFLICT=true
+export XDEB_OPT_FIX_CONFLICT=true
+```
+
+More information:
 ```sh
 usage: xdeb [-S] [-d] [-Sd] [--deps] ... FILE
   -d                         # Automatic dependencies
@@ -41,17 +52,6 @@ example:
   xdeb -Cq                   # Remove all files and quit
   xdeb -Sd FILE              # Sync depdendency list and create package
   xdeb --deps='tar>0' FILE   # Add tar as manual dependency and create package
-```
-
-### Flags
-In short: Just use `-Sedf` (Sync dependency list, remove empty directories, enable dependency resolution, resolve conflicts = don't break system)
-
-Options can also be set via environment variables:
-```
-export XDEB_OPT_DEPS=true
-export XDEB_OPT_SYNC=true
-export XDEB_OPT_WARN_CONFLICT=true
-export XDEB_OPT_FIX_CONFLICT=true
 ```
 
 #### Automatic Dependencies
