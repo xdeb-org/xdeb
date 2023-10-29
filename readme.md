@@ -1,7 +1,7 @@
 #### Ignoring the logs might break your system. Please use releases.
 
 # xdeb
-xdeb is posix shell script for converting deb(ian) packages to the xbps format.
+xdeb is a posix shell script for converting deb(ian) packages to the xbps format.
 
 ## Usage
 
