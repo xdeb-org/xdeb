@@ -75,7 +75,7 @@ usage: xdeb [-S] [-d] [-Sd] [--deps] ... FILE
   -S                         # Sync runtime dependency file
   -c                         # Clean everything except shlibs and binpkgs
   -r                         # Clean repodata (Use when rebuilding a package)
-  -q                         # Don't build the package at all
+  -q                         # Extract files, quit before building
   -C                         # Clean all files
   -b                         # No extract, just build files in destdir
   -e                         # Remove empty directories
