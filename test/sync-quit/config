@@ -1,0 +1,10 @@
+#!/bin/sh
+
+build() {
+    return
+}
+
+run() {
+    xdeb -SQ || fail "xdeb failed"
+    [ -f "${XDEB_PKGROOT}/shlibs" ] || fail "shlibs file does not exist"
+}
