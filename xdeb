@@ -92,7 +92,8 @@ fix_conflict() {
 	src="${1}"
 	dst="${2}/${3-"${1}"}"
 	mkdir -p "${XDEB_DESTDIR}/${2}"
-	mv "${XDEB_DESTDIR}/${src}" "${XDEB_DESTDIR}/${dst}";
+	cp -rT "${XDEB_DESTDIR}/${src}" "${XDEB_DESTDIR}/${dst}"
+	rm -rf "${XDEB_DESTDIR}/${src}"
 	log_info "Moved conflict '${src}' -> '${dst}'"
 }
 
