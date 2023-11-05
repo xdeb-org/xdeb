@@ -259,7 +259,7 @@ XDEB_DEPENDENCIES="${XDEB_DEPENDENCIES%* }"
 [ "${XDEB_OPT_CLEAN_DIR}" != true ] && [ "${XDEB_OPT_WARN_CONFLICT}" != true ] || {
 	command -v xbps-query >/dev/null && ign="$(xbps-query -f "${pkgname}" | sed 's/ -> .*//')"
 
-	find "${XDEB_DESTDIR}" -depth | (
+	find "${XDEB_DESTDIR}" -depth -mindepth 1 | (
 		while read -r f; do
 			# Remove empty directories
 			[ "${XDEB_OPT_CLEAN_DIR}" = true ] && [ -z "$(ls -A "${f}")" ] && {
