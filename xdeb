@@ -223,6 +223,9 @@ done
 }
 
 # The variable names are the same as in the regular xbps-src package build
+[ -z "${revision}" ] && \
+	revision="1"
+
 [ -z "${pkgname}" ] && \
 	pkgname=$(grep -Po -m1 "Package:[ \t]*\K.*" "${XDEB_DATADIR}/control")
 
@@ -234,7 +237,6 @@ maintainer=$(grep -Po -m1 "Maintainer:[ \t]*\K.*" "${XDEB_DATADIR}/control")
 short_desc=$(grep -Po -m1 "Description:[ \t]*\K.*" "${XDEB_DATADIR}/control")
 long_desc=$(grep -Po -m1 -z "Description:[ \t\n]*\K.*" "${XDEB_DATADIR}/control" | tr '\0' '\n')
 archs=${archs-$(grep -Po -m1 "Architecture:[ \t]*\K.*" "${XDEB_DATADIR}/control")}
-revision="${revision-1}"
 
 # It seems that debian packages don't have to provide a short_desc (XMind-ZEN didn't do it)
 [ -z "${short_desc}" ] && short_desc="${long_desc}"
