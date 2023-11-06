@@ -259,6 +259,10 @@ case "${archs}" in
 	armhf) archs="armv7l";;
 	i386) archs="i686";;
 	all) archs="noarch";;
+	*)
+		log_crit "Invalid arch: ${archs}. Use '--arch=...' to set arch manually."
+		exit 1
+		;;
 esac
 
 [ "${XDEB_OPT_DEPS}" = true ] && XDEB_DEPENDENCIES="${XDEB_DEPENDENCIES}$(genrdeps)"
