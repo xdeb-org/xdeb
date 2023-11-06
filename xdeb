@@ -313,11 +313,9 @@ XDEB_DEPENDENCIES="${XDEB_DEPENDENCIES%* }"
 	) || log_crit "Consider (re)moving file(s) from '${XDEB_DESTDIR}' and run \`xdeb -rb\`"
 }
 
-short_binpkgs="${XDEB_BINPKGS#"${PWD}/"}"
-
 cd "${XDEB_BINPKGS}" || exit
 
 out="${pkgname}${XDEB_SUFFIX}-${version}_${revision}"
 xbps-create -q -A "${archs}" -n "${out}" -m "${maintainer}" -s "${short_desc}" -S "${long_desc}" -l "${license}" -D "${XDEB_DEPENDENCIES}" "${XDEB_DESTDIR}"
 xbps-rindex -a "${out}.${archs}.xbps"
-log_info "Install using \`xbps-install -R ${short_binpkgs} ${out}\`"
+log_info "Install using \`xbps-install -R ${XDEB_BINPKGS#"${PWD}/"} ${out}\`"
