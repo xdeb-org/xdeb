@@ -5,6 +5,6 @@ build() {
 }
 
 run() {
-    xdeb -SQ || fail "xdeb failed"
+    "${xdeb_path}" -SQ || fail "xdeb failed"
     [ -f "${XDEB_PKGROOT}/shlibs" ] || fail "shlibs file does not exist"
 }
