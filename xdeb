@@ -44,7 +44,6 @@ sync_shlibs() {
 # clean : Removes old package data, without removing any binpkgs
 clean() {
 	rm -f "${XDEB_BINPKGS}"/.xbps-pkg-*
-
 	rm -rf "${XDEB_WORKDIR}"
 	rm -rf "${XDEB_DATADIR}"
 	rm -rf "${XDEB_DESTDIR}"
@@ -133,6 +132,7 @@ EOF
 	exit "${1}"
 }
 
+# check dependencies, omit coreutils
 check_command xz
 check_command tar
 check_command curl
