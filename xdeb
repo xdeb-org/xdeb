@@ -120,6 +120,8 @@ usage: xdeb [-S] [-d] [-Sd] [--deps] ... FILE
   -f                         # Attempt to automatically fix common conflicts
   --deps=...                 # Add manual dependencies
   --arch=...                 # Add an arch for the package to run on
+  --name=...                 # Build package with custom name
+  --version=...              # Build package with custom version
   --revision=... | --rev=... # Set package revision. Alternative to -r
   --help | -h                # Show this page
 
@@ -150,6 +152,8 @@ while [ "${#}" != "0" ]; do
 
 		--deps=*) XDEB_DEPENDENCIES="${XDEB_DEPENDENCIES}${1#*=} "; shift; continue;;
 		--arch=*) archs="${1#*=}"; shift; continue;;
+		--name=*) pkgname="${1#*=}"; shift; continue;;
+		--version=*) version="${1#*=}"; shift; continue;;
 		--revision=*|--rev=*) revision="${1#*=}"; shift; continue;;
 
 		--help) usage 0;;
@@ -219,8 +223,12 @@ done
 }
 
 # The variable names are the same as in the regular xbps-src package build
-pkgname=$(grep -Po -m1 "Package:[ \t]*\K.*" "${XDEB_DATADIR}/control")
-version=$(grep -Po -m1 "Version:[ \t]*\K.*" "${XDEB_DATADIR}/control")
+[ -z "${pkgname}" ] && \
+	pkgname=$(grep -Po -m1 "Package:[ \t]*\K.*" "${XDEB_DATADIR}/control")
+
+[ -z "${version}" ] && \
+	version=$(grep -Po -m1 "Version:[ \t]*\K.*" "${XDEB_DATADIR}/control")
+
 license=$(grep -Po -m1 "License:[ \t]*\K.*" "${XDEB_DATADIR}/control")
 maintainer=$(grep -Po -m1 "Maintainer:[ \t]*\K.*" "${XDEB_DATADIR}/control")
 short_desc=$(grep -Po -m1 "Description:[ \t]*\K.*" "${XDEB_DATADIR}/control")
