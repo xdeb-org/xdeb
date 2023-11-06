@@ -222,7 +222,10 @@ done
 	exit 0;
 }
 
-# The variable names are the same as in the regular xbps-src package build
+# Check commandline arguments "-z" to prevent empty arguments.
+# This is incomplete and regex-validation must be added.
+#
+# Variable names are analogous to xbps-src
 [ -z "${revision}" ] && \
 	revision="1"
 
