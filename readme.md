@@ -8,8 +8,8 @@ xdeb is a posix shell script for converting deb(ian) packages to the xbps format
 ### Converting packages
 Conversion will create files in your current working directory. Refer to [the installation instruction](#Installation) for more information.
 
-1. Download xdeb: `curl -LO github.com/xdeb-org/xdeb/releases/latest/download/xdeb`
-2. Install dependencies: `xbps-install binutils tar curl xbps xz`
+1. Install dependencies: `xbps-install binutils tar curl xbps xz`
+2. Download xdeb: `curl -LO github.com/xdeb-org/xdeb/releases/latest/download/xdeb`
 3. Set executable bit: `chmod 0744 xdeb`
 4. Convert: `./xdeb -Sedf <name>_<version>_<arch>.deb`
 5. Install: `xbps-install -R ./binpkgs <name>`
