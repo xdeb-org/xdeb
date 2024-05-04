@@ -22,13 +22,17 @@ test_dir="${xdeb_dir}/test"
 xdeb_path="${xdeb_dir}/xdeb"
 
 export XDEB_PKGROOT="${test_dir}/.pkgroot"
+export XDEB_TEMPDIR="${test_dir}/.tmp"
 
-find "${test_dir}" -maxdepth 1 -mindepth 1 -type d -not -iname '.*' -exec 'basename' '{}' ';' | while read -r d; do
-    cd "${test_dir}/${d}"
+# TODO allow subdirs
+find "${test_dir}" -maxdepth 1 -mindepth 1 -type f -iname '*.test' -exec 'basename' '{}' ';' | while read -r d; do
+    mkdir -p "${XDEB_TEMPDIR}/${d%.test}"
+    cd "${XDEB_TEMPDIR}/${d%*.test}"
+
     xdeb -CcQ
 
     begin_test "${d}"
-        . "./config"
+        . "${test_dir}/${d}"
         build
         run
     end_test

@@ -12,8 +12,7 @@ Package: conflicting-with-existing-target
 Version: 0
 Architecture: all
 Maintainer: none
-Description:
- Test if merging conflicting directories with their destination works properly
+Description: none
 EOF
 
     tar -cf control.tar control
