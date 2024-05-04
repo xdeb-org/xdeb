@@ -32,23 +32,24 @@ export XDEB_OPT_FIX_CONFLICT=true
 More information:
 ```sh
 usage: xdeb [-S] [-d] [-Sd] [--deps] ... FILE
-  -d                         # Automatic dependencies
-  -S                         # Sync runtime dependency file
-  -c                         # Clean everything except shlibs and binpkgs
-  -r                         # Clean repodata (Use when rebuilding a package)
-  -q                         # Extract files, quit before building
-  -C                         # Clean all files
-  -b                         # No extract, just build files in destdir
-  -e                         # Remove empty directories
-  -m                         # Add the -32bit suffix
-  -i                         # Ignore file conflicts
-  -f                         # Attempt to automatically fix common conflicts
-  --deps=...                 # Add manual dependencies
-  --arch=...                 # Add an arch for the package to run on
-  --name=...                 # Build package with custom name
-  --version=...              # Build package with custom version
-  --revision=... | --rev=... # Set package revision. Alternative to -r
-  --help | -h                # Show this page
+  -d                         # Automatic dependency resolution
+  -S                         # Download shlibs file for automatic dependencies
+  -c                         # Like -C, excluding shlibs and binpkgs
+  -r                         # Remvoe repodata file (Use for re-building)
+  -q                         # Extract .deb into destdir only, do not build
+  -C                         # Remove all files created by this script
+  -b                         # Build from destdir directly without a .deb file
+  -e                         # Remove empty directories from the package
+  -m                         # Add the -32bit suffix to the package name
+  -i                         # Don't warn if the package could break your system
+  -f                         # Automatically fix certain file conflicts
+  --deps=...                 # Packages that shall be added as dependencies
+  --not-deps=...             # Packages that shall not be used as dependencies
+  --arch=...                 # Package arch
+  --name=...                 # Package name
+  --version=...              # Package version
+  --revision=... | --rev=... # Package revision
+  --help | -h                # Show help page
 
 example:
   xdeb -Cq                   # Remove all files and quit
