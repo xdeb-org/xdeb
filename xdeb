@@ -151,7 +151,7 @@ mkdir -p "${XDEB_PKGROOT}"
 
 while [ "${#}" != "0" ]; do
 	case "${1}" in
-		--deps|--arch|--not-deps|--revision)
+		--deps|--arch|--name|--version|--not-deps|--revision|--rev)
 			log_crit "'${1}' invalid. Use ${1}=... instead"; exit 1;;
 
 		--deps=*) XDEB_DEPENDENCIES="${XDEB_DEPENDENCIES}${1#*=} "; shift; continue;;
