@@ -86,7 +86,7 @@ Conflicts can either be resolved automatically (`-f`) or manually.
 3. Fix files (Example: remove): `rm -rf ${XDEB_PKGROOT-.}/destdir/usr/lib`
 4. Build package without conflicts: `./xdeb -rb`
 
-#### Using Manual dependencies
+#### Using manual dependencies
 Converting `Minecraft.deb` with manual dependency `oracle-jre` (Version 8 or later):
 ```sh
 $ ./xdeb -Sedr --deps='oracle-jre>=8' ~/Downloads/Minecraft.deb
@@ -116,6 +116,29 @@ Space available on disk:       276GB
 Do you want to continue? [Y/n] n
 ```
 Add `>0` to match any version (i.e. `--deps='tar>0 base-system>0 curl>0'`)
+
+
+#### Ignoring dependencies
+
+When converting packages for electron based appliciations, `xdeb` may
+mistakenly add `musl` as a dependency. This can be resolved by using the
+`--not-deps` flag to blacklist certain dependencies:
+
+```
+$ ./xdeb -Sedf --not-deps="musl" ~/Downloads/gitkraken-amd64.deb
+I Synced shlibs
+I Extracted files
+W Unable to find dependency for libcrypto.so.1.0.0
+W Unable to find dependency for libcrypto.so.1.1
+W Unable to find dependency for libcrypto.so.10
+W Unable to find dependency for libssl.so.1.0.0
+W Unable to find dependency for libssl.so.1.1
+W Unable to find dependency for libssl.so.10
+I Resolved dependencies (alsa-lib>=1.0.20_1 at-spi2-atk>=2.6.0_1 at-spi2-core>=1.91.91_1 atk>=1.26.0_1 cairo>=1.8.6_1 dbus-libs>=1.2.10_1 e2fsprogs-libs>=1.41.5_1 expat>=2.0.0_1 glib>=2.80.0_1 glibc>=2.39_1 gtk+3>=3.0.0_1 libX11>=1.2_1 libXcomposite>=0.4.0_1 libXdamage>=1.1.1_1 libXext>=1.0.5_1 libXfixes>=4.0.3_1 libXrandr>=1.3.0_1 libcups>=1.5.3_1 libcurl>=7.75.0_2 libdrm>=2.4.6_1 libgbm>=9.0_1 libgcc>=4.4.0_1 libstdc++>=4.4.0_1 libxcb>=1.2_1 libxkbcommon>=0.2.0_1 libxkbfile>=1.0.5_1 mit-krb5-libs>=1.8_1 nspr>=4.8_1 nss>=3.12.4_1 pango>=1.24.0_1 zlib>=1.2.3_1)
+index: skipping `gitkraken-9.13.0_1' (x86_64), already registered.
+index: 1 packages registered.
+I Install using `xbps-install -R ./binpkgs gitkraken-9.13.0_1`
+```
 
 ## Rationale
 
