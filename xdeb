@@ -79,6 +79,10 @@ genrdeps() {
 			continue
 		}
 
+		printf "%s" "${XDEB_NOT_DEPENDENCIES}" | grep -wF "${rdep%-*}${XDEB_SUFFIX}" >/dev/null && {
+			continue
+		}
+
 		echo "${rdep%-*}${XDEB_SUFFIX}>=${rdep##*-}"
 	done | sort -u | tr '\n' ' '
 }
@@ -147,13 +151,14 @@ mkdir -p "${XDEB_PKGROOT}"
 
 while [ "${#}" != "0" ]; do
 	case "${1}" in
-		--deps|--arch|--revision)
+		--deps|--arch|--not-deps|--revision)
 			log_crit "'${1}' invalid. Use ${1}=... instead"; exit 1;;
 
 		--deps=*) XDEB_DEPENDENCIES="${XDEB_DEPENDENCIES}${1#*=} "; shift; continue;;
 		--arch=*) archs="${1#*=}"; shift; continue;;
 		--name=*) pkgname="${1#*=}"; shift; continue;;
 		--version=*) version="${1#*=}"; shift; continue;;
+		--not-deps=*) XDEB_NOT_DEPENDENCIES="${XDEB_NOT_DEPENDENCIES}${1#*=} "; shift; continue;;
 		--revision=*|--rev=*) revision="${1#*=}"; shift; continue;;
 
 		--help) usage 0;;

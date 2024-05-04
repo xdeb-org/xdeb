@@ -44,6 +44,7 @@ usage: xdeb [-S] [-d] [-Sd] [--deps] ... FILE
   -i                         # Ignore file conflicts
   -f                         # Attempt to automatically fix common conflicts
   --deps=...                 # Add manual dependencies
+  --not-deps=...             # List of packages to never add as dependencies
   --arch=...                 # Add an arch for the package to run on
   --revision=... | --rev=... # Set package revision. Alternative to -r
   --help | -h                # Show this page
