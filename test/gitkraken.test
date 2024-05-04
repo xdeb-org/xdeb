@@ -1,7 +1,7 @@
 #!/bin/sh
 
 build() {
-    curl --no-clobber -o package.deb https://release.axocdn.com/linux/gitkraken-amd64.deb
+    curl -o package.deb https://release.axocdn.com/linux/gitkraken-amd64.deb
 }
 
 run() {
