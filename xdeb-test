@@ -25,14 +25,20 @@ export XDEB_PKGROOT="${test_dir}/.pkgroot"
 export XDEB_TEMPDIR="${test_dir}/.tmp"
 
 # TODO allow subdirs
-find "${test_dir}" -maxdepth 1 -mindepth 1 -type f -iname '*.test' -exec 'basename' '{}' ';' | while read -r d; do
-    mkdir -p "${XDEB_TEMPDIR}/${d%.test}"
-    cd "${XDEB_TEMPDIR}/${d%*.test}"
+{
+    [ -z "${@}" ] && {
+        find "${test_dir}" -maxdepth 1 -mindepth 1 -type f -iname '*.test' -exec 'basename' '{}' '.test' ';'
+    } || {
+        printf "%s\n" ${@}
+    }
+} | while read -r d; do
+    mkdir -p "${XDEB_TEMPDIR}/${d}"
+    cd "${XDEB_TEMPDIR}/${d}"
 
     xdeb -CcQ
 
     begin_test "${d}"
-        . "${test_dir}/${d}"
+        . "${test_dir}/${d}.test"
         build
         run
     end_test
