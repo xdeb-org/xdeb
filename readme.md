@@ -25,8 +25,9 @@ Options can also be set via environment variables:
 ```
 export XDEB_OPT_DEPS=true
 export XDEB_OPT_SYNC=true
-export XDEB_OPT_WARN_CONFLICT=true
+export XDEB_OPT_INSTALL=true
 export XDEB_OPT_FIX_CONFLICT=true
+export XDEB_OPT_WARN_CONFLICT=true
 ```
 
 More information:
@@ -43,6 +44,7 @@ usage: xdeb [-S] [-d] [-Sd] [--deps] ... FILE
   -m                         # Add the -32bit suffix to the package name
   -i                         # Don't warn if the package could break your system
   -f                         # Automatically fix certain file conflicts
+  -I                         # Automatically install the package
   --deps=...                 # Packages that shall be added as dependencies
   --not-deps=...             # Packages that shall not be used as dependencies
   --arch=...                 # Package arch
