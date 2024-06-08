@@ -1,0 +1,119 @@
+.TH xdeb 1
+
+.SH NAME
+xdeb - Convert deb (Debian) packages to xbps (Void Linux)
+
+.SH SYNOPSIS
+xdeb [OPTION]... [FILE]
+
+.SH DESCRIPTION
+xdeb converts .deb packages into the .xbps format. It does so by extracting the
+deb file, parsing metadata and rebuilding the package using xbps cli tools. By
+default, xdeb merely passes the package name, version and architecture. Certain
+commandline options may enable a vast amount of additional features, such as
+automatic dependency resolution.
+
+.SH OPTIONS
+
+.B \-d
+Automatically try to figure out which dependencies the .deb package needs
+
+.B \-S
+Download the dependency file needed for the
+.BR \-d
+flag
+
+.B \-c
+Remove generated files except shlibs and binpkgs/
+
+.B \-r
+Remove the repodata file
+
+.B \-q
+Extract only, quit before building
+
+.B \-C
+Remove all generated files
+
+.B \-b
+Build without extracting, doesn't require FILE argument
+
+.B \-e
+Remove empty directories from the package
+
+.B \-m
+Add the suffix
+.BR -32bit
+to the package name
+
+.B \-i
+Do not warn about conflicting files
+
+.B \-f
+Attempt to automatically fix conflicting files
+
+.B \-I
+Automatically install after building
+
+.B \-\-deps=...
+Manually specify package dependencies
+
+.B \-\-not\-\-deps=...
+Manually specify package that shall never be used as dependencies. Dependencies added with
+.B \-\-deps
+will be used regardless.
+
+.B \-\-arch=...
+Manually specify the target arch
+
+.B \-\-name=...
+Manually specify the output name
+
+.B \-\-version=...
+Manually specify the output version
+
+.B \-\-revision=...,\-\-rev=...
+Manually specify the package revision
+
+.B \-h,\-\-help
+Show the help page
+
+.SH ENVIRONMENT VARIABLES
+
+In addition the the options, the following environment variables are supported
+by xdeb:
+
+.SS Paths
+
+.B XDEB_PKGROOT
+Parent directory for default values of
+.BR XDEB_WORKDIR ,
+.BR XDEB_DESTDIR ,
+.BR XDEB_DATADIR ,
+.BR XDEB_BINPKGS
+and
+.BR XDEB_SHLIB
+
+
+.B XDEB_WORKDIR
+
+.B XDEB_DESTDIR
+
+.B XDEB_DATADIR
+
+.B XDEB_BINPKGS
+
+.B XDEB_SHLIBS
+
+.SS Options
+XDEB_OPT_DEPS
+XDEB_OPT_SYNC
+XDEB_OPT_QUIT
+XDEB_OPT_EXTRACT
+XDEB_OPT_CLEAN_DIR
+XDEB_OPT_FIX_CONFLICT
+XDEB_OPT_WARN_CONFLICT
+
+.SH SEE ALSO
+.BR xbps-install(1)
+.BR xbps-query(1)
