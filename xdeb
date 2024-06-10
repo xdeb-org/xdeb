@@ -330,7 +330,9 @@ out="${pkgname}${XDEB_SUFFIX}-${version}_${revision}"
 xbps-create -q -A "${archs}" -n "${out}" -m "${maintainer}" -s "${short_desc}" -S "${long_desc}" -l "${license}" -D "${XDEB_DEPENDENCIES}" "${XDEB_DESTDIR}"
 xbps-rindex -a "${out}.${archs}.xbps"
 
-if [ "${XDEB_OPT_INSTALL}" = true ]; then
+if [ "${XDEB_REFUSE}" = true ] && [ "${XDEB_OPT_INSTALL}" = true ]; then
+	log_info "Errors occurred. I will not proceed with automatic installation."
+elif [ "${XDEB_OPT_INSTALL}" = true ]; then
 	"$(command -v sudo doas 2>/dev/null | head -n1)" xbps-install -R ${XDEB_BINPKGS#"${PWD}/"} ${out}
 else
 	log_info "Install using \`xbps-install -R ${XDEB_BINPKGS#"${PWD}/"} ${out}\`"
