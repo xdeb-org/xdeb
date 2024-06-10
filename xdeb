@@ -335,7 +335,7 @@ xbps-rindex -a "${out}.${archs}.xbps"
 if [ "${XDEB_REFUSE}" = true ] && [ "${XDEB_OPT_INSTALL}" = true ]; then
 	log_info "Errors occurred. I will not proceed with automatic installation."
 elif [ "${XDEB_OPT_INSTALL}" = true ]; then
-	"$(command -v sudo doas 2>/dev/null | head -n1)" xbps-install -R ${XDEB_BINPKGS#"${PWD}/"} ${out}
+	"$(command -v sudo doas 2>/dev/null | head -n1)" xbps-install -R "${XDEB_BINPKGS#"${PWD}/"}" "${out}"
 else
 	log_info "Install using \`xbps-install -R ${XDEB_BINPKGS#"${PWD}/"} ${out}\`"
 fi
