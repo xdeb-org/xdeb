@@ -334,10 +334,9 @@ xbps-rindex -a "${out}.${archs}.xbps"
 
 if [ "${XDEB_REFUSE}" = true ]; then
 	log_crit "Errors occurred. Do not install the package on this system!"
+	return 1
 elif [ "${XDEB_OPT_INSTALL}" = true ]; then
 	"$(command -v sudo doas 2>/dev/null | head -n1)" xbps-install -R "${XDEB_BINPKGS#"${PWD}/"}" "${out}"
 else
 	log_info "Install using \`xbps-install -R ${XDEB_BINPKGS#"${PWD}/"} ${out}\`"
 fi
-
-[ "${XDEB_REFUSE}" = true ] && return 1
