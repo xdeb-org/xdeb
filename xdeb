@@ -252,6 +252,8 @@ short_desc=$(grep -Po -m1 "Description:[ \t]*\K.*" "${XDEB_DATADIR}/control")
 long_desc=$(grep -Po -m1 -z "Description:[ \t\n]*\K.*" "${XDEB_DATADIR}/control" | tr '\0' '\n')
 archs=${archs-$(grep -Po -m1 "Architecture:[ \t]*\K.*" "${XDEB_DATADIR}/control")}
 
+pkgname="${pkgname}${XDEB_SUFFIX}"
+
 # if not short_desc: short_desc=long_desc
 # if not long_desc: long_desc=short_desc
 if [ -z "${short_desc}" ] && [ -z "${long_desc}" ]; then
@@ -326,7 +328,7 @@ XDEB_DEPENDENCIES="${XDEB_DEPENDENCIES%* }"
 
 cd "${XDEB_BINPKGS}" || exit
 
-out="${pkgname}${XDEB_SUFFIX}-${version}_${revision}"
+out="${pkgname}-${version}_${revision}"
 xbps-create -q -A "${archs}" -n "${out}" -m "${maintainer}" -s "${short_desc}" -S "${long_desc}" -l "${license}" -D "${XDEB_DEPENDENCIES}" "${XDEB_DESTDIR}"
 xbps-rindex -a "${out}.${archs}.xbps"
 
