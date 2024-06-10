@@ -17,6 +17,7 @@ XDEB_OPT_INSTALL="${XDEB_OPT_INSTALL-false}"
 XDEB_OPT_CLEAN_DIR="${XDEB_OPT_CLEAN_DIR-false}"
 XDEB_OPT_FIX_CONFLICT="${XDEB_OPT_FIX_CONFLICT-false}"
 XDEB_OPT_WARN_CONFLICT="${XDEB_OPT_WARN_CONFLICT-true}"
+XDEB_REFUSE=false
 XDEB_SUFFIX=""
 
 log_info() {
@@ -29,6 +30,7 @@ log_warn() {
 
 log_crit() {
 	printf "\033[1;31mE\033[0;1m %s\033[0m\n" "${*}"
+	XDEB_REFUSE=true
 }
 
 sync_shlibs() {
@@ -333,3 +335,5 @@ if [ "${XDEB_OPT_INSTALL}" = true ]; then
 else
 	log_info "Install using \`xbps-install -R ${XDEB_BINPKGS#"${PWD}/"} ${out}\`"
 fi
+
+[ "${XDEB_REFUSE}" = true ] && return 1
