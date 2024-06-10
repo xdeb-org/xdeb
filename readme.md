@@ -1,4 +1,4 @@
-#### Ignoring the logs might break your system. Please use releases.
+### Caution: Ignoring bold red error messages can mess up your system. This is the result of a missing error check in xbps. Do not blame the script for this.
 
 # xdeb
 xdeb is a posix shell script for converting deb(ian) packages to the xbps format.
