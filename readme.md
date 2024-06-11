@@ -43,7 +43,8 @@ usage: xdeb [-S] [-d] [-Sd] [--deps] ... FILE
   -e                         # Remove empty directories from the package
   -m                         # Add the -32bit suffix to the package name
   -i                         # Don't warn if the package could break your system
-  -f                         # Automatically fix certain file conflicts
+  -f                         # Try to fix certain file conflicts (deprecated)
+  -F                         # Don't try to fix certain file conflicts
   -I                         # Automatically install the package
   --deps=...                 # Packages that shall be added as dependencies
   --not-deps=...             # Packages that shall not be used as dependencies

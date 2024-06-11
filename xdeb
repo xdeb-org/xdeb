@@ -15,7 +15,7 @@ XDEB_OPT_QUIT="${XDEB_OPT_QUIT-false}"
 XDEB_OPT_EXTRACT="${XDEB_OPT_EXTRACT-true}"
 XDEB_OPT_INSTALL="${XDEB_OPT_INSTALL-false}"
 XDEB_OPT_CLEAN_DIR="${XDEB_OPT_CLEAN_DIR-false}"
-XDEB_OPT_FIX_CONFLICT="${XDEB_OPT_FIX_CONFLICT-false}"
+XDEB_OPT_FIX_CONFLICT="${XDEB_OPT_FIX_CONFLICT-true}"
 XDEB_OPT_WARN_CONFLICT="${XDEB_OPT_WARN_CONFLICT-true}"
 XDEB_REFUSE=false
 XDEB_SUFFIX=""
@@ -123,7 +123,8 @@ usage: xdeb [-S] [-d] [-Sd] [--deps] ... FILE
   -e                         # Remove empty directories from the package
   -m                         # Add the -32bit suffix to the package name
   -i                         # Don't warn if the package could break your system
-  -f                         # Automatically fix certain file conflicts
+  -f                         # Try to fix certain file conflicts (deprecated)
+  -F                         # Don't try to fix certain file conflicts
   -I                         # Automatically install the package
   --deps=...                 # Packages that shall be added as dependencies
   --not-deps=...             # Packages that shall not be used as dependencies
@@ -188,7 +189,8 @@ while [ "${#}" != "0" ]; do
 			e*) XDEB_OPT_CLEAN_DIR=true;;
 			m*) XDEB_SUFFIX="-32bit";;
 			i*) XDEB_OPT_WARN_CONFLICT=false;;
-			f*) XDEB_OPT_FIX_CONFLICT=true;;
+			f*) log_warn "Option '-f' is now enabled by default. Use '-F' to disable it.";;
+			F*) XDEB_OPT_FIX_CONFLICT=false;;
 			I*) XDEB_OPT_INSTALL=true;;
 			*) log_crit "invalid option -- '${flag%"${flag#?}"}'"; usage 1;;
 		esac
