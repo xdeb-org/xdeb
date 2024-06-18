@@ -17,7 +17,7 @@ XDEB_OPT_INSTALL="${XDEB_OPT_INSTALL-false}"
 XDEB_OPT_CLEAN_DIR="${XDEB_OPT_CLEAN_DIR-false}"
 XDEB_OPT_FIX_CONFLICT="${XDEB_OPT_FIX_CONFLICT-true}"
 XDEB_OPT_WARN_CONFLICT="${XDEB_OPT_WARN_CONFLICT-true}"
-XDEB_OPT_STDIN_POST_EXTRACT="${XDEB_OPT_STDIN_POST_EXTRACT-false}"
+# XDEB_OPT_POST_EXTRACT="${XDEB_OPT_STDIN_POST_EXTRACT-}"
 
 XDEB_REFUSE=false
 XDEB_SUFFIX=""
@@ -115,32 +115,32 @@ check_command() {
 usage() {
 	cat << EOF
 usage: xdeb [-S] [-d] [-Sd] [--deps] ... FILE
-  -d                         # Automatic dependency resolution
-  -S                         # Download shlibs file for automatic dependencies
-  -c                         # Like -C, excluding shlibs and binpkgs
-  -r                         # Remvoe repodata file (Use for re-building)
-  -q                         # Extract .deb into destdir only, do not build
-  -C                         # Remove all files created by this script
-  -b                         # Build from destdir directly without a .deb file
-  -e                         # Remove empty directories from the package
-  -m                         # Add the -32bit suffix to the package name
-  -i                         # Don't warn if package could break the system
-  -f                         # Try to fix certain file conflicts (deprecated)
-  -F                         # Don't try to fix certain file conflicts
-  -I                         # Automatically install the package
-  --deps=...                 # Packages that shall be added as dependencies
-  --not-deps=...             # Packages that shall not be used as dependencies
-  --arch=...                 # Package arch
-  --name=...                 # Package name
-  --version=...              # Package version
-  --revision=... | --rev=... # Package revision
-  --stdin-post-extract       # Read post-extract commands from stdin
-  --help | -h                # Show help page
+  -d                          Automatic dependency resolution
+  -S                          Download shlibs file for automatic dependencies
+  -c                          Like -C, excluding shlibs and binpkgs
+  -r                          Remvoe repodata file (Use for re-building)
+  -q                          Extract .deb into destdir only, do not build
+  -C                          Remove all files created by this script
+  -b                          Build from destdir directly without a .deb file
+  -e                          Remove empty directories from the package
+  -m                          Add the -32bit suffix to the package name
+  -i                          Don't warn if package could break the system
+  -f                          Try to fix certain file conflicts (deprecated)
+  -F                          Don't try to fix certain file conflicts
+  -I                          Automatically install the package
+  --deps=...                  Packages that shall be added as dependencies
+  --not-deps=...              Packages that shall not be used as dependencies
+  --arch=...                  Package arch
+  --name=...                  Package name
+  --version=...               Package version
+  --revision=... --rev=...    Package revision
+  --post-extract=...          File with post-extract commands (i.e. /dev/stdin)
+  --help | -h                 Show help page
 
 example:
-  xdeb -Cq                   # Remove all files and quit
-  xdeb -Sd FILE              # Sync depdendency list and create package
-  xdeb --deps='tar>0' FILE   # Add tar as manual dependency and create package
+  xdeb -Cq                    Remove all files and quit
+  xdeb -Sd FILE               Sync depdendency list and create package
+  xdeb --deps='tar>0' FILE    Add tar as manual dependency and create package
 EOF
 	exit "${1}"
 }
@@ -169,8 +169,8 @@ while [ "${#}" != "0" ]; do
 		--version=*) version="${1#*=}"; shift; continue;;
 		--not-deps=*) XDEB_NOT_DEPENDENCIES="${XDEB_NOT_DEPENDENCIES}${1#*=} "; shift; continue;;
 		--revision=*|--rev=*) revision="${1#*=}"; shift; continue;;
+		--post-extract=*) XDEB_OPT_POST_EXTRACT="${1#*=}"; shift; continue;;
 
-		--stdin-post-extract) XDEB_OPT_STDIN_POST_EXTRACT=true; shift; continue;;
 		--help) usage 0;;
 		--) shift; break;;
 		--*) log_crit "invalid option '${1}'"; usage 1;;
@@ -305,9 +305,9 @@ esac
 	fix_conflict usr/lib64 usr lib
 }
 
-[ "${XDEB_OPT_STDIN_POST_EXTRACT}" = true ] && {
+[ -n "${XDEB_OPT_POST_EXTRACT}" ] && {
 	cd "${XDEB_DESTDIR}" || exit 1
-	. /dev/stdin || exit 1
+	. "${XDEB_OPT_POST_EXTRACT}" || exit 1
 }
 
 [ "${XDEB_OPT_DEPS}" = true ] && XDEB_DEPENDENCIES="${XDEB_DEPENDENCIES}$(genrdeps)"
