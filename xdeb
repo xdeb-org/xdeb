@@ -145,7 +145,7 @@ EOF
 	exit "${1}"
 }
 
-# check dependencies, omit coreutils
+## Check dependencies
 check_command xz
 check_command tar
 check_command curl
@@ -156,7 +156,7 @@ check_command objdump binutils
 check_command xbps-rindex xbps
 check_command xbps-create xbps
 
-mkdir -p "${XDEB_PKGROOT}"
+## Parse arguments
 
 while [ "${#}" != "0" ]; do
 	case "${1}" in
@@ -210,6 +210,8 @@ done
 	XDEB_BASEPKG="${1}"
 }
 
+## Prepare
+
 [ "${XDEB_OPT_DEPS}" = true ] && [ ! -r "${XDEB_SHLIBS}" ] && {
 	log_crit "shlibs file not synced. Run xdeb with '-Sd' to fetch dependency file"
 	exit 1
@@ -223,6 +225,7 @@ done
 	}
 
 	clean
+	mkdir -p "${XDEB_PKGROOT}"
 	mkdir -p "${XDEB_BINPKGS}"
 	mkdir -p "${XDEB_DATADIR}"
 	mkdir -p "${XDEB_DESTDIR}"
@@ -244,9 +247,10 @@ done
 	exit 0;
 }
 
-# Check commandline arguments "-z" to prevent empty arguments.
-# This is incomplete and regex-validation must be added.
-#
+## Parse
+
+# @todo: Check for empty arguments using regex to prohibit exclusively whitespace
+
 # Variable names are analogous to xbps-src
 [ -z "${revision}" ] && \
 	revision="1"
@@ -288,6 +292,8 @@ case "${archs}" in
 		exit 1
 		;;
 esac
+
+## Build
 
 [ "${XDEB_OPT_FIX_CONFLICT}" = true ] && {
 	fix_conflict bin       usr
@@ -342,7 +348,9 @@ XDEB_DEPENDENCIES="${XDEB_DEPENDENCIES%* }"
 	) || log_crit "Consider (re)moving file(s) from '${XDEB_DESTDIR}' and run \`xdeb -rb\`"
 }
 
-cd "${XDEB_BINPKGS}" || exit
+## Package
+
+cd "${XDEB_BINPKGS}" || exit 1
 
 out="${pkgname}-${version}_${revision}"
 xbps-create \
@@ -358,6 +366,8 @@ xbps-create \
 	"${XDEB_DESTDIR}"
 
 xbps-rindex -a "${out}.${archs}.xbps"
+
+## Install
 
 if [ "${XDEB_REFUSE}" = true ]; then
 	log_crit "Errors occurred. Do not install the package on this system!"
