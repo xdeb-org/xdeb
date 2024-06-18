@@ -218,8 +218,8 @@ done
 }
 
 [ "${XDEB_OPT_EXTRACT}" = true ] && {
-	# Does the filename end with .deb? Is the file readable?
-	[ -z "${XDEB_BASEPKG##*.deb}" ] && [ -r "${XDEB_BASEPKG}" ] || {
+	# Is the file readable?
+	[ ! -r "${XDEB_BASEPKG}" ] && {
 		log_crit "Last argument is not a .deb file or does not exist"
 		exit 1
 	}
