@@ -42,7 +42,7 @@ usage: xdeb [-S] [-d] [-Sd] [--deps] ... FILE
   -b                         # Build from destdir directly without a .deb file
   -e                         # Remove empty directories from the package
   -m                         # Add the -32bit suffix to the package name
-  -i                         # Don't warn if the package could break your system
+  -i                         # Don't warn if package could break the system
   -f                         # Try to fix certain file conflicts (deprecated)
   -F                         # Don't try to fix certain file conflicts
   -I                         # Automatically install the package
