@@ -345,7 +345,18 @@ XDEB_DEPENDENCIES="${XDEB_DEPENDENCIES%* }"
 cd "${XDEB_BINPKGS}" || exit
 
 out="${pkgname}-${version}_${revision}"
-xbps-create -q -A "${archs}" -n "${out}" -m "${maintainer}" -s "${short_desc}" -S "${long_desc}" -l "${license}" -D "${XDEB_DEPENDENCIES}" "${XDEB_DESTDIR}"
+xbps-create \
+	-q \
+	-t xdeb \
+	-A "${archs}" \
+	-n "${out}" \
+	-m "${maintainer}" \
+	-s "${short_desc}" \
+	-S "${long_desc}" \
+	-l "${license}" \
+	-D "${XDEB_DEPENDENCIES}" \
+	"${XDEB_DESTDIR}"
+
 xbps-rindex -a "${out}.${archs}.xbps"
 
 if [ "${XDEB_REFUSE}" = true ]; then
