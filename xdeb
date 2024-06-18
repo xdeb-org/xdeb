@@ -172,10 +172,11 @@ while [ "${#}" != "0" ]; do
 
 		--stdin-post-extract) XDEB_OPT_STDIN_POST_EXTRACT=true; shift; continue;;
 		--help) usage 0;;
+		--) shift; break;;
 		--*) log_crit "invalid option '${1}'"; usage 1;;
 		-*);;
 		# Posix getopt stops after first non-option
-		*) [ "${#}" = 1 ] && XDEB_BASEPKG="${1}"; break;;
+		*) break;;
 	esac
 
 	flag="${1#?}"
@@ -204,6 +205,10 @@ while [ "${#}" != "0" ]; do
 
 	shift
 done
+
+[ "${#}" = 1 ] && {
+	XDEB_BASEPKG="${1}"
+}
 
 [ "${XDEB_OPT_DEPS}" = true ] && [ ! -r "${XDEB_SHLIBS}" ] && {
 	log_crit "shlibs file not synced. Run xdeb with '-Sd' to fetch dependency file"
