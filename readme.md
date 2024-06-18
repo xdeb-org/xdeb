@@ -33,32 +33,32 @@ export XDEB_OPT_WARN_CONFLICT=true
 More information:
 ```sh
 usage: xdeb [-S] [-d] [-Sd] [--deps] ... FILE
-  -d                         # Automatic dependency resolution
-  -S                         # Download shlibs file for automatic dependencies
-  -c                         # Like -C, excluding shlibs and binpkgs
-  -r                         # Remvoe repodata file (Use for re-building)
-  -q                         # Extract .deb into destdir only, do not build
-  -C                         # Remove all files created by this script
-  -b                         # Build from destdir directly without a .deb file
-  -e                         # Remove empty directories from the package
-  -m                         # Add the -32bit suffix to the package name
-  -i                         # Don't warn if package could break the system
-  -f                         # Try to fix certain file conflicts (deprecated)
-  -F                         # Don't try to fix certain file conflicts
-  -I                         # Automatically install the package
-  --deps=...                 # Packages that shall be added as dependencies
-  --not-deps=...             # Packages that shall not be used as dependencies
-  --arch=...                 # Package arch
-  --name=...                 # Package name
-  --version=...              # Package version
-  --revision=... | --rev=... # Package revision
-  --stdin-post-extract       # Read post-extract commands from stdin
-  --help | -h                # Show help page
+  -d                          Automatic dependency resolution
+  -S                          Download shlibs file for automatic dependencies
+  -c                          Like -C, excluding shlibs and binpkgs
+  -r                          Remvoe repodata file (Use for re-building)
+  -q                          Extract .deb into destdir only, do not build
+  -C                          Remove all files created by this script
+  -b                          Build from destdir directly without a .deb file
+  -e                          Remove empty directories from the package
+  -m                          Add the -32bit suffix to the package name
+  -i                          Don't warn if package could break the system
+  -f                          Try to fix certain file conflicts (deprecated)
+  -F                          Don't try to fix certain file conflicts
+  -I                          Automatically install the package
+  --deps=...                  Packages that shall be added as dependencies
+  --not-deps=...              Packages that shall not be used as dependencies
+  --arch=...                  Package arch
+  --name=...                  Package name
+  --version=...               Package version
+  --revision=... --rev=...    Package revision
+  --post-extract=...          File with post-extract commands (i.e. /dev/stdin)
+  --help | -h                 Show help page
 
 example:
-  xdeb -Cq                   # Remove all files and quit
-  xdeb -Sd FILE              # Sync depdendency list and create package
-  xdeb --deps='tar>0' FILE   # Add tar as manual dependency and create package
+  xdeb -Cq                    Remove all files and quit
+  xdeb -Sd FILE               Sync depdendency list and create package
+  xdeb --deps='tar>0' FILE    Add tar as manual dependency and create package
 ```
 
 #### Automatic Dependencies
