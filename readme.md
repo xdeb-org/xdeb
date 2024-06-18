@@ -52,6 +52,7 @@ usage: xdeb [-S] [-d] [-Sd] [--deps] ... FILE
   --name=...                 # Package name
   --version=...              # Package version
   --revision=... | --rev=... # Package revision
+  --stdin-post-extract       # Read post-extract commands from stdin
   --help | -h                # Show help page
 
 example:
