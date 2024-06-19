@@ -17,7 +17,9 @@ XDEB_OPT_INSTALL="${XDEB_OPT_INSTALL-false}"
 XDEB_OPT_CLEAN_DIR="${XDEB_OPT_CLEAN_DIR-false}"
 XDEB_OPT_FIX_CONFLICT="${XDEB_OPT_FIX_CONFLICT-true}"
 XDEB_OPT_WARN_CONFLICT="${XDEB_OPT_WARN_CONFLICT-true}"
+
 # XDEB_OPT_POST_EXTRACT="${XDEB_OPT_STDIN_POST_EXTRACT-}"
+# XDEB_BUILD_OPTIONS
 
 XDEB_REFUSE=false
 XDEB_SUFFIX=""
@@ -363,6 +365,7 @@ xbps-create \
 	-S "${long_desc}" \
 	-l "${license}" \
 	-D "${XDEB_DEPENDENCIES}" \
+	--build-options "${XDEB_BUILD_OPTIONS}" \
 	"${XDEB_DESTDIR}"
 
 xbps-rindex -a "${out}.${archs}.xbps"
