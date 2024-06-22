@@ -368,7 +368,9 @@ xbps-create \
 	--build-options "${XDEB_BUILD_OPTIONS}" \
 	"${XDEB_DESTDIR}"
 
-xbps-rindex -a "${out}.${archs}.xbps"
+xbps-rindex -a "${out}.${archs}.xbps" >/dev/null
+
+[ -t 1 ] || echo "${XDEB_BINPKGS#"${PWD}/"}/${out}.${archs}.xbps"
 
 ## Install
 
