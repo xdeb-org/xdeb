@@ -14,6 +14,7 @@ XDEB_OPT_SYNC="${XDEB_OPT_SYNC-false}"
 XDEB_OPT_QUIT="${XDEB_OPT_QUIT-false}"
 XDEB_OPT_EXTRACT="${XDEB_OPT_EXTRACT-true}"
 XDEB_OPT_INSTALL="${XDEB_OPT_INSTALL-false}"
+XDEB_OPT_REGISTER="${XDEB_OPT_REGISTER-true}"
 XDEB_OPT_CLEAN_DIR="${XDEB_OPT_CLEAN_DIR-false}"
 XDEB_OPT_FIX_CONFLICT="${XDEB_OPT_FIX_CONFLICT-true}"
 XDEB_OPT_WARN_CONFLICT="${XDEB_OPT_WARN_CONFLICT-true}"
@@ -121,6 +122,7 @@ usage: xdeb [-S] [-d] [-Sd] [--deps] ... FILE
   -S                          Download shlibs file for automatic dependencies
   -c                          Like -C, excluding shlibs and binpkgs
   -r                          Remvoe repodata file (Use for re-building)
+  -R                          Do not register package in repository pool.
   -q                          Extract .deb into destdir only, do not build
   -C                          Remove all files created by this script
   -b                          Build from destdir directly without a .deb file
@@ -190,6 +192,7 @@ while [ "${#}" != "0" ]; do
 			c*) clean;;
 			C*) clean_all;;
 			r*) clean_repodata;;
+			R*) XDEB_OPT_REGISTER=false;;
 			q*) XDEB_OPT_QUIT=true;;
 			Q*) exit 0;;
 			b*) XDEB_OPT_EXTRACT=false;;
@@ -368,7 +371,9 @@ xbps-create \
 	--build-options "${XDEB_BUILD_OPTIONS}" \
 	"${XDEB_DESTDIR}"
 
-xbps-rindex -a "${out}.${archs}.xbps" >/dev/null
+[ "${XDEB_OPT_REGISTER}" = true ] && {
+	xbps-rindex -a "${out}.${archs}.xbps" >/dev/null
+}
 
 [ -t 1 ] || echo "${XDEB_BINPKGS#"${PWD}/"}/${out}.${archs}.xbps"
 
