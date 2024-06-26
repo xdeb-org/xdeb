@@ -283,19 +283,19 @@ elif [ -z "${long_desc}" ]; then
 fi
 
 # debian_epoch="$(printf "%s" "${version}" | grep -Po '^[0-9]+(?=:)')"
-debian_revision="$(printf "%s" "${version}" | grep -Po '\-\K[A-Za-z+.~]+$')"
+# debian_revision="$(printf "%s" "${version}" | grep -Po '\-\K[A-Za-z+.~]+$')"
 
-[ -n "${debian_revision}" ] && \
-	version="${version%-"${debian_revision}"}"
+# [ -n "${debian_revision}" ] && \
+# 	version="${version%-"${debian_revision}"}"
 
-[ -z "${revision}" ] && \
-	revision="${debian_revision}"
+# [ -z "${revision}" ] && \
+# 	revision="${debian_revision}"
 
 [ -z "${revision}" ] && \
 	revision="1"
 
 version="$(printf "%s" "${version}" | sed 's|[-_/]|.|g; s/^[^0-9]*$/\00/g; s/^$/0/g')"
-revision="$(printf "%s" "${revision}" | sed 's|[^0-9]|.|g')"
+revision="$(printf "%s" "${revision}" | sed 's|[^0-9]||g')"
 
 case "${archs}" in
 	amd64) archs="x86_64";;
