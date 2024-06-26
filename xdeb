@@ -249,28 +249,25 @@ done
 # Quit after parsing every argument argument
 [ "${XDEB_OPT_QUIT}" = true ] && {
 	log_info "Quitting before building"
-	exit 0;
+	exit 0
 }
 
 ## Parse
 
-# @todo: Check for empty arguments using regex to prohibit exclusively whitespace
-
-# Variable names are analogous to xbps-src
-[ -z "${revision}" ] && \
-	revision="1"
-
 [ -z "${pkgname}" ] && \
-	pkgname=$(grep -Po -m1 "Package:[ \t]*\K.*" "${XDEB_DATADIR}/control")
-
+	pkgname="$(grep -Po -m1 "Package:[ \t]*\K.*" "${XDEB_DATADIR}/control")"
 [ -z "${version}" ] && \
-	version=$(grep -Po -m1 "Version:[ \t]*\K.*" "${XDEB_DATADIR}/control")
-
-license=$(grep -Po -m1 "License:[ \t]*\K.*" "${XDEB_DATADIR}/control")
-maintainer=$(grep -Po -m1 "Maintainer:[ \t]*\K.*" "${XDEB_DATADIR}/control")
-short_desc=$(grep -Po -m1 "Description:[ \t]*\K.*" "${XDEB_DATADIR}/control")
-long_desc=$(grep -Po -m1 -z "Description:[ \t\n]*\K.*" "${XDEB_DATADIR}/control" | tr '\0' '\n')
-archs=${archs-$(grep -Po -m1 "Architecture:[ \t]*\K.*" "${XDEB_DATADIR}/control")}
+	version="$(grep -Po -m1 "Version:[ \t]*\K.*" "${XDEB_DATADIR}/control")"
+[ -z "${license}" ] && \
+	license="$(grep -Po -m1 "License:[ \t]*\K.*" "${XDEB_DATADIR}/control")"
+[ -z "${maintainer}" ] && \
+	maintainer="$(grep -Po -m1 "Maintainer:[ \t]*\K.*" "${XDEB_DATADIR}/control")"
+[ -z "${short_desc}" ] && \
+	short_desc="$(grep -Po -m1 "Description:[ \t]*\K.*" "${XDEB_DATADIR}/control")"
+[ -z "${long_desc}" ] && \
+	long_desc="$(grep -Po -m1 -z "Description:[ \t\n]*\K.*" "${XDEB_DATADIR}/control" | tr '\0' '\n')"
+[ -z "${archs}" ] && \
+	archs="$(grep -Po -m1 "Architecture:[ \t]*\K.*" "${XDEB_DATADIR}/control")"
 
 pkgname="${pkgname}${XDEB_SUFFIX}"
 
@@ -285,7 +282,21 @@ elif [ -z "${long_desc}" ]; then
 	long_desc="${short_desc}"
 fi
 
-version=$(echo "${version}" | grep -Po "^(\d|\.)*")
+# debian_epoch="$(printf "%s" "${version}" | grep -Po '^[0-9]+(?=:)')"
+debian_revision="$(printf "%s" "${version}" | grep -Po '\-\K[A-Za-z+.~]+$')"
+
+[ -n "${debian_revision}" ] && \
+	version="${version%-"${debian_revision}"}"
+
+[ -z "${revision}" ] && \
+	revision="${debian_revision}"
+
+[ -z "${revision}" ] && \
+	revision="1"
+
+version="$(printf "%s" "${version}" | sed 's|[-_/]|.|g; s/^[^0-9]*/\00/g; s/^$/0/g')"
+revision="$(printf "%s" "${revision}" | sed 's|[^0-9]|.|g')"
+
 case "${archs}" in
 	amd64) archs="x86_64";;
 	arm64) archs="aarch64";;
