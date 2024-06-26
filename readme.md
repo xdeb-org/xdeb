@@ -36,7 +36,8 @@ usage: xdeb [-S] [-d] [-Sd] [--deps] ... FILE
   -d                          Automatic dependency resolution
   -S                          Download shlibs file for automatic dependencies
   -c                          Like -C, excluding shlibs and binpkgs
-  -r                          Remvoe repodata file (Use for re-building)
+  -r                          Remove repodata file (Use for re-building)
+  -R                          Do not register package in repository pool.
   -q                          Extract .deb into destdir only, do not build
   -C                          Remove all files created by this script
   -b                          Build from destdir directly without a .deb file
