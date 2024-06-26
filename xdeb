@@ -383,7 +383,7 @@ xbps-create \
 	"${XDEB_DESTDIR}"
 
 [ "${XDEB_OPT_REGISTER}" = true ] && {
-	xbps-rindex -a "${out}.${archs}.xbps" >/dev/null
+	xbps-rindex -a "${out}.${archs}.xbps" >&2
 }
 
 [ -t 1 ] || echo "${XDEB_BINPKGS#"${PWD}/"}/${out}.${archs}.xbps"
