@@ -294,7 +294,7 @@ debian_revision="$(printf "%s" "${version}" | grep -Po '\-\K[A-Za-z+.~]+$')"
 [ -z "${revision}" ] && \
 	revision="1"
 
-version="$(printf "%s" "${version}" | sed 's|[-_/]|.|g; s/^[^0-9]*/\00/g; s/^$/0/g')"
+version="$(printf "%s" "${version}" | sed 's|[-_/]|.|g; s/^[^0-9]*$/\00/g; s/^$/0/g')"
 revision="$(printf "%s" "${revision}" | sed 's|[^0-9]|.|g')"
 
 case "${archs}" in
