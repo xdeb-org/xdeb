@@ -216,6 +216,12 @@ done
 }
 
 ## Prepare
+clean
+mkdir -p "${XDEB_PKGROOT}"
+mkdir -p "${XDEB_BINPKGS}"
+mkdir -p "${XDEB_DATADIR}"
+mkdir -p "${XDEB_DESTDIR}"
+mkdir -p "${XDEB_WORKDIR}"
 
 [ "${XDEB_OPT_DEPS}" = true ] && [ ! -r "${XDEB_SHLIBS}" ] && {
 	log_crit "shlibs file not synced. Run xdeb with '-Sd' to fetch dependency file"
@@ -228,13 +234,6 @@ done
 		log_crit "Last argument is not a .deb file or does not exist"
 		exit 1
 	}
-
-	clean
-	mkdir -p "${XDEB_PKGROOT}"
-	mkdir -p "${XDEB_BINPKGS}"
-	mkdir -p "${XDEB_DATADIR}"
-	mkdir -p "${XDEB_DESTDIR}"
-	mkdir -p "${XDEB_WORKDIR}"
 
 	ar -xf "${XDEB_BASEPKG}" --output "${XDEB_WORKDIR}" &&
 	tar -xf "${XDEB_WORKDIR}"/control.* -C "${XDEB_DATADIR}" &&
