@@ -380,7 +380,7 @@ xbps-create \
 	-l "${license}" \
 	-D "${XDEB_DEPENDENCIES}" \
 	--build-options "${XDEB_BUILD_OPTIONS}" \
-	"${XDEB_DESTDIR}"
+	"${XDEB_DESTDIR}" || exit 1
 
 [ "${XDEB_OPT_REGISTER}" = true ] && {
 	xbps-rindex -a "${out}.${archs}.xbps" >&2
