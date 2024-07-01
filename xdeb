@@ -80,7 +80,8 @@ genrdeps() {
 
 		# Escape string
 		_lib=$(echo "${lib}" | sed -E 's|\+|\\+|g')
-		rdep="$(grep -E -m1 "^${_lib}[[:blank:]]+.*$" "${XDEB_SHLIBS}" | cut -d ' ' -f2)"
+		# Flag -i: Currently no case where casing matters. Use -i for better compatibility with other tools.
+		rdep="$(grep -i -E -m1 "^${_lib}[[:blank:]]+.*$" "${XDEB_SHLIBS}" | cut -d ' ' -f2)"
 
 		[ -z "${rdep}" ] && {
 			log_warn "Unable to find dependency for ${lib}" >&2
