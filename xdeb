@@ -327,6 +327,7 @@ esac
 	fix_conflict sbin      usr bin
 	fix_conflict usr/sbin  usr bin
 	fix_conflict usr/lib64 usr lib
+	fix_conflict usr/lib/python3/dist-packages usr/lib/python3.12 site-packages
 }
 
 [ -n "${XDEB_OPT_POST_EXTRACT}" ] && {
