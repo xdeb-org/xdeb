@@ -16,6 +16,7 @@ XDEB_OPT_EXTRACT="${XDEB_OPT_EXTRACT-true}"
 XDEB_OPT_INSTALL="${XDEB_OPT_INSTALL-false}"
 XDEB_OPT_REGISTER="${XDEB_OPT_REGISTER-true}"
 XDEB_OPT_CLEAN_DIR="${XDEB_OPT_CLEAN_DIR-false}"
+XDEB_OPT_LAZY_SONAME="${XDEB_OPT_LAZY_SONAME-false}"
 XDEB_OPT_FIX_CONFLICT="${XDEB_OPT_FIX_CONFLICT-true}"
 XDEB_OPT_WARN_CONFLICT="${XDEB_OPT_WARN_CONFLICT-true}"
 
@@ -80,8 +81,13 @@ genrdeps() {
 
 		# Escape string
 		_lib=$(echo "${lib}" | sed -E 's|\+|\\+|g')
-		# Flag -i: Currently no case where casing matters. Use -i for better compatibility with other tools.
-		rdep="$(grep -i -E -m1 "^${_lib}[[:blank:]]+.*$" "${XDEB_SHLIBS}" | cut -d ' ' -f2)"
+		rdep="$(grep -i -E -m1 "^${_lib}[[:blank:].]+.*$" "${XDEB_SHLIBS}" | cut -d ' ' -f2)"
+
+		[ -z "${rdep}" ] && [ "${XDEB_OPT_LAZY_SONAME}" = true ] && {
+			log_warn "Unable to find dependency for ${lib}, trying lazy" >&2
+			_lib=$(printf "%s" "${_lib}" | sed -E 's|^(.*\.so).*$|\1|g')
+			rdep="$(grep -i -E -m1 "^${_lib}[.]+.*$" "${XDEB_SHLIBS}" | cut -d ' ' -f2)"
+		}
 
 		[ -z "${rdep}" ] && {
 			log_warn "Unable to find dependency for ${lib}" >&2
@@ -133,6 +139,7 @@ usage: xdeb [-S] [-d] [-Sd] [--deps] ... FILE
   -f                          Try to fix certain file conflicts (deprecated)
   -F                          Don't try to fix certain file conflicts
   -I                          Automatically install the package
+  -L                          Lazy match SONAMEs
   --deps=...                  Packages that shall be added as dependencies
   --not-deps=...              Packages that shall not be used as dependencies
   --arch=...                  Package arch
@@ -203,6 +210,7 @@ while [ "${#}" != "0" ]; do
 			f*) log_warn "Option '-f' is now enabled by default. Use '-F' to disable it.";;
 			F*) XDEB_OPT_FIX_CONFLICT=false;;
 			I*) XDEB_OPT_INSTALL=true;;
+			L*) XDEB_OPT_LAZY_SONAME=true;;
 			*) log_crit "invalid option -- '${flag%"${flag#?}"}'"; usage 1;;
 		esac
 
