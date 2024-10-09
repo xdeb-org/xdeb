@@ -176,6 +176,9 @@ while [ "${#}" != "0" ]; do
 			log_crit "'${1}' invalid. Use ${1}=... instead"; exit 1;;
 
 		--deps=*) XDEB_DEPENDENCIES="${XDEB_DEPENDENCIES}${1#*=} "; shift; continue;;
+		--conflicts=*) XDEB_CONFLICTS="${XDEB_CONFLICTS}${1#*=} "; shift; continue;;
+		--replaces=*) XDEB_REPLACES="${XDEB_REPLACES}${1#*=} "; shift; continue;;
+		--provides=*) XDEB_PROVIDES="${XDEB_PROVIDES}${1#*=} "; shift; continue;;
 		--arch=*) archs="${1#*=}"; shift; continue;;
 		--name=*) pkgname="${1#*=}"; shift; continue;;
 		--version=*) version="${1#*=}"; shift; continue;;
@@ -388,6 +391,9 @@ xbps-create \
 	-S "${long_desc}" \
 	-l "${license}" \
 	-D "${XDEB_DEPENDENCIES}" \
+	-C "${XDEB_CONFLICTS}" \
+	-R "${XDEB_REPLACES}" \
+	-P "${XDEB_PROVIDES}" \
 	--build-options "${XDEB_BUILD_OPTIONS}" \
 	"${XDEB_DESTDIR}" || exit 1
 
