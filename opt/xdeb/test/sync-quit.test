@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+
+# O Void Linux usa /bin/sh por padrão.
+
+clear
+
+# ----------------------------------------------------------------------------------------
+
+# Internacionalização com gettext
+
+export TEXTDOMAIN=xdeb
+export TEXTDOMAINDIR=/usr/share/locale
+
+# ----------------------------------------------------------------------------------------
+
+
+# Define uma função chamada build, mas ela não faz absolutamente nada.
+# O return sozinho termina a função, sem retornar valor algum nem realizar ações.
+
+function build() {
+    return
+}
+
+
+
+# Função run()
+
+function run() {
+
+     # Executa o comando que está no caminho contido na variável ${xdeb_path}, com as opções -SQ.
+
+     # Se esse comando falhar (código de saída diferente de zero), então:
+
+     # Chama a função fail com a mensagem "xdeb failed", que está sendo internacionalizada com gettext.
+
+    "${xdeb_path}" -SQ || fail "$(gettext "xdeb failed")"
+
+
+    # Verifica se o arquivo ${XDEB_PKGROOT}/shlibs existe.
+
+    # Se não existir, chama novamente fail com a mensagem correspondente.
+
+    [ -f "${XDEB_PKGROOT}/shlibs" ] || fail "$(gettext "shlibs file does not exist")"
+
+}

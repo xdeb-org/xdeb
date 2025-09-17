@@ -1,0 +1,130 @@
+.\" -*- coding: UTF-8 -*-
+.\" Autor:           Fernando Souza <https://www.youtube.com/@fernandosuporte>
+.\" Data:            05/09/2025
+.\" Atualização em:  https://github.com/tuxslack/xdeb
+.\" Script:          xdeb
+.\" Versão:          0.2
+.TH xdeb 1 05\-09\-2025 "xdeb 1.6" "Comandos de usuário"
+.SH NOME
+xdeb - Converte pacotes deb (Debian) para xbps (Void Linux)
+
+.SH SINOPSE
+xdeb [OPÇÃO]... [ARQUIVO]
+
+.SH DESCRIÇÃO
+O xdeb converte pacotes .deb para o formato .xbps. Ele faz isso
+extraindo o arquivo deb, analisando metadados e reconstruindo o pacote
+usando ferramentas de linha de comando xbps. Por padrão, o xdeb apenas passa o nome do pacote,
+a versão e a arquitetura. Certas opções de linha de comando podem habilitar uma grande
+quantidade de recursos adicionais, como resolução automática de dependências.
+
+.SH OPÇÕES
+.B \-d 
+Tenta descobrir automaticamente quais dependências o pacote .deb
+
+.B \-S 
+Baixa o arquivo de dependências necessário para a flag -d
+
+.B \-c 
+Remove os arquivos gerados, exceto shlibs e binpkgs/
+
+.B \-r 
+Remove o arquivo repodata
+
+.B \-q 
+Extrai apenas, sai antes de compilar
+
+.B \-C 
+Remove todos os arquivos gerados
+
+.B \-b 
+Construir sem extrair, não requer argumento FILE
+
+.B \-e 
+Remove diretórios vazios do pacote
+
+.B \-m 
+Adiciona o sufixo 
+.BR -32 bits 
+ao nome do pacote
+
+.B \-i 
+Não avisa sobre arquivos conflitantes
+
+.B \-f 
+Tenta corrigir automaticamente arquivos conflitantes (habilitado por padrão)
+
+.B \-F 
+Não tenta corrigir automaticamente arquivos conflitantes
+
+.B \-I 
+Instala automaticamente após a compilação
+
+.B \-\-deps=...
+Especifica manualmente as dependências do pacote
+
+.B \-\-not-\-deps=...
+Especifica manualmente o pacote que nunca deve ser usado como dependências. As dependências adicionadas com
+.B \-\-deps
+serão usadas independentemente.
+
+.B \-\-arch=...  
+Especifica manualmente a arquitetura de destino
+
+.B \-\-name=...  
+Especifica manualmente o nome da saída
+
+.B \-\-version=...  
+Especifica manualmente a versão de saída
+
+.B \-\-revision=...,-\-rev=...	 
+Especifica manualmente a revisão do pacote
+
+.B \-\-post-extract=...  
+Arquivo para ler os comandos pós-extração
+
+.B \-h,-\-help  
+Exibe a página de ajuda
+
+.B \-v,\-version
+Mostrar a versão do xdeb
+
+
+.SH VARIÁVEIS DE AMBIENTE
+Além das opções, as seguintes variáveis ​​de ambiente são
+suportadas pelo xdeb:
+
+.SS Caminhos
+.B XDEB_PKGROOT 
+Diretório pai para os valores padrão de 
+.BR XDEB_WORKDIR,
+.BR XDEB_DESTDIR,
+.BR XDEB_DATADIR,
+.BR XDEB_BINPKGS 
+e 
+.BR XDEB_SHLIB
+
+
+.B XDEB_WORKDIR
+
+.B XDEB_DESTDIR
+
+.B XDEB_DATADIR
+
+.B XDEB_BINPKGS
+
+.B XDEB_SHLIBS
+
+.SS Opções
+XDEB_OPT_DEPS
+XDEB_OPT_SYNC
+XDEB_OPT_QUIT
+XDEB_OPT_EXTRACT
+XDEB_OPT_CLEAN_DIR
+XDEB_OPT_FIX_CONFLICT
+XDEB_OPT_WARN_CONFLICT
+
+.SH VEJA TAMBÉM
+.BR xbps-install(1)
+.BR xbps-query(1)
+

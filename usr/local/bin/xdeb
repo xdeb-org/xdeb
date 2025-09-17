@@ -1,0 +1,1492 @@
+#!/usr/bin/env bash
+#
+# Authors:         /usr/share/doc/xdeb/AUTHORS
+# Date:            09/09/2025
+# Update:          https://github.com/tuxslack/xdeb
+# Script:          xdeb
+# version: 1.6
+# License: MIT
+# Requires:        yad, xdeb
+
+
+# O Void Linux usa /bin/sh por padrão.
+
+
+
+# Evite usar 'clear' aqui, pois pode gerar caracteres indesejados em interfaces gráficas (yad).
+
+# clear
+
+
+# ----------------------------------------------------------------------------------------
+
+# Internacionalização com gettext
+
+export TEXTDOMAIN=xdeb
+export TEXTDOMAINDIR=/usr/share/locale
+
+# export TEXTDOMAINDIR=../../share/locale/
+
+# ----------------------------------------------------------------------------------------
+
+# cd ~/
+
+# Por que o man ignora o idioma no Void Linux?
+
+# O mandoc (usado por Void Linux) não respeita LANG ou LC_MESSAGES para selecionar páginas 
+# localizadas. Ele simplesmente busca a primeira página que encontrar no caminho padrão, 
+# geralmente em /usr/share/man/man1, e ignora subdiretórios como pt_BR.
+
+# ✅ Soluções possíveis
+
+# Substituir a versão em inglês pela versão em português
+
+# Se você quiser que man xdeb exiba a versão em português por padrão:
+
+
+# Isso ignora o banco de dados e abre o arquivo diretamente. Se isso funcionar, sabemos 
+# que o conteúdo está correto e o problema é só com o índice.
+
+# man -l /usr/share/man/pt_BR/man1/xdeb.1
+
+# echo $MANPATH
+# export MANPATH="/usr/share/man:/usr/share/man/pt_BR"
+
+
+# Criar um alias para abrir diretamente a versão em português
+
+
+#  nano ~/.bashrc
+
+# ...
+
+# manpt() {
+
+#    man -l "/usr/share/man/$(echo $LANG | cut -d. -f1)/man1/$1.1" || echo -e "\n\n" && ls /usr/share/man/$(echo $LANG | cut -d. -f1)/man1/
+
+# }
+
+
+# alias manpt=manpt
+
+# ...
+
+#  source ~/.bashrc
+
+
+# manpt xdeb.1
+
+# manpt xdeb
+
+
+
+
+# Directories and filenames
+
+# Esse comando define XDEB_PKGROOT como o diretório atual ($(pwd)) caso a variável não 
+# esteja definida.
+# XDEB_PKGROOT="$(realpath -m "${XDEB_PKGROOT-"$(pwd)"}")"
+
+
+# Explicação:
+
+# :-/opt/binpkgs define /opt/binpkgs como valor padrão, se XDEB_PKGROOT não estiver definido.
+
+# O realpath -m garante que o caminho seja absoluto e resolvido corretamente.
+
+# As demais pastas (XDEB_WORKDIR, XDEB_DESTDIR, etc.) são criadas dentro de XDEB_PKGROOT, 
+# então ao mudar isso, tudo vai para /tmp.
+
+# Se quiser, também pode exportar essa variável antes de rodar o script.
+
+# export XDEB_PKGROOT=/opt/binpkgs
+# xdeb
+
+
+# Se a variável XDEB_PKGROOT não estiver definida ou estiver vazia, será usado "/opt/binpkgs" como valor.
+
+# Exemplo:
+
+# XDEB_PKGROOT=""   → vira  /opt/binpkgs
+# XDEB_PKGROOT="${HOME}/.config/xdeb" → permanece ${HOME}/.config/xdeb
+
+
+XDEB_PKGROOT="$(realpath -m "${XDEB_PKGROOT:-/opt/binpkgs}")"
+
+
+
+XDEB_WORKDIR="$(realpath -m "${XDEB_WORKDIR-"${XDEB_PKGROOT}/workdir"}")"
+XDEB_DESTDIR="$(realpath -m "${XDEB_DESTDIR-"${XDEB_PKGROOT}/destdir"}")"
+XDEB_DATADIR="$(realpath -m "${XDEB_DATADIR-"${XDEB_PKGROOT}/datadir"}")"
+XDEB_BINPKGS="$(realpath -m "${XDEB_BINPKGS-"${XDEB_PKGROOT}/binpkgs"}")"
+XDEB_SHLIBS="$(realpath -m "${XDEB_SHLIBS-"${XDEB_PKGROOT}/shlibs"}")"
+
+# Options
+XDEB_OPT_DEPS="${XDEB_OPT_DEPS-false}"
+XDEB_OPT_SYNC="${XDEB_OPT_SYNC-false}"
+XDEB_OPT_QUIT="${XDEB_OPT_QUIT-false}"
+XDEB_OPT_EXTRACT="${XDEB_OPT_EXTRACT-true}"
+XDEB_OPT_INSTALL="${XDEB_OPT_INSTALL-false}"
+XDEB_OPT_REGISTER="${XDEB_OPT_REGISTER-true}"
+XDEB_OPT_CLEAN_DIR="${XDEB_OPT_CLEAN_DIR-false}"
+XDEB_OPT_LAZY_SONAME="${XDEB_OPT_LAZY_SONAME-false}"
+XDEB_OPT_FIX_CONFLICT="${XDEB_OPT_FIX_CONFLICT-true}"
+XDEB_OPT_WARN_CONFLICT="${XDEB_OPT_WARN_CONFLICT-true}"
+
+# XDEB_OPT_POST_EXTRACT="${XDEB_OPT_STDIN_POST_EXTRACT-}"
+# XDEB_BUILD_OPTIONS
+
+XDEB_REFUSE=false
+XDEB_SUFFIX=""
+
+# ----------------------------------------------------------------------------------------
+
+# Incompatibilidade com shell não Bash
+
+# Se alguém usar com /bin/sh, vai falhar (especialmente no Void Linux, onde /bin/sh → dash).
+
+if [ -z "$BASH_VERSION" ]; then
+
+    echo -e "\n$(gettext "This script requires bash. Exiting...")\n"
+
+    exit 1
+fi
+
+# ----------------------------------------------------------------------------------------
+
+function intro() {
+
+
+[ -d "${XDEB_PKGROOT:-}" ] && list=$(ls "${XDEB_PKGROOT}") || list=""
+
+
+echo "
+# ----------------------------------------------------------------------------------------
+
+$(gettext "Base directory of the packaging process"): ${XDEB_PKGROOT}
+
+$list
+
+$(gettext "These folders make up the structure used by the xdeb script when converting .deb packages 
+to the native Void Linux format (.xbps). Each directory plays a specific role 
+in the content extraction, modification, and packaging steps.
+
+Below is a description of each of them:")
+
+
+📁 workdir
+
+$(gettext "Function"):
+
+$(gettext "Temporary folder used to store files extracted directly from the .deb file, before being organized.")
+
+$(gettext "Example content"):
+
+control.tar.*
+
+data.tar.*
+
+debian-binary
+
+$(gettext "Summary"):
+
+$(gettext "This is where the .deb is initially unpacked.")
+
+📁 datadir
+
+$(gettext "Function"):
+
+$(gettext "Where the .deb package control metadata is extracted (such as control, maintainer, version, etc).")
+
+$(gettext "Example content"):
+
+$(gettext "Control File
+
+Other control files (preinst, postinst, etc.)")
+
+$(gettext "Summary"):
+
+$(gettext "Contains information about the package (name, version, description, etc.).")
+
+📁 destdir
+
+$(gettext "Function"):
+
+$(gettext "Directory where the actual package files are extracted (what will be installed on the system).")
+
+$(gettext "Example content"):
+
+/usr/bin/mousepad
+/usr/lib/libmousepad.so.0.0.0
+/usr/lib/mousepad/plugins/libmousepad-plugin-gspell.so
+/usr/lib/mousepad/plugins/libmousepad-plugin-shortcuts.so
+/usr/share/applications/org.xfce.mousepad-settings.desktop
+/usr/share/applications/org.xfce.mousepad.desktop
+/usr/share/glib-2.0/schemas/org.xfce.mousepad.gschema.xml
+/usr/share/glib-2.0/schemas/org.xfce.mousepad.plugins.gspell.gschema.xml
+/usr/share/icons/hicolor/128x128/apps/org.xfce.mousepad.png
+/usr/share/icons/hicolor/16x16/apps/org.xfce.mousepad.png
+
+...
+
+$(gettext "Summary"):
+
+$(gettext "Represents the package's file system. It is the final content that will be packaged in the .xbps file.")
+
+📁 binpkgs
+
+$(gettext "Function"):
+
+$(gettext "Directory where the final .xbps package (from Void Linux) will be stored after creation.")
+
+$(gettext "Example content"):
+
+$(gettext "package-name-version")_1.x86_64.xbps
+
+$(gettext "Summary"):
+
+$(gettext "Final output of the script. Contains the package that can be installed with xbps-install.")
+
+🧠 $(gettext "General Summary: 
+
+Folder What is it for?
+
+workdir Temporary workspace (raw contents of the .deb)
+datadir Package metadata (control, maintainer, etc.)
+destdir Package file system (what will be installed)
+binpkgs Final result: the generated .xbps package")
+
+"
+
+}
+
+# ----------------------------------------------------------------------------------------
+
+function log_info() {
+	printf "\033[1;36mI\033[0m %s\033[0m\n" "${*}" >&2
+}
+
+# ----------------------------------------------------------------------------------------
+
+function log_warn() {
+	printf "\033[1;33mW\033[0m %s\033[0m\n" "${*}" >&2
+}
+
+# ----------------------------------------------------------------------------------------
+
+function log_crit() {
+	printf "\033[1;31mE\033[0;1m %s\033[0m\n" "${*}" >&2
+	XDEB_REFUSE=true
+}
+
+# ----------------------------------------------------------------------------------------
+
+# Filtra e exibe a versão interna definida no próprio arquivo.
+
+# Você pode usar as opções como -v ou -version para extrair essa informação automaticamente.
+
+
+# Extrai a linha que contém "version:" e pega só o número
+
+script_version=$(grep -E "^# version:" "$0" | awk '{print $3}')
+
+
+version() {
+
+    # clear
+
+    # msg=$(gettext "%s version: %s")
+
+    # shellcheck disable=SC2059
+    # printf '%s\n' "$(printf "$msg" "$0" "$script_version")"
+
+    # echo $(grep -E "^# version:" "$0" | awk '{print $3}')
+
+
+    # Evite usar 'clear' aqui, pois pode gerar caracteres indesejados em interfaces gráficas (yad).
+
+    grep -E "^# version:" "$0" | awk '{print $3}'
+
+}
+
+
+# ----------------------------------------------------------------------------------------
+
+# Função sync_shlibs()
+
+
+# curl -s URL -o "${XDEB_SHLIBS}" -f
+
+# Baixa silenciosamente (-s) o arquivo remoto na URL:
+# https://raw.githubusercontent.com/void-linux/void-packages/master/common/shlibs
+# (Esse arquivo é uma lista de shlibs — bibliotecas compartilhadas — usada no Void Linux para dependências).
+
+# Salva o conteúdo baixado no arquivo local definido pela variável ${XDEB_SHLIBS}.
+
+
+function sync_shlibs() {
+
+
+    # Antes de tentar baixar algo com curl, é bom verificar se há conexão com a internet.
+
+    # Verifica se tem internet (tentando pingar o GitHub)
+
+	if ! ping -c 1 -W 2 github.com >/dev/null 2>&1; then
+
+		log_crit "$(gettext "No internet connection. Unable to sync shlibs.")"
+
+		exit 1
+
+	fi
+
+    # Tenta baixar o arquivo shlibs
+
+	curl \
+		-s "https://raw.githubusercontent.com/void-linux/void-packages/master/common/shlibs" \
+		-o "${XDEB_SHLIBS}" \
+		-f || {
+		log_crit "$(gettext "Unable to sync shlibs.")"
+		exit 1
+	}
+	log_info "$(gettext "Synced shlibs")"
+}
+
+# ----------------------------------------------------------------------------------------
+
+# clean : Removes old package data, without removing any binpkgs
+
+function clean() {
+	# rm -f "${XDEB_BINPKGS}"/.xbps-pkg-*
+	rm -rf "${XDEB_WORKDIR}"
+	rm -rf "${XDEB_DATADIR}"
+	rm -rf "${XDEB_DESTDIR}"
+}
+
+# Ela só é chamada explicitamente com -c ou -C.
+
+# ----------------------------------------------------------------------------------------
+
+# clean_repodata : Removes the repodata file. Needed to rebuild a package with the same version
+
+function clean_repodata() {
+	rm -rf "${XDEB_BINPKGS}"/*-repodata
+}
+
+# ----------------------------------------------------------------------------------------
+
+# clean_all : Remove everything, this script created
+
+function clean_all() {
+	clean
+	clean_repodata
+	rm -rf "${XDEB_BINPKGS}"
+	rm -rf "${XDEB_SHLIBS}"
+}
+
+# ----------------------------------------------------------------------------------------
+
+function genrdeps() {
+
+	find "${XDEB_DESTDIR}" -type f | while read -r f; do
+		[ "$(head -c 4 "${f}" | tr -d '\0')" = "$(printf "\177ELF")" ] || continue
+		objdump -p "${f}" | grep NEEDED | awk '{print $2}'
+	done | sort -u | while read -r lib; do
+		# Ignore libraries provided by current package
+		[ -n "$(find "${XDEB_DESTDIR}" -name "${lib}")" ] && continue
+
+		# Escape string
+		_lib=$(echo "${lib}" | sed -E 's|\+|\\+|g')
+		rdep="$(grep -i -E -m1 "^${_lib}[[:blank:].]+.*$" "${XDEB_SHLIBS}" | cut -d ' ' -f2)"
+
+		[ -z "${rdep}" ] && [ "${XDEB_OPT_LAZY_SONAME}" = true ] && {
+
+            log_warn "$(gettext "Unable to find dependency for %s, trying lazy"  "$lib")" >&2
+
+
+			_lib=$(printf "%s" "${_lib}" | sed -E 's|^(.*\.so).*$|\1|g')
+			rdep="$(grep -i -E -m1 "^${_lib}[.]+.*$" "${XDEB_SHLIBS}" | cut -d ' ' -f2)"
+		}
+
+		[ -z "${rdep}" ] && {
+			log_warn "$(gettext "Unable to find dependency for %s"  "${lib}")" >&2
+			continue
+		}
+
+		printf "%s" "${XDEB_NOT_DEPENDENCIES}" | grep -wF "${rdep%-*}${XDEB_SUFFIX}" >/dev/null && {
+			continue
+		}
+
+		echo "${rdep%-*}${XDEB_SUFFIX}>=${rdep##*-}"
+	done | sort -u | tr '\n' ' '
+}
+
+# If 2 arguments, move $1 to $2/$1
+# if 3 arguments, move $1 to $2/$3
+
+# ----------------------------------------------------------------------------------------
+
+# Função check_missing_libs
+
+# - Analise todos os arquivos ELF do pacote extraído ($XDEB_DESTDIR);
+
+# - Use ldd para identificar bibliotecas ausentes (=> not found);
+
+# - Avise sobre os problemas antes de criar ou instalar o .xbps.
+
+# ⚠️ Requisitos da função
+
+# ldd
+
+# file
+
+# Função roda apenas em binários ELF.
+
+# Não tenta instalar nada automaticamente — só avisa o usuário.
+
+
+
+# Verificar bibliotecas ausentes em binários extraídos de um pacote .deb no Void Linux
+
+
+function check_missing_libs() {
+
+
+# Usa ldd para verificar dependências
+
+
+# Ele percorre todos os binários ELF (executáveis e bibliotecas .so) dentro do diretório extraído do .deb.
+
+# Usa ldd para verificar dependências ausentes em cada um desses arquivos.
+
+# Detecta dependências transitivas — ou seja, bibliotecas que são exigidas por outras bibliotecas, não apenas pelo binário principal.
+
+
+
+missing=0
+
+while IFS= read -r bin; do
+
+    while IFS= read -r line; do
+        lib=$(echo "$line" | awk '{print $1}')
+        echo -e "\033[1;31m[!] $(gettext "Missing library:")\033[0m $lib => $(gettext "not found")"
+        echo -e "    \033[1;34m→ $(gettext "in binary"):\033[0m ${bin#$XDEB_DESTDIR/}"
+        missing=1
+    done < <(ldd "$bin" 2>/dev/null | grep "not found")
+
+done < <(find "$XDEB_DESTDIR" -type f -exec file {} \; | grep -E 'ELF.*(executable|shared object)' | cut -d: -f1)
+
+if [ "$missing" -eq 1 ]; then
+
+echo -e "\n\033[1;33m⚠️  $(gettext "Warning:") \033[0m $(gettext "One or more required shared libraries are missing.")\n\033[1;33m   $(gettext "You may need to install the appropriate packages or adjust your dependencies.")\033[0m\n\n$(gettext "Use \`--deps=...\` or install missing libraries before proceeding.")\n"
+
+
+echo "$(gettext "🧩 Alternative solutions:
+
+* Repackage the program as a Void package (.xbps) with adjusted dependencies.
+
+In Void Linux, you have several ways to install programs, each with its own advantages depending on your usage style and needs. Here are the main ones:
+
+1. Using the xbps package manager
+
+xbps-install -S package-name
+
+2. Compiling with xtools (build from source)
+
+xbps-install -S xtools
+
+git clone https://github.com/void-linux/void-packages
+
+cd void-packages
+./xbps-src binary-bootstrap
+
+./xbps-src pkg package-name
+xbps-install --repository=hostdir/binpkgs package-name
+
+3. Installing .xbps packages manually using xbps-install
+
+If you have a local .xbps package.
+
+4. Flatpak (sandboxed apps)
+
+Flatpak works well on Void and allows you to install universal apps:
+
+xbps-install -S flatpak
+
+flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+flatpak install flathub name.do.app
+
+5. Docker (containers)
+
+xbps-install -S docker
+
+
+6. AppImage
+
+chmod +x program.AppImage
+./programa.AppImage
+
+
+7. Manual: compile from source code
+
+git clone https://github.com/algo/projeto.git
+cd project
+make && sudo make install")"
+
+
+    return 1
+
+fi
+
+
+
+}
+
+
+
+# ----------------------------------------------------------------------------------------
+
+
+function fix_conflict() {
+
+	[ ! -e "${XDEB_DESTDIR}/${1}" ] || [ ! -d "${XDEB_DESTDIR}/${1}" ] && return 1
+
+	local src="${1}"
+	local dst="${2}/${3-"${1}"}"
+
+	mkdir -p "${XDEB_DESTDIR}/${2}"
+
+    # Risco importante: o uso de cp -rT pode sobrescrever o conteúdo do destino se ele já existir.
+
+
+    # Verifica se o diretório de destino já existe E tem conteúdo
+
+    # Não copie nada se o diretório de destino já existir e contiver arquivos ou subdiretórios.
+
+    if [ -d "${XDEB_DESTDIR}/${dst}" ] && [ -n "$(ls -A "${XDEB_DESTDIR}/${dst}")" ]; then
+
+
+        # ✅ Solução recomendada (segura e compatível com ShellCheck):
+
+        # Em vez de passar o conteúdo de msg diretamente como formato, sempre use uma string 
+        # de formato fixa com printf, e passe a variável como argumento.
+
+        msg="$(gettext "Error: Destination directory '%s' already exists and is NOT empty.")"
+
+        # printf "%s\n" "$(printf "%s" "$msg")" "${XDEB_DESTDIR}/${dst}"
+
+        echo "$(printf '%s\n' "$(printf '%s\n' "$msg" | xargs -I{} printf '{}' "${XDEB_DESTDIR}/${dst}")")"
+
+        sleep 5
+
+        return 1
+
+    fi
+
+
+	cp -rT "${XDEB_DESTDIR}/${src}" "${XDEB_DESTDIR}/${dst}"
+
+	# Faz o shell abortar imediatamente com um erro se a variável XDEB_DESTDIR estiver vazia ou não definida.
+
+    rm -rf "${XDEB_DESTDIR:?}/${src}"
+
+    msg="$(gettext "Moved conflict '%s' -> '%s'")"
+    log_info "$(printf "$msg" "${src}" "${dst}")"
+
+}
+
+# ----------------------------------------------------------------------------------------
+
+# function check_command() {
+#	command -v "${1}" > /dev/null 2>&1 || {
+#		log_crit "$(printf "$(gettext "Executable '%s' from package '%s' not found.")"  "${1}" "${2-"${1}"}")"
+#		exit 1
+#	}
+# }
+
+
+# Usar um loop para verificar múltiplos comandos
+
+function check_command() {
+
+	local missing=0
+
+	for cmd in "$@"; do
+
+		if ! command -v "$cmd" >/dev/null 2>&1; then
+
+            msg=$(gettext "Executable '%s' not found.")
+            log_crit "$(printf '%s\n' "$(printf '%s\n' "$msg" | xargs -I{} printf '{}' "$cmd")")"
+
+
+			missing=1
+		fi
+
+	done
+
+	[ "$missing" -eq 1 ] && exit 1
+
+}
+
+# ----------------------------------------------------------------------------------------
+
+function usage() {
+
+    # clear
+
+    echo -e "\n=========================================================================================="
+    echo "                 $(gettext "xdeb - Convert Debian packages (.deb) to Void Linux (.xbps)")       "
+    echo "=========================================================================================="
+    echo -e "\n$(gettext "Version") $script_version"
+
+
+
+	cat << EOF
+
+$(gettext "usage"): xdeb [-S] [-d] [-Sd] [--deps] ... $(gettext "FILE")
+
+  -d                          $(gettext "Automatic dependency resolution")
+  -S                          $(gettext "Download shlibs file for automatic dependencies")
+  -c                          $(gettext "Like -C, excluding shlibs and binpkgs")
+  -r                          $(gettext "Remove repodata file (Use for re-building)")
+  -R                          $(gettext "Do not register package in repository pool.")
+  -q                          $(gettext "Extract .deb into destdir only, do not build")
+  -C                          $(gettext "Remove all files created by this script")
+  -b                          $(gettext "Build from destdir directly without a .deb file")
+  -e                          $(gettext "Remove empty directories from the package")
+  -m                          $(gettext "Add the -32bit suffix to the package name")
+  -i                          $(gettext "Don't warn if package could break the system")
+  -f                          $(gettext "Try to fix certain file conflicts (deprecated)")
+  -F                          $(gettext "Don't try to fix certain file conflicts")
+  -I                          $(gettext "Automatically install the package")
+  -L                          $(gettext "Lazy match SONAMEs")
+  --deps=...                  $(gettext "Packages that shall be added as dependencies")
+  --not-deps=...              $(gettext "Packages that shall not be used as dependencies")
+  --arch=...                  $(gettext "Package arch")
+  --name=...                  $(gettext "Package name")
+  --version=...               $(gettext "Package version")
+  --revision=... --rev=...    $(gettext "Package revision")
+  --post-extract=...          $(gettext "File with post-extract commands (i.e. /dev/stdin)")
+  --help | -h                 $(gettext "Show help page")
+  -version | -v               $(gettext "Show xdeb version")
+
+$(gettext "example"):
+
+  xdeb -Cq                    $(gettext "Remove all files and quit")
+  xdeb -Sd FILE               $(gettext "Sync depdendency list and create package")
+  xdeb --deps='tar>0' FILE    $(gettext "Add tar as manual dependency and create package")
+
+EOF
+
+
+intro
+
+	exit "${1}"
+}
+
+# ----------------------------------------------------------------------------------------
+
+## Check dependencies
+
+check_command xz
+check_command tar
+check_command curl
+
+check_command ar 
+check_command objdump 
+
+# Gera pacotes XBPS com xbps-create e registra com xbps-rindex.
+
+check_command xbps-rindex 
+check_command xbps-create 
+
+
+check_command python3 gettext realpath awk sed grep ls
+
+
+
+# Lista de pacotes obrigatórios
+
+# xbps-query -p pkgver "package"
+
+# Verifica exatamente o pacote, e falha se ele não estiver instalado.
+
+check_packages() {
+
+    local missing=0
+
+    for pkg in "$@"; do
+
+        if ! xbps-query -p pkgver "${pkg}" >/dev/null 2>&1; then
+
+            msg=$(gettext "You need to install the %s package on your system.")
+
+            echo "$(printf '%s\n' "$(printf '%s\n' "$msg" | xargs -I{} printf '{}' "$pkg")")"
+
+            missing=1
+        fi
+
+    done
+
+    [ "$missing" -eq 1 ] && exit 1
+}
+
+
+
+check_packages xbps xbps binutils binutils noto-fonts-ttf  # noto-fonts-emoji
+
+
+# ----------------------------------------------------------------------------------------
+
+## Parse arguments
+
+while [ "${#}" != "0" ]; do
+	case "${1}" in
+		--deps|--arch|--name|--version|--not-deps|--revision|--rev)
+
+           log_crit "$(gettext "'%s' invalid. Use %s=... instead" | xargs printf "${1}" "${1}")"; exit 1;;
+
+		--deps=*) XDEB_DEPENDENCIES="${XDEB_DEPENDENCIES}${1#*=} "; shift; continue;;
+		--conflicts=*) XDEB_CONFLICTS="${XDEB_CONFLICTS}${1#*=} "; shift; continue;;
+		--replaces=*) XDEB_REPLACES="${XDEB_REPLACES}${1#*=} "; shift; continue;;
+		--provides=*) XDEB_PROVIDES="${XDEB_PROVIDES}${1#*=} "; shift; continue;;
+		--arch=*) archs="${1#*=}"; shift; continue;;
+		--name=*) pkgname="${1#*=}"; shift; continue;;
+		--version=*) version="${1#*=}"; shift; continue;;
+		--not-deps=*) XDEB_NOT_DEPENDENCIES="${XDEB_NOT_DEPENDENCIES}${1#*=} "; shift; continue;;
+		--revision=*|--rev=*) revision="${1#*=}"; shift; continue;;
+		--post-extract=*) XDEB_OPT_POST_EXTRACT="${1#*=}"; shift; continue;;
+	    -v|-version) version ; exit 1;;
+
+		--help) usage 0;;
+		--) shift; break;;
+
+		--*) # shellcheck disable=SC2059
+             log_crit "$(printf "$(gettext "invalid option '%s'")" "${1}")" ; usage 1;;
+
+ 		-*);;
+		# Posix getopt stops after first non-option
+		*) break;;
+	esac
+
+	flag="${1#?}"
+	while [ -n "${flag}" ]; do
+		case "${flag}" in
+			S*) sync_shlibs;;
+			d*) XDEB_OPT_DEPS=true;;
+			h*) usage 0;;
+			c*) clean;;
+			C*) clean_all;;
+			r*) clean_repodata;;
+			R*) XDEB_OPT_REGISTER=false;;
+			q*) XDEB_OPT_QUIT=true;;
+			Q*) exit 0;;
+			b*) XDEB_OPT_EXTRACT=false;;
+			e*) XDEB_OPT_CLEAN_DIR=true;;
+			m*) XDEB_SUFFIX="-32bit";;
+			i*) XDEB_OPT_WARN_CONFLICT=false;;
+			f*) log_warn "$(gettext "Option '-f' is now enabled by default. Use '-F' to disable it.")";;
+			F*) XDEB_OPT_FIX_CONFLICT=false;;
+			I*) XDEB_OPT_INSTALL=true;;
+			L*) XDEB_OPT_LAZY_SONAME=true;;
+
+			 *) # shellcheck disable=SC2059
+                log_crit "$(printf "$(gettext "invalid option -- %s")"  "'${flag%"${flag#?}"}'" )"; usage 1;;
+		esac
+
+		flag="${flag#?}"
+	done
+
+	shift
+done
+
+[ "${#}" = 1 ] && {
+	XDEB_BASEPKG="${1}"
+}
+
+# ----------------------------------------------------------------------------------------
+
+## Prepare
+
+clean
+
+
+# ----------------------------------------------------------------------------------------
+
+# mkdir: não foi possível criar o diretório “/opt/binpkgs”: Permissão negada
+# mkdir: não foi possível criar o diretório “/opt/binpkgs”: Permissão negada
+# mkdir: não foi possível criar o diretório “/opt/binpkgs”: Permissão negada
+# mkdir: não foi possível criar o diretório “/opt/binpkgs”: Permissão negada
+# mkdir: não foi possível criar o diretório “/opt/binpkgs”: Permissão negada
+
+
+
+check_dir_permissions() {
+
+    # Verifica se o diretório existe e se é possível escrever e ler nele
+
+    if [ ! -d "${XDEB_PKGROOT}" ] || [ ! -w "${XDEB_PKGROOT}" ] || [ ! -r "${XDEB_PKGROOT}" ]; then
+
+
+        msg=$(gettext "Error: No read/write permission on: %s
+
+Tip: Run the command with administrator privileges (e.g. using sudo), or change the directory permissions:
+")
+        
+        # ✅ Evita SC2059
+        formatted_msg=$(printf "%s" "$msg" | sed "s|%s|${XDEB_PKGROOT}|")
+
+        printf "%s\n" "$formatted_msg" >&2
+
+
+        # ✅ Mensagem adicional
+
+        echo -e "\n\t$ sudo mkdir -p \"${XDEB_PKGROOT}\" && sudo chown -R $(whoami) \"${XDEB_PKGROOT}\" \n" >&2
+
+        echo -e "\t$(gettext "or")\n"
+
+        echo -e "\t$ mkdir -p ${HOME}/.config/xdeb  && export XDEB_PKGROOT=${HOME}/.config/xdeb \n\n\t$ xdeb"
+
+        return 1
+
+    fi
+}
+
+
+
+
+
+
+check_dir_permissions "${XDEB_PKGROOT}"     || exit 1
+check_dir_permissions "${XDEB_BINPKGS}"     || exit 1
+check_dir_permissions "${XDEB_DATADIR}"     || exit 1
+check_dir_permissions "${XDEB_DESTDIR}"     || exit 1
+check_dir_permissions "${XDEB_WORKDIR}"     || exit 1
+
+# ----------------------------------------------------------------------------------------
+
+
+# Recria diretórios limpos
+
+mkdir -p "${XDEB_PKGROOT}"
+mkdir -p "${XDEB_BINPKGS}"
+mkdir -p "${XDEB_DATADIR}" && rm -rf "${XDEB_DATADIR:?}"/*
+mkdir -p "${XDEB_DESTDIR}" && rm -rf "${XDEB_DESTDIR:?}"/*
+mkdir -p "${XDEB_WORKDIR}" && rm -rf "${XDEB_WORKDIR:?}"/*
+
+# Isso garante que workdir, datadir e destdir estejam limpos, mas sem remover a estrutura.
+
+
+[ "${XDEB_OPT_DEPS}" = true ] && [ ! -r "${XDEB_SHLIBS}" ] && {
+	log_crit "$(gettext "shlibs file not synced. Run xdeb with '-Sd' to fetch dependency file")"
+	exit 1
+}
+
+[ "${XDEB_OPT_EXTRACT}" = true ] && {
+	# Is the file readable?
+	[ ! -r "${XDEB_BASEPKG}" ] && {
+		log_crit "$(gettext "Last argument is not a .deb file or does not exist")"
+		exit 1
+	}
+
+
+# Qualquer falha dentro do bloco { ... } executa o || { ... }.
+{
+    ar -xf "${XDEB_BASEPKG}" --output "${XDEB_WORKDIR}" &&
+    tar -xf "${XDEB_WORKDIR}"/control.* -C "${XDEB_DATADIR}" &&
+    tar -xf "${XDEB_WORKDIR}"/data.* -C "${XDEB_DESTDIR}"
+} || {
+    log_crit "$(gettext "Not a valid deb file, one of the extraction steps failed")"
+    exit 1
+}
+
+
+
+	log_info "$(gettext "Extracted files")"
+}
+
+# Quit after parsing every argument argument
+
+[ "${XDEB_OPT_QUIT}" = true ] && {
+	log_info "$(gettext "Quitting before building")"
+	exit 0
+}
+
+# ----------------------------------------------------------------------------------------
+
+## Parse
+
+
+# Para verificar se o grep suporta a opção -P (Perl regex)
+
+# Só mostra o aviso caso o grep NÃO suporte -P
+
+
+# O Void Linux padrão usa o GNU grep, com suporte a -P habilitado.
+
+# Mas o usuário pode ter substituído o grep por outra versão (como busybox grep, para scripts mais enxutos).
+
+# Não é garantido que -P estará sempre disponível, especialmente em ambientes mínimos ou chroot.
+
+echo test | grep -P 'test' >/dev/null 2>&1 || {
+
+    # SC2005 (style): Useless echo? Instead of 'echo $(cmd)', just use 'cmd'.
+    # gettext "grep does NOT support -P." >&2
+
+    # shellcheck disable=SC2005
+    echo "$(gettext "grep does NOT support -P.")" >&2
+
+    exit 1
+}
+
+
+
+
+# Tornar o grep insensível a maiúsculas/minúsculas
+
+# Isso permite que ele encontre Package: ou package: ou PACKAGE: — qualquer variação.
+
+
+# Extrai o nome do pacote do arquivo control (case-insensitive)
+[ -z "${pkgname}" ] && \
+pkgname="$(grep -iPo -m1 "^Package:[ \t]*\K.*" "${XDEB_DATADIR}/control")"
+
+# Valida se o nome foi realmente extraído
+if [ -z "$pkgname" ]; then
+    echo "❌ $(gettext "Error: Package name not found in control file.")"
+    exit 1
+fi
+
+
+version="$(grep -iPo -m1 "^Version:[ \t]*\K[0-9]+(\.[0-9]+)*" "${XDEB_DATADIR}/control")"
+
+if [ -z "$version" ]; then
+    echo "⚠️ $(gettext "Missing or incorrectly formatted 'Version' field. Valid example: Version: 1.0")"
+    exit 1
+fi
+
+
+
+[ -z "${license}" ] && \
+	license="$(grep -Po -m1 "License:[ \t]*\K.*" "${XDEB_DATADIR}/control")"
+
+
+
+
+
+# Extrai o campo Maintainer (case-insensitive)
+
+[ -z "${maintainer}" ] && \
+    maintainer="$(grep -iPo -m1 "^Maintainer:[ \t]*\K.*" "${XDEB_DATADIR}/control")"
+
+# Valida se foi extraído corretamente
+
+if [ -z "$maintainer" ]; then
+    echo "❌ $(gettext "Error: Field 'Maintainer' not found or empty in control file.")"
+    exit 1
+fi
+
+# Valida formato básico (nome <email>)
+
+if ! echo "$maintainer" | grep -Eq '.+<[^@]+@[^>]+>'; then
+    echo "⚠️  $(gettext "Invalid 'Maintainer' format. Use: Name <email@domain>")"
+    # exit 1
+fi
+
+
+
+
+[ -z "${short_desc}" ] && \
+	short_desc="$(grep -iPo -m1 "Description:[ \t]*\K.*" "${XDEB_DATADIR}/control")"
+
+# ⚠️ Parsing de campos no control pode quebrar com multilinhas (como Description)
+
+# O campo Description, que pode conter múltiplas linhas com indentação, como no exemplo abaixo:
+
+# Description: Short summary
+#  This is a longer description
+#  that spans multiple lines.
+#  It is indented by one space.
+
+# long_desc="$(grep -Po -m1 -z "Description:[ \t\n]*\K.*" "${XDEB_DATADIR}/control" | tr '\0' '\n')"
+
+
+# Não captura todas as linhas da descrição longa (aquelas que vêm após a linha Description:, começando com espaço). Isso pode levar a descrições incompletas ou corrompidas.
+
+
+[ -z "${long_desc}" ] && \
+
+long_desc="$(
+  awk '
+    $1 == "Description:" {
+      desc = substr($0, index($0, ":") + 2)
+      collecting = 1
+      next
+    }
+    collecting && /^[^ ]/ { collecting = 0 }
+    collecting { desc = desc "\n" substr($0, 2) }
+    END { print desc }
+  ' "${XDEB_DATADIR}/control"
+)"
+
+
+# 🔎 O que esse awk faz
+
+# Encontra a linha Description:.
+
+# Começa a coletar as linhas subsequentes que começam com um espaço.
+
+# Para quando encontra uma nova chave (linha não indentada).
+
+# Junta tudo na variável long_desc.
+
+
+
+
+
+# Extrai o campo Architecture (case-insensitive)
+
+[ -z "${archs}" ] && \
+    archs="$(grep -iPo -m1 "^Architecture:[ \t]*\K.*" "${XDEB_DATADIR}/control")"
+
+# Valida se foi extraído corretamente
+
+if [ -z "$archs" ]; then
+    echo "❌ $(gettext "Error: Field 'Architecture' not found in control file.")"
+    # exit 1
+fi
+
+# Valida se o valor é aceitável
+
+if ! echo "$archs" | grep -Eq '^(all|amd64|i386|arm64|armhf)$'; then
+    echo "⚠️ $(gettext "Invalid 'Architecture' value:") $archs"
+    echo "$(gettext "Use one of the following: all, amd64, i386, arm64, armhf.")"
+    # exit 1
+fi
+
+
+
+
+pkgname="${pkgname}${XDEB_SUFFIX}"
+
+# if not short_desc: short_desc=long_desc
+# if not long_desc: long_desc=short_desc
+if [ -z "${short_desc}" ] && [ -z "${long_desc}" ]; then
+	log_crit "$(gettext "Neither long_desc nor short_desc provided by package")"
+	exit 1
+elif [ -z "${short_desc}" ]; then
+	short_desc="${long_desc}"
+elif [ -z "${long_desc}" ]; then
+	long_desc="${short_desc}"
+fi
+
+# debian_epoch="$(printf "%s" "${version}" | grep -Po '^[0-9]+(?=:)')"
+# debian_revision="$(printf "%s" "${version}" | grep -Po '\-\K[A-Za-z+.~]+$')"
+
+# [ -n "${debian_revision}" ] && \
+# 	version="${version%-"${debian_revision}"}"
+
+# [ -z "${revision}" ] && \
+# 	revision="${debian_revision}"
+
+[ -z "${revision}" ] && \
+	revision="1"
+
+version="$(printf "%s" "${version}" | sed 's|[-_/]|.|g; s/^[^0-9]*$/\00/g; s/^$/0/g')"
+revision="$(printf "%s" "${revision}" | sed 's|[^0-9]||g')"
+
+case "${archs}" in
+	amd64) archs="x86_64";;
+	arm64) archs="aarch64";;
+	armhf) archs="armv7l";;
+	i386) archs="i686";;
+	all) archs="noarch";;
+	*)
+        log_crit "$(gettext "Invalid arch: %s. Use '--arch=...' to set arch manually." | xargs printf "$archs")"
+
+		exit 1
+
+		;;
+esac
+
+
+
+# ----------------------------------------------------------------------------------------
+
+## Build
+
+
+
+[ "${XDEB_OPT_FIX_CONFLICT}" = true ] && {
+	python3_version="$(python3 --version | sed 's/.*\([0-9]\+\.[0-9]\+\)\.[0-9]\+/\1/')" || exit 1
+
+	fix_conflict bin       usr
+	fix_conflict lib       usr
+	fix_conflict lib32     usr
+	fix_conflict lib64     usr
+	fix_conflict sbin      usr bin
+	fix_conflict usr/sbin  usr bin
+	fix_conflict usr/lib64 usr lib
+	fix_conflict usr/lib/python3/dist-packages "usr/lib/python${python3_version}" site-packages
+}
+
+
+
+[ -n "${XDEB_OPT_POST_EXTRACT}" ] && {
+	cd "${XDEB_DESTDIR}" || exit 1
+
+   # SC1090 (warning): ShellCheck can't follow non-constant source. Use a directive to specify location.
+   # O valor de XDEB_OPT_POST_EXTRACT é uma variável, e o ShellCheck não sabe exatamente qual arquivo será incluído.
+
+   # shellcheck source=/dev/null
+	. "${XDEB_OPT_POST_EXTRACT}" || exit 1
+}
+
+
+[ "${XDEB_OPT_DEPS}" = true ] && XDEB_DEPENDENCIES="${XDEB_DEPENDENCIES}$(genrdeps)"
+
+
+# Remove trailing space
+XDEB_DEPENDENCIES="${XDEB_DEPENDENCIES%* }"
+
+# shellcheck disable=SC2059
+[ -n "${XDEB_DEPENDENCIES}" ] && echo -e " " &&  msg=$(gettext "Resolved dependencies: (%s)") && log_info "$(printf "$msg" "${XDEB_DEPENDENCIES}")" && echo -e " "     
+
+# shellcheck disable=SC2059
+
+# log_info "$(gettext "Resolved dependencies (%s)" | xargs printf "%s\n" "${XDEB_DEPENDENCIES}")"
+
+
+
+
+if [ "${XDEB_OPT_CLEAN_DIR}" = true ] || [ "${XDEB_OPT_WARN_CONFLICT}" = true ]; then
+
+
+
+    if command -v xbps-query >/dev/null; then
+
+        # Uso de xbps-query -f "${pkgname}" para ignorar arquivos pode falhar se o pacote não estiver instalado.
+
+        if xbps-query --property=pkgver "${pkgname}" >/dev/null 2>&1; then
+
+           ign="$(xbps-query -f "${pkgname}" | sed 's/ -> .*//')"
+
+        fi
+
+    fi
+
+
+    
+
+
+
+    find "${XDEB_DESTDIR}" -depth -mindepth 1 | (
+
+        # Se nenhum conflito for encontrado, rc poderia não estar definido, e o exit ${rc-0} ainda funciona, mas não é limpo.
+
+        rc=0
+
+		while read -r f; do
+			# Remove empty directories
+			[ "${XDEB_OPT_CLEAN_DIR}" = true ] && [ -z "$(ls -A "${f}")" ] && {
+				rm -rf "${f}"
+
+                 msg=$(gettext "Removed empty directory %s")
+                 # shellcheck disable=SC2059
+                 log_info "$(printf "$msg" "${f}")"
+
+				continue
+			}
+
+			# Check for conflicts
+			[ "${XDEB_OPT_WARN_CONFLICT}" != true ] && continue
+
+			fr="${f#"${XDEB_DESTDIR}"}"
+			[ ! -e "${fr}" ] && continue
+			[ ! -L "${fr}" ] && [ -d "${fr}" ] && [ ! -L "${f}" ] && [ -d "${f}" ] && continue
+
+			echo "${ign}" | grep -q -x -F "${fr}" && continue
+			[ -z "$(ls -A "${f}")" ] && {
+
+                 msg=$(gettext "Conflict: '%s'. Use '-e' to remove automatically.")
+                 # shellcheck disable=SC2059
+                 log_crit "$(printf "$msg" "${f#"${PWD}/"}")"
+
+			} || {
+
+                 msg=$(gettext "Conflict: '%s'")
+                 # shellcheck disable=SC2059
+                 log_crit "$(printf "$msg" "${f#"${PWD}/"}")"
+
+			}
+			rc=1
+		done
+
+		exit "${rc-0}"
+
+   ) || { 
+    # msg=$(gettext "Consider (re)moving file(s) from '%s' and run `xdeb -rb`")
+    msg=$(gettext "Consider (re)moving file(s) from '%s' and run \`xdeb -rb\`")
+ 
+
+    # shellcheck disable=SC2059
+    log_crit "$(printf "$msg" "$XDEB_DESTDIR")"
+    }
+
+
+fi
+
+
+# ----------------------------------------------------------------------------------------
+
+
+## Abortar se houve falhas anteriores
+
+if [ "${XDEB_REFUSE}" = true ]; then
+
+	log_crit "$(gettext "Errors occurred earlier. Aborting before package creation or installation.")"
+
+	exit 1
+fi
+
+
+# Verificar XDEB_REFUSE antes do xbps-create e do xbps-install.
+
+# ----------------------------------------------------------------------------------------
+
+# Verifica bibliotecas ausentes antes de empacotar ou instalar
+
+if ! check_missing_libs; then
+
+    # Saindo por bibliotecas ausentes
+
+    log_warn "$(gettext "Missing libraries found. Aborting package creation to avoid broken installs.")"
+
+    echo -e "\n\n"
+
+    ls -l "${XDEB_DESTDIR}"
+
+    ls -l "${XDEB_BINPKGS}"
+
+    # sleep 2
+
+	exit 1
+
+fi
+
+# ----------------------------------------------------------------------------------------
+
+## Package
+
+cd "${XDEB_BINPKGS}" || exit 1
+
+out="${pkgname}-${version}_${revision}"
+if ! xbps-create \
+	-q \
+	-t xdeb \
+	-A "${archs}" \
+	-n "${out}" \
+	-m "${maintainer}" \
+	-s "${short_desc}" \
+	-S "${long_desc}" \
+	-l "${license}" \
+	-D "${XDEB_DEPENDENCIES}" \
+	-C "${XDEB_CONFLICTS}" \
+	-R "${XDEB_REPLACES}" \
+	-P "${XDEB_PROVIDES}" \
+	--build-options "${XDEB_BUILD_OPTIONS}" \
+	"${XDEB_DESTDIR}"; then
+	log_crit "$(gettext "xbps-create failed. Package not created.")"
+	exit 1
+fi
+
+[ "${XDEB_OPT_REGISTER}" = true ] && {
+
+	xbps-rindex -a "${out}.${archs}.xbps" >&2
+
+}
+
+[ -t 1 ] || echo "${XDEB_BINPKGS#"${PWD}/"}/${out}.${archs}.xbps"
+
+# ----------------------------------------------------------------------------------------
+
+## Install
+
+if [ "${XDEB_OPT_INSTALL}" = true ]; then
+
+
+
+
+installer=$(command -v sudo doas 2>/dev/null | head -n1)
+
+# Executa o comando de instalação com verificação direta
+if "$installer" xbps-install -R "${XDEB_BINPKGS#"${PWD}/"}" "${out}"; then
+
+    # notify-send "✔️ Sucesso" ""
+    echo -e "\n"
+
+    # Verifica se o pacote foi instalado
+    xbps-query -l | grep -F -- "${out}"
+
+    echo -e "\n"
+
+    xbps-query -S "${out}"
+
+    # echo -e "\n$(printf "$(gettext "To remove the package:\nsudo xbps-remove -y %s")" "${out}")"
+
+    # shellcheck disable=SC2059
+    echo -e "\n$(printf "$(gettext "To remove the package: 
+
+sudo xbps-remove -y %s")" "${out}")"
+
+    # notify-send "✔️ Pacote instalado" "$(gettext 'Use o comando para remover:\n') sudo xbps-remove -y ${out}"
+
+else
+
+    # Você pode descomentar estas linhas se quiser lidar com falha
+
+    echo -e "\n$(printf "$(gettext "Error installing package: %s")" "${out}")"
+
+    notify-send "❌ $(gettext "Error")" "$(printf "$(gettext "Error installing package: %s")" "${out}")"
+
+fi
+
+
+
+else
+
+    # Forma segura (e correta) de resolver o SC2059:
+
+    echo -e "\n"
+
+    # shellcheck disable=SC2059
+    # log_info "$(printf "$(gettext 'Install using `xbps-install -R %s %s `')" "${XDEB_BINPKGS#"${PWD}/"}" "${out}")"
+
+    # Aspas simples impedem a expansão de variáveis ou comandos. gettext também precisa de cuidado com escape.
+
+    msg="$(gettext "Install using \`xbps-install -R %s %s \`")"
+    log_info "$(printf "$msg" "${XDEB_BINPKGS#"${PWD}/"}" "$out")"
+
+
+
+# Explicação:
+
+# gettext retorna a string com os %s.
+
+# xargs printf '%s\n' trata essa string como formato, aplicando os argumentos.
+
+# O uso do -0 (ou --null) em xargs depende de seu sistema — remova se necessário.
+
+    echo -e " "
+
+    # ls -lh "${XDEB_BINPKGS#"${PWD}/"}" | grep "${out}"
+
+    # ls | grep pode falhar com nomes de arquivos que contenham espaços, acentos ou caracteres especiais.
+
+    for file in "${XDEB_BINPKGS#"${PWD}/"}"/*; do
+
+        if [[ "$file" == *"$out"* ]]; then
+
+            ls -lh "$file"
+
+        fi
+
+    done
+
+
+    # shellcheck disable=SC2059
+    echo -e "\n$(printf "$(gettext "To remove the package: 
+
+sudo xbps-remove -y %s")" "${out}")"
+
+fi
+
+# ----------------------------------------------------------------------------------------
+
+
+# Exemplo:
+
+
+# $ xdeb -e dissenter-browser_1.5.114_amd64.deb
+
+# I Arquivos extraídos
+# index: skipping `dissenter-browser-1.5.114_1' (x86_64), already registered.
+# index: 1 packages registered.
+
+
+# I Instalar usando `xbps-install -R /opt/binpkgs dissenter-browser-1.5.114_1 `
+ 
+# -rw-r--r-- 1 anon anon 77M set  8 01:49 dissenter-browser-1.5.114_1.x86_64.xbps
+
+
+
+# sudo xbps-install -R /opt/binpkgs dissenter-browser-1.5.114_1
+
+# Name              Action    Version           New version            Download size
+# dissenter-browser install   -                 1.5.114_1              - 
+
+# Size required on disk:         216MB
+# Space available on disk:      3499MB
+
+# Do you want to continue? [Y/n] Y
+
+# [*] Verifying package integrity
+# dissenter-browser-1.5.114_1: verifying SHA256 hash...
+
+# [*] Collecting package files
+# dissenter-browser-1.5.114_1: collecting files...
+
+# [*] Unpacking packages
+# dissenter-browser-1.5.114_1: unpacking ...
+
+# [*] Configuring unpacked packages
+# dissenter-browser-1.5.114_1: configuring ...
+# dissenter-browser-1.5.114_1: installed successfully.
+
+# 0 downloaded, 1 installed, 0 updated, 1 configured, 0 removed, 0 on hold.
+
+
+# xbps-query -l | grep dissenter-browser
+# ii dissenter-browser-1.5.114_1               The web browser from Dissenter
+
+
+# $ xbps-query -S dissenter-browser
+# architecture: x86_64
+# filename-sha256: 838e84db3a21979692d977a9ba9109d00b61ee8f486c269b39b2fc8b441ec4a1
+# filename-size: 77MB
+# install-date: 2025-09-08 01:27 UTC
+# installed_size: 216MB
+# long_desc: The web browser from Dissenter
+# maintainer: Gab AI Inc <support@dissenter.com>
+# metafile-sha256: e30cda634b9287254b5308b2a243fb6794db8a8d551e5cb318db1f9cc034d362
+# pkgname: dissenter-browser
+# pkgver: dissenter-browser-1.5.114_1
+# repository: /opt/binpkgs
+# short_desc: The web browser from Dissenter
+# state: installed
+# tags: xdeb
+
+#  =================================================================================
+
+# xdeb -Sde dissenter-browser_1.5.114_amd64.deb
+
+# I Shlibs sincronizadas
+# I Arquivos extraídos
+ 
+# I Dependências resolvidas: (alsa-lib>=1.0.20_1 at-spi2-atk>=2.6.0_1 at-spi2-core>=1.91.91_1 atk>=1.26.0_1 cairo>=1.8.6_1 dbus-libs>=1.2.10_1 expat>=2.0.0_1 gdk-pixbuf>=2.22.0_1 glib>=2.80.0_1 glibc>=2.41_1 gtk+3>=3.0.0_1 libX11>=1.2_1 libXScrnSaver>=1.1.3_1 libXcomposite>=0.4.0_1 libXcursor>=1.1.9_1 libXdamage>=1.1.1_1 libXext>=1.0.5_1 libXfixes>=4.0.3_1 libXi>=1.2.1_1 libXrandr>=1.3.0_1 libXrender>=0.9.4_1 libXtst>=1.0.3_1 libcups>=1.5.3_1 libgcc>=4.4.0_1 libxcb>=1.2_1 nspr>=4.8_1 nss>=3.12.4_1 pango>=1.24.0_1)
+ 
+# index: skipping `dissenter-browser-1.5.114_1' (x86_64), already registered.
+# index: 1 packages registered.
+
+
+# I Instalar usando `xbps-install -R /opt/binpkgs dissenter-browser-1.5.114_1 `
+ 
+# -rw-r--r-- 1 anon anon 77M set  8 02:42 dissenter-browser-1.5.114_1.x86_64.xbps
+
+#  =================================================================================
+
+
+
+
+exit 0
+

@@ -1,0 +1,22 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=xdeb
+GenericName=Package Converter
+GenericName[pt_BR]=Conversor de Pacotes
+GenericName[es]=Convertidor de Paquetes
+GenericName[fr]=Convertisseur de Paquets
+Comment=For Void Linux users who don't want to use the xdeb CLI.
+Comment[pt_BR]=Para usuários do Void Linux que não querem usar linha de comando do xdeb.
+Comment[es]=Para usuarios de Void Linux que no quieren usar la línea de comandos de xdeb.
+Comment[fr]=Pour les utilisateurs de Void Linux qui ne veulent pas utiliser la ligne de commande de xdeb.
+Exec=/usr/local/bin/xdeb-gui.sh
+Icon=package-x-generic
+# Terminal=false
+Terminal=true
+Categories=System;
+Keywords=convert;deb;xbps;package;xdeb;void;xdeb;
+Keywords[pt_BR]=converter;deb;xbps;pacote;xdeb;void;xdeb;
+Keywords[es]=convertir;deb;xbps;paquete;xdeb;void;xdeb;
+Keywords[fr]=convertir;deb;xbps;paquet;xdeb;void;xdeb;
+

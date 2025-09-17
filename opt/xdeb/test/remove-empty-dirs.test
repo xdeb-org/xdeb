@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+# O Void Linux usa /bin/sh por padrão.
+
+clear
+
+# ----------------------------------------------------------------------------------------
+
+# Internacionalização com gettext
+
+export TEXTDOMAIN=xdeb
+export TEXTDOMAINDIR=/usr/share/locale
+
+# ----------------------------------------------------------------------------------------
+
+
+function build() {
+    mkdir -p path/to/empty/dir
+    touch path/to/empty/file
+
+    tee control >/dev/null <<EOF
+Package: remove-empty-dirs
+Version: 0
+Architecture: all
+Maintainer: none
+Description:
+ $(gettext "Test if removing empty directories works properly")
+EOF
+
+    tar -cf control.tar control
+    tar -cf data.tar */
+    ar -rc package.deb control.tar data.tar
+}
+
+function run() {
+    "${xdeb_path}" -Se package.deb || fail "$(gettext "build failed")"
+
+    files="$(xbps-query --repository="${XDEB_PKGROOT}/binpkgs" -f remove-empty-dirs 2>&1)"
+
+    echo "${files}" | grep "/path/to/empty/file" >/dev/null 2>&1 || fail "$(gettext "file also removed")"
+    echo "${files}" | grep "/path/to/empty/dir" >/dev/null 2>&1 && fail "$(gettext "dir not removed")"
+}

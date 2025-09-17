@@ -1,20 +1,27 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-begin_test() {
+# O Void Linux usa /bin/sh por padrão.
+
+clear
+
+function begin_test() {
     printf "%s\n" "--------------------------------------------------------------------------------"
     printf "\033[1m% 80s\033[0m\n" "${@}"
 }
 
-end_test() {
+function end_test() {
     return
 }
 
-fail() {
+function fail() {
     printf "\033[31;1m% 80s\033[0m\n" "${@}"
 }
 
 # splitting arguments desired
 unset $(env | grep XDEB_ | sed 's/^\([^=]*\)=.*$/\1/g')
+
+
+# Define variáveis de caminho
 
 xdeb_dir="$(dirname -- "$(realpath -- "${0}")")"
 test_dir="${xdeb_dir}/test"
@@ -43,3 +50,6 @@ export XDEB_TEMPDIR="${test_dir}/.tmp"
         run
     end_test
 done
+
+exit 0
+

@@ -1,0 +1,392 @@
+# Changelog
+
+==========================================================================================
+                                     Release History
+==========================================================================================
+
+
+https://github.com/xdeb-org/xdeb/releases
+
+
+------------------------------------------------------------------------------------------
+
+Set 06, 2025  Fernando Souza <https://github.com/tuxslack>
+
+1.6 Release
+Commit
+
+Script internationalization (multiple language support):
+
+en
+
+pt_BR
+
+Generation of localization files: .pot, .po, .mo
+
+Creation of files: ChangeLog, README.pt_BR.md
+
+Standardization of the directory structure according to the Linux standard, facilitating 
+the generation of the .xbps package for xdeb and its installation in Void Linux
+
+Translation of the man page (xdeb.1) to pt_BR
+
+Tests performed on the translations (ISO 639-1/639-2): en and pt_BR
+
+$ man xdeb
+
+$ xdeb -h
+
+
+* Created a function to filter and display the internal version defined in the xdeb file 
+itself, accessible via the -v or --version parameters.
+
+$ xdeb -h
+...
+-version | -v               Show xdeb version
+
+
+* Changed the creation of temporary directories from the current directory (${PWD}) to /opt/binpkgs:
+
+/opt/binpkgs/workdir
+
+/opt/binpkgs/destdir
+
+/opt/binpkgs/datadir
+
+/opt/binpkgs/binpkgs
+
+/opt/binpkgs/shlibs
+
+
+* Created the intro() function to introduce the xdeb script
+
+$ xdeb -h
+
+
+* Defined rc=0
+
+If no conflict is found, rc could be undefined, and exit ${rc-0} still works, but is not clean.
+
+
+* BUG: Use of return outside functions
+
+if [ "${XDEB_REFUSE}" = true ]; then
+    log_crit "$(gettext "Errors occurred. Do not install the package on this system!")"
+    return 1
+
+
+* ensures that workdir, datadir and destdir are clean, but without removing the structure.
+
+mkdir -p "${XDEB_DATADIR}" && rm -rf "${XDEB_DATADIR:?}"/*
+mkdir -p "${XDEB_DESTDIR}" && rm -rf "${XDEB_DESTDIR:?}"/*
+mkdir -p "${XDEB_WORKDIR}" && rm -rf "${XDEB_WORKDIR:?}"/*
+
+
+* Added emoji symbols to the script
+
+Without a font that supports emojis, you may see boxes or strange symbols in place of
+emoticons. Noto-fonts-emoji solves this by providing appropriate glyphs to represent
+emojis.
+
+$ xbps-query -Rs noto-fonts-emoji
+[-] noto-fonts-emoji-2.048_1 Google Noto Emoji Fonts
+
+$ sudo xbps-install -Sy noto-fonts-ttf noto-fonts-emoji
+
+
+$ xbps-query -Rf noto-fonts-emoji
+/usr/share/fonts/noto-emoji/NotoColorEmoji.ttf
+/usr/share/licenses/noto-fonts-emoji/LICENSE
+
+NotoColorEmoji.ttf
+NotoMono-Regular.ttf
+NotoSansMono-Bold.ttf
+NotoSansMono-Regular.ttf
+
+
+Download all .ttf files recursively
+
+wget -r -np -nd -A "*.ttf" https://ftp.unpad.ac.id/ctan/fonts/noto/truetype/
+
+
+https://ftp.unpad.ac.id/ctan/fonts/noto/truetype/
+
+
+* Added check_packages() function to check exactly the package name and fail if it is not installed.
+
+
+* check multiple commands - check_command()
+
+  Added checks for python3, gettext, realpath, awk, sed, grep, ls
+
+
+* Centralized error checking before installing or packaging.
+
+* xdeb script verified with shellcheck. SC2059
+
+  $ cat xdeb | grep shellcheck | wc -l
+  8
+
+  $ shellcheck ./xdeb
+
+
+  $ cat xdeb-gui.sh | grep shellcheck | wc -l
+  5
+
+  $ shellcheck xdeb-gui.sh
+
+
+* Improved error handling in:
+
+  log_crit "$(gettext "Not a valid deb file, one of the extraction steps failed")"
+
+
+* Created the AUTHORS file.
+
+
+* Created the files:
+
+/usr/share/applications/xdeb-gui.desktop
+/usr/local/bin/xdeb-gui.sh
+
+
+A graphical interface with yad for converting .deb packages to .xbps in Void Linux.
+
+This allows users to perform common tasks with xdeb without having to type commands manually.
+
+It contains the main features of xdeb organized in a simple and interactive menu. It also allows
+you to enter custom arguments for options such as --deps, --arch, etc.
+
+
+* $log variable can be overridden in parallel environments.
+
+
+* To change the order of the buttons, you must manually change the order in the script.
+
+Example:
+
+# 🇺🇸 American standard: OK on the left
+--button="$(gettext "OK")":0 --button="$(gettext "Cancel")":1
+
+# 🇧🇷 Brazilian/European standard: Cancel on the left
+--button="$(gettext "Cancel")":1 --button="$(gettext "OK")":0
+
+
+* Use of variables not explicitly declared as local.
+
+function fix_conflict() {
+	[ ! -e "${XDEB_DESTDIR}/${1}" ] || [ ! -d "${XDEB_DESTDIR}/${1}" ] && return 1
+
+	local src="${1}"
+	local dst="${2}/${3-"${1}"}"
+
+
+This could cause side effects if another function or part of the script uses the same variables.
+
+
+* Detect if the shell is actually bash
+
+* Check if grep supports the -P option
+
+
+* Check if the package is installed
+
+ ign="$(xbps-query -f "${pkgname}" | sed 's/ -> .*//')"
+
+
+* Does not capture all lines of the long description
+
+long_desc="$(grep -Po -m1 -z "Description:[ \t\n]*\K.*" "${XDEB_DATADIR}/control" | tr '\0' '\n')"
+
+
+* Fixed man: /usr/share/man/en_US/man1/xdeb.1: BADARG: Invalid command line argument: No such file or directory.
+
+
+* The file /usr/share/doc/xdeb/"Packages generated with xdeb".ods, contains a list of packages created by xdeb and that are working.
+
+
+* Added yad as a dependency.
+
+
+* Created the installer.sh script to facilitate the installation of xdeb on Void Linux.
+
+
+* Before trying to download something with curl, it's a good idea to check if you have an internet connection.
+
+  function sync_shlibs()
+
+
+* check_missing_libs function (checks for missing libraries before packaging or installing)
+
+
+- Analyze all ELF files in the extracted package ($XDEB_DESTDIR);
+
+- Use ldd to identify missing libraries (=> not found);
+
+- Report problems before creating or installing the .xbps.
+
+
+$  ldd /opt/binpkgs/destdir/usr/share/spotube/spotube | grep -i "not found"
+	libappindicator3.so.1 => not found
+
+
+$ xbps-query -Rs libappindicator
+
+
+* Fixed: "gettext: too many arguments" in function fix_conflict()
+
+
+	# log_info "$(gettext "Moved conflict '%s' -> '%s'"  "${src}" "${dst}") "
+
+    msg="$(gettext "Moved conflict '%s' -> '%s'")"
+    log_info "$(printf "$msg" "${src}" "${dst}")"
+
+
+* Fixed:
+
+    log_info "$(gettext "Install using \`xbps-install -R %s %s \`" | xargs printf "${XDEB_BINPKGS#"${PWD}/"}" "${out}")"
+
+    Error:
+
+    printf: warning: ignoring excess arguments starting with "xxxxx-2.21.4.3_1"
+
+    Changed to:
+
+    msg="$(gettext "Install using \`xbps-install -R %s %s \`")"
+    log_info "$(printf "$msg" "${XDEB_BINPKGS#"${PWD}/"}" "$out")"
+
+
+NOTICE:
+
+Void Linux utilities such as xbps-install, xbps-query, and xbps-remove do not have native 
+support for translation into Brazilian Portuguese (or any other language). They were 
+developed with simplicity and performance in mind, and their messages are encoded directly 
+in English in the source code, without integration with localization systems such as gettext.
+
+------------------------------------------------------------------------------------------
+
+Jun 10, 2024   toluschr <https://github.com/toluschr>
+
+1.5 release
+Commit b1b8f47
+
+
+20240610
+
+Other Changes
+
+* Disabled automatic installation by default
+* Hid installation instructions in case of any error
+* Added a clearer warning message regarding conflicts in readme
+* Return EXIT_FAILURE in case of any error
+
+
+------------------------------------------------------------------------------------------
+
+Jun 8, 2024
+
+1.4 release
+Commit 2dbaf2c
+
+
+20240608
+
+What has changed since the last release 4 years ago?
+
+New Features
+
+* Added support for ARM architectures (Thanks to @mahiuchun - https://github.com/mahiuchun)
+* Added support for zstd compressed packages (#16 - https://github.com/xdeb-org/xdeb/issues/16)
+* Added configuration for output directories using environment variables
+* Added option -I to automatically install package
+* Added automated tests
+
+Bug Fixes
+
+* Removed invalid dependency ar (#8 - https://github.com/xdeb-org/xdeb/issues/8)
+* Added xz as dependency (#7 - https://github.com/xdeb-org/xdeb/issues/7)
+* Other bug fixes
+
+Other Changes
+
+* Improved terminal output legibility
+* Improved source code (Thanks to @zakariaGatter - https://github.com/zakariaGatter)
+* Added manpage
+* More conflicts can be resolved automatically
+* Improved readme
+
+
+Contributors
+
+* @mahiuchun     https://github.com/mahiuchun
+* @zakariaGatter https://github.com/zakariaGatter
+
+
+
+------------------------------------------------------------------------------------------
+
+Nov 6, 2020  toluschr <https://github.com/toluschr>
+
+1.3 release
+Commit 63aecb4
+
+
+Changes
+
+* Improved overall script quality
+* Made package conflicts more obvious and actually detect them
+* Changed longopts to use --*= instead of splitting the args
+* Improved readability of logs
+* Added longopt for help
+* Added ability to use custom workdir (XDEB_PKGROOT=/path/to/wd)
+* Fixed removing of empty directories
+* Added ability to use global custom options
+* Added ability to automatically fix common conflicts
+
+Tested
+
+* google-chrome
+* discord-ptb
+* linux-image-5.9.6-xanmod1
+
+
+------------------------------------------------------------------------------------------
+
+Jul 20, 2020  toluschr <https://github.com/toluschr>
+
+1.2 release
+Commit a3ccb75
+
+
+* Improved performance
+* Added support for noarch packages
+
+Tested on FreeTube and Simplenote
+
+------------------------------------------------------------------------------------------
+
+May 7, 2020  toluschr <https://github.com/toluschr>
+
+1.1 release
+Commit af99485
+
+
+* Added support for multilib.
+* Sanitized shlib regex, to fix libraries with non-alpha characters in them.
+* Added option to silence file conflicts.
+
+Tested on xmind-vana, bitwig-studio, teamviewer, minecraft-launcher, brave-browser-dev, Simplenote and discord
+
+------------------------------------------------------------------------------------------
+
+May 5, 2020  toluschr <https://github.com/toluschr>
+
+1.0 release
+Commit ac0a225
+
+
+* Successfully tested on brave-browser-dev, simplenote, figma-linux and minecraft-launcher
+
+------------------------------------------------------------------------------------------
+
+

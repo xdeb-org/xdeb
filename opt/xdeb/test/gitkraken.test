@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+# O Void Linux usa /bin/sh por padrão.
+
+clear
+
+# ----------------------------------------------------------------------------------------
+
+# Internacionalização com gettext
+
+export TEXTDOMAIN=xdeb
+export TEXTDOMAINDIR=/usr/share/locale
+
+# ----------------------------------------------------------------------------------------
+
+
+function build() {
+    curl -o package.deb https://release.axocdn.com/linux/gitkraken-amd64.deb
+}
+
+function run() {
+    "${xdeb_path}" -Sedf --not-deps=musl package.deb
+    xbps-query --repository="${XDEB_PKGROOT}/binpkgs" -x gitkraken | grep 'musl' >/dev/null && fail "$(gettext "musl added as dependency")"
+}

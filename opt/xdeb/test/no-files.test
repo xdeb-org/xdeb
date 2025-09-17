@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+# O Void Linux usa /bin/sh por padrão.
+
+clear
+
+# ----------------------------------------------------------------------------------------
+
+# Internacionalização com gettext
+
+export TEXTDOMAIN=xdeb
+export TEXTDOMAINDIR=/usr/share/locale
+
+# ----------------------------------------------------------------------------------------
+
+
+function build() {
+    tee control >/dev/null <<EOF
+Package: no-files
+Version: 0
+Architecture: all
+Maintainer: none
+Description:
+ $(gettext "Test if a faulty package without any files can break xdeb")
+EOF
+
+    tar -cf control.tar control
+    tar -cf data.tar -T /dev/null
+    ar -rc package.deb control.tar data.tar
+}
+
+function run() {
+    xbps-query --repository="${XDEB_PKGROOT}/binpkgs" -f no-files
+}

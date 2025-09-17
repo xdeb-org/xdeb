@@ -1,0 +1,1076 @@
+# Portuguese translations for PACKAGE package.
+# Copyright (C) 2025 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Automatically generated, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: xdeb 1.6\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-09-06 00:15-0300\n"
+"PO-Revision-Date: 2025-09-06 00:15-0300\n"
+"Last-Translator: Fernando Souza\n"
+"Language-Team: none\n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: xdeb.sh:59
+msgid "Unable to sync shlibs."
+msgstr "Não foi possível sincronizar shlibs."
+
+#: xdeb.sh:62
+msgid "Synced shlibs"
+msgstr "Shlibs sincronizadas"
+
+#: xdeb.sh:99
+msgid "Unable to find dependency for %s, trying lazy"
+msgstr "Não foi possível encontrar a dependência para %s, tentando usar o lazy"
+
+#: xdeb.sh:105
+msgid "Unable to find dependency for %s"
+msgstr "Não foi possível encontrar a dependência para %s"
+
+#: xdeb.sh:127
+msgid "Moved conflict '%s' -> '%s'"
+msgstr "Conflito movido '%s' -> '%s'"
+
+#: xdeb.sh:132
+msgid "Executable '%s' from package '%s' not found."
+msgstr "Executável '%s' do pacote '%s' não encontrado."
+
+#: xdeb.sh:139
+msgid "usage"
+msgstr "uso"
+
+#: xdeb.sh:139
+msgid "FILE"
+msgstr "ARQUIVO"
+
+#: xdeb.sh:140
+msgid "Automatic dependency resolution"
+msgstr "Resolução automática de dependências"
+
+#: xdeb.sh:141
+msgid "Download shlibs file for automatic dependencies"
+msgstr "Baixar o arquivo shlibs para dependências automáticas"
+
+#: xdeb.sh:142
+msgid "Like -C, excluding shlibs and binpkgs"
+msgstr "Como -C, excluindo shlibs e binpkgs"
+
+#: xdeb.sh:143
+msgid "Remove repodata file (Use for re-building)"
+msgstr "Remover arquivo repodata (Usar para reconstruir)"
+
+#: xdeb.sh:144
+msgid "Do not register package in repository pool."
+msgstr "Não registrar pacote no pool de repositórios."
+
+#: xdeb.sh:145
+msgid "Extract .deb into destdir only, do not build"
+msgstr "Extrair .deb apenas para o diretório dest, não compilar"
+
+#: xdeb.sh:146
+msgid "Remove all files created by this script"
+msgstr "Remover todos os arquivos criados por este script"
+
+#: xdeb.sh:147
+msgid "Build from destdir directly without a .deb file"
+msgstr "Compilar diretamente do diretório destdir, sem um arquivo .deb"
+
+#: xdeb.sh:148
+msgid "Remove empty directories from the package"
+msgstr "Remover diretórios vazios do pacote"
+
+#: xdeb.sh:149
+msgid "Add the -32bit suffix to the package name"
+msgstr "Adicionar o sufixo -32 bits ao nome do pacote"
+
+#: xdeb.sh:150
+msgid "Don't warn if package could break the system"
+msgstr "Não avisar se o pacote pode danificar o sistema"
+
+#: xdeb.sh:151
+msgid "Try to fix certain file conflicts (deprecated)"
+msgstr "Tentar corrigir certos conflitos de arquivo (obsoleto)"
+
+#: xdeb.sh:152
+msgid "Don't try to fix certain file conflicts"
+msgstr "Não tentar corrigir certos conflitos de arquivo"
+
+#: xdeb.sh:153
+msgid "Automatically install the package"
+msgstr "Instalar o pacote automaticamente"
+
+#: xdeb.sh:154
+msgid "Lazy match SONAMEs"
+msgstr "Correspondência lenta de SONAMEs"
+
+#: xdeb.sh:155
+msgid "Packages that shall be added as dependencies"
+msgstr "Pacotes que devem ser adicionados como dependências"
+
+#: xdeb.sh:156
+msgid "Packages that shall not be used as dependencies"
+msgstr "Pacotes que não devem ser usados ​​como dependências"
+
+#: xdeb.sh:157
+msgid "Package arch"
+msgstr "Arquitetura do pacote"
+
+#: xdeb.sh:158
+msgid "Package name"
+msgstr "Nome do pacote"
+
+#: xdeb.sh:159
+msgid "Package version"
+msgstr "Versão do pacote"
+
+#: xdeb.sh:160
+msgid "Package revision"
+msgstr "Revisão do pacote"
+
+#: xdeb.sh:161
+msgid "File with post-extract commands (i.e. /dev/stdin)"
+msgstr "Arquivo com comandos pós-extração (por exemplo, /dev/stdin)"
+
+#: xdeb.sh:162
+msgid "Show help page"
+msgstr "Mostrar página de ajuda"
+
+#: xdeb.sh:164
+msgid "example"
+msgstr "exemplo"
+
+#: xdeb.sh:165
+msgid "Remove all files and quit"
+msgstr "Remover todos os arquivos e sair"
+
+#: xdeb.sh:166
+msgid "Sync depdendency list and create package"
+msgstr "Sincronizar lista de dependências e criar pacote"
+
+#: xdeb.sh:167
+msgid "Add tar as manual dependency and create package"
+msgstr "Adicionar tar como dependência manual e criar pacote"
+
+#: xdeb.sh:188
+msgid "'%s' invalid. Use %s=... instead"
+msgstr "'%s' inválido. Use %s=... em vez disso"
+
+#: xdeb.sh:203
+msgid "invalid option '%s'"
+msgstr "opção '%s' inválida"
+
+#: xdeb.sh:225
+msgid "Option '-f' is now enabled by default. Use '-F' to disable it."
+msgstr "A opção '-f' agora está habilitada por padrão. Use '-F' para desabilitá-la."
+
+#: xdeb.sh:229
+msgid "invalid option -- %s"
+msgstr "opção inválida -- %s"
+
+#: xdeb.sh:251
+msgid "shlibs file not synced. Run xdeb with '-Sd' to fetch dependency file"
+msgstr "arquivo shlibs não sincronizado. Execute xdeb com '-Sd' para buscar o arquivo de dependência"
+
+#: xdeb.sh:258
+msgid "Last argument is not a .deb file or does not exist"
+msgstr "O último argumento não é um arquivo .deb ou não existe"
+
+#: xdeb.sh:265
+msgid "Not a valid deb file, one of the extraction steps failed"
+msgstr "Não é um arquivo deb válido, uma das etapas de extração falhou"
+
+#: xdeb.sh:269
+msgid "Extracted files"
+msgstr "Arquivos extraídos"
+
+#: xdeb.sh:274
+msgid "Quitting before building"
+msgstr "Encerrando antes de compilar"
+
+#: xdeb.sh:300
+msgid "Neither long_desc nor short_desc provided by package"
+msgstr "Nem long_desc nem short_desc são fornecidos pelo pacote"
+
+#: xdeb.sh:330
+msgid "Invalid arch: %s. Use '--arch=...' to set arch manually."
+msgstr "Arquitetura inválida: %s. Use '--arch=...' para definir a arquitetura manualmente."
+
+#: xdeb.sh:359
+msgid "Resolved dependencies: (%s)"
+msgstr "Dependências resolvidas: (%s)"
+
+#: xdeb.sh:369
+msgid "Removed empty directory %s"
+msgstr "Diretório vazio %s removido"
+
+#: xdeb.sh:382
+msgid "Conflict: '%s'. Use '-e' to remove automatically."
+msgstr "Conflito: '%s'. Use '-e' para remover automaticamente."
+
+#: xdeb.sh:384
+msgid "Conflict: '%s'"
+msgstr "Conflito: '%s'"
+
+#: xdeb.sh:390
+msgid "Consider (re)moving file(s) from '%s' and run `xdeb -rb`"
+msgstr "Considere (re)mover o(s) arquivo(s) de '%s' e execute `xdeb -rb`"
+
+#: xdeb.sh:423
+msgid "Errors occurred. Do not install the package on this system!"
+msgstr "Ocorreram erros. Não instale o pacote neste sistema!"
+
+#: xdeb.sh:428
+msgid "Install using `xbps-install -R %s %s `"
+msgstr "Instalar usando `xbps-install -R %s %s `"
+
+#: gitkraken.test:21
+msgid "musl added as dependency"
+msgstr "musl adicionado como dependência"
+
+#: no-files.test:22
+msgid "Test if a faulty package without any files can break xdeb"
+msgstr "Teste se um pacote defeituoso sem nenhum arquivo pode corromper o xdeb"
+
+#: remove-empty-dirs.test:25
+msgid "Test if removing empty directories works properly"
+msgstr "Teste se a remoção de diretórios vazios funciona corretamente"
+
+#: remove-empty-dirs.test:34
+#: conflicting-with-existing-target.test:36
+msgid "build failed"
+msgstr "Falha na compilação"
+
+#: remove-empty-dirs.test:38
+msgid "file also removed"
+msgstr "arquivo também removido"
+
+#: remove-empty-dirs.test:39
+msgid "dir not removed"
+msgstr "diretório não removido"
+
+#: sync-quit.test:20
+msgid "xdeb failed"
+msgstr "xdeb falhou"
+
+#: sync-quit.test:21
+msgid "shlibs file does not exist"
+msgstr "arquivo shlibs não existe"
+
+#: conflicting-with-existing-target.test:23
+msgid "conflicting-with-existing-target"
+msgstr "conflitante-com-alvo-existente"
+
+#: conflicting-with-existing-target.test:40
+msgid "old /usr/lib/dir modified"
+msgstr "antigo /usr/lib/dir modificado"
+
+#: conflicting-with-existing-target.test:41
+msgid "/lib/dir not merged with /usr/lib/dir"
+msgstr "/lib/dir não mesclado com /usr/lib/dir"
+
+#: xdeb.sh:78
+msgid "%s version: %s"
+msgstr "Versão do %s: %s"
+
+
+
+msgid "unimplemented"
+msgstr "não implementado"
+
+msgid "none"
+msgstr "nenhum"
+
+
+
+msgid "Version"
+msgstr "Versão"
+
+msgid "xdeb - Convert Debian packages (.deb) to Void Linux (.xbps)"
+msgstr "xdeb - Converte pacotes Debian (.deb) para Void Linux (.xbps)"
+
+msgid "Base directory of the packaging process"
+msgstr "Diretório base do processo de empacotamento"
+
+msgid "Function"
+msgstr "Função"
+
+msgid "Summary"
+msgstr "Resumo"
+
+msgid "Example content"
+msgstr "Exemplo de conteúdo"
+
+msgid "Temporary folder used to store files extracted directly from the .deb file, before being organized."
+msgstr "Pasta temporária usada para armazenar os arquivos extraídos diretamente do .deb, antes de serem organizados."
+
+msgid "This is where the .deb is initially unpacked."
+msgstr "É onde o .deb é inicialmente descompactado."
+
+msgid "Where the .deb package control metadata is extracted (such as control, maintainer, version, etc)."
+msgstr "Onde os metadados de controle do pacote .deb são extraídos (como control, maintainer, version, etc)."
+
+msgid "Control File\n\nOther control files (preinst, postinst, etc.)"
+msgstr "Arquivo control\n\nOutros arquivos de controle (preinst, postinst, etc.)"
+
+msgid "Directory where the actual package files are extracted (what will be installed on the system)."
+msgstr "Diretório onde os arquivos reais do pacote são extraídos (o que será instalado no sistema)."
+
+msgid "Represents the package's file system. It is the final content that will be packaged in the .xbps file."
+msgstr "Representa o sistema de arquivos do pacote. É o conteúdo final que será empacotado no .xbps."
+
+msgid "package-name-version"
+msgstr "nome-do-pacote-versao"
+
+msgid "Final output of the script. Contains the package that can be installed with xbps-install."
+msgstr "Saída final do script. Contém o pacote que pode ser instalado com xbps-install."
+
+
+msgid "These folders make up the structure used by the xdeb script when converting .deb packages \nto the native Void Linux format (.xbps). Each directory plays a specific role \nin the content extraction, modification, and packaging steps.\n\nBelow is a description of each of them:"
+
+msgstr "Essas pastas compõem a estrutura utilizada pelo script xdeb durante a conversão de pacotes .deb \npara o formato nativo do Void Linux (.xbps). Cada diretório desempenha um papel específico \nnas etapas de extração, modificação e empacotamento do conteúdo.\n\nAbaixo está a descrição de cada uma delas:"
+
+
+msgid "General Summary: \n\nFolder What is it for?\n\nworkdir Temporary workspace (raw contents of the .deb)\ndatadir Package metadata (control, maintainer, etc.)\ndestdir Package file system (what will be installed)\nbinpkgs Final result: the generated .xbps package"
+
+
+msgstr "Resumo geral: \n\nPasta	Para que serve?\n\nworkdir	Área de trabalho temporária (conteúdo bruto do .deb)\ndatadir	Metadados do pacote (control, maintainer, etc)\ndestdir	Sistema de arquivos do pacote (o que será instalado)\nbinpkgs	Resultado final: o pacote .xbps gerado"
+
+
+msgid "Contains information about the package (name, version, description, etc.)."
+msgstr "Contém as informações sobre o pacote (nome, versão, descrição, etc)."
+
+msgid "Directory where the final .xbps package (from Void Linux) will be stored after creation."
+msgstr "Diretório onde o pacote final .xbps (do Void Linux) será armazenado depois de criado."
+
+msgid "You need to install the %s package on your system."
+msgstr "Falta instalar o pacote %s no seu sistema."
+
+
+msgid "Executable '%s' not found."
+msgstr "Executável '%s' não encontrado."
+
+
+msgid "To remove the package: \n\nsudo xbps-remove -y %s"
+msgstr "Para remover o pacote: \n\nsudo xbps-remove -y %s"
+
+
+#: deb-gui.sh⁩:41
+msgid ""
+"Error: yad is not installed. \\n\\nInstall with: sudo xbps-install -Sy yad\\n"
+msgstr ""
+"Erro: yad não está instalado. \\n\\nInstale com: sudo xbps-install -Sy yad\\n"
+
+#: ⁨xdeb-gui.sh⁩:49
+msgid "Error"
+msgstr "Erro"
+
+#: ⁨xdeb-gui.sh⁩:49
+msgid "The xdeb script was not found."
+msgstr "O script xdeb não foi localizado."
+
+#: ⁨xdeb-gui.sh⁩:57
+#: xdeb-gui.sh⁩:89
+msgid "Converting .deb (Debian) packages to .xbps (Void Linux)"
+msgstr "Convertendo pacotes .deb (Debian) para .xbps (Void Linux)"
+
+
+#: ⁨xdeb-gui.sh⁩:59
+
+msgid ""
+"🧰 Welcome to the .deb to .xbps package converter!\n"
+"\n"
+"This wizard was created to make life easier for Void Linux \n"
+"users who want to convert Debian packages (.deb) to the format used in \n"
+"Void (.xbps).\n"
+"\n"
+"✅ With this program, you can:\n"
+"\n"
+"- Convert .deb packages with or without dependencies\n"
+"- Download libraries (shlibs) automatically\n"
+"- Add dependencies manually\n"
+"- Perform various xdeb maintenance tasks\n"
+"- And much more, all with just a few clicks!\n"
+"\n"
+"💡 Just follow the steps, choose the desired option from the menu, and select the file or directory when prompted.\n"
+"\n"
+"Click OK to continue and open the main menu."
+
+msgstr ""
+"🧰 Bem-vindo ao conversor de pacotes .deb para .xbps!\n"
+"\n"
+"Este assistente foi criado para facilitar a vida de usuários do Void Linux "
+"que desejam converter pacotes do Debian (.deb) para o formato utilizado no "
+"Void (.xbps).\n"
+"\n"
+"✅ Com este programa, você pode:\n"
+"\n"
+"- Converter pacotes .deb com ou sem dependências\n"
+"- Baixar bibliotecas (shlibs) automaticamente\n"
+"- Adicionar dependências manualmente\n"
+"- Executar diversas tarefas de manutenção do xdeb\n"
+"- E muito mais, tudo com apenas alguns cliques!\n"
+"\n"
+"💡 Basta seguir os passos, escolher a opção desejada no menu e selecionar o "
+"arquivo ou diretório quando solicitado.\n"
+"\n"
+"Clique em OK para continuar e abrir o menu principal."
+
+
+
+#: ⁨xdeb-gui.sh⁩:90
+msgid "Choose the task you want to perform"
+msgstr "Escolha a tarefa que deseja executar"
+
+#: ⁨xdeb-gui.sh⁩:91
+msgid "Options"
+msgstr "Opções"
+
+#: ⁨xdeb-gui.sh⁩:92
+msgid "Simple package conversion (.deb → .xbps)"
+msgstr "Conversão simples de pacote (.deb → .xbps)"
+
+#: ⁨xdeb-gui.sh⁩:93
+msgid "Conversion with automatic dependency resolution"
+msgstr "Conversão com resolução automática de dependências"
+
+#: ⁨xdeb-gui.sh⁩:94
+msgid "Download dependencies (shlibs)"
+msgstr "Download de dependências (shlibs)"
+
+#: ⁨xdeb-gui.sh⁩:95
+msgid "Conversion with shlibs + automatic resolution"
+msgstr "Conversão com shlibs + resolução automática"
+
+#: ⁨xdeb-gui.sh⁩:96
+msgid "Add dependencies manually"
+msgstr "Adicionar dependências manualmente"
+
+#: ⁨xdeb-gui.sh⁩:97
+msgid "Remove temporary files"
+msgstr "Remover arquivos temporários"
+
+#: ⁨xdeb-gui.sh⁩:98
+msgid "Remove only repodata (rebuild)"
+msgstr "Remover apenas repodata (rebuild)"
+
+#: ⁨xdeb-gui.sh⁩:99
+msgid "Extract .deb without assembling package"
+msgstr "Extrair .deb sem montar pacote"
+
+#: ⁨xdeb-gui.sh⁩:100
+msgid "Direct package build from directory"
+msgstr "Build de pacote direto de diretório"
+
+#: ⁨xdeb-gui.sh⁩:101
+msgid "Do not register package in repository"
+msgstr "Não registrar pacote no repositório"
+
+#: ⁨xdeb-gui.sh⁩:102
+msgid "Add -32bit suffix to package"
+msgstr "Adicionar sufixo -32bit ao pacote"
+
+#: ⁨xdeb-gui.sh⁩:103
+msgid "Automatically install after creation"
+msgstr "Instalar automaticamente após a criação"
+
+#: ⁨xdeb-gui.sh⁩:104
+msgid "Remove empty directories"
+msgstr "Remover diretórios vazios"
+
+#: ⁨xdeb-gui.sh⁩:105
+msgid "Show xdeb version"
+msgstr "Mostrar versão do xdeb"
+
+#: ⁨xdeb-gui.sh⁩:106
+msgid "Show xdeb help"
+msgstr "Mostrar ajuda do xdeb"
+
+#: ⁨xdeb-gui.sh⁩:107
+msgid "Exit"
+msgstr "Sair"
+
+
+#: ⁨xdeb-gui.sh⁩:120
+#: ⁨xdeb-gui.sh⁩:146
+#: ⁨xdeb-gui.sh⁩:168
+#: ⁨xdeb-gui.sh⁩:190
+#: ⁨xdeb-gui.sh⁩:232
+#: ⁨xdeb-gui.sh⁩:253
+#: ⁨xdeb-gui.sh⁩:283
+#: ⁨xdeb-gui.sh⁩:301
+#: ⁨xdeb-gui.sh⁩:343
+#: ⁨xdeb-gui.sh⁩:366
+msgid "Select the .deb package"
+msgstr "Selecione o pacote .deb"
+
+
+#: ⁨xdeb-gui.sh⁩:126
+#: ⁨xdeb-gui.sh⁩:152
+#: ⁨xdeb-gui.sh⁩:175
+#: ⁨xdeb-gui.sh⁩:196
+#: ⁨xdeb-gui.sh⁩:217
+#: ⁨xdeb-gui.sh⁩:238
+#: ⁨xdeb-gui.sh⁩:259
+#: ⁨xdeb-gui.sh⁩:292
+#: ⁨xdeb-gui.sh⁩:307
+#: ⁨xdeb-gui.sh⁩:349
+#: ⁨xdeb-gui.sh⁩:372
+msgid "Please select a valid .deb file."
+msgstr "Selecione um arquivo .deb válido."
+
+
+#: ⁨xdeb-gui.sh⁩:136
+#: ⁨xdeb-gui.sh⁩:159
+#: ⁨xdeb-gui.sh⁩:296
+#: ⁨xdeb-gui.sh⁩:356
+
+msgid "Conversion completed successfully!"
+msgstr "Conversão concluída com sucesso!"
+
+
+#: ⁨xdeb-gui.sh⁩:138
+#: ⁨xdeb-gui.sh⁩:161
+#: ⁨xdeb-gui.sh⁩:358
+
+msgid "Error converting package."
+msgstr "Erro na conversão do pacote."
+
+
+#: ⁨xdeb-gui.sh⁩:181
+msgid "Shlibs download completed successfully!"
+msgstr "Download de shlibs concluído com sucesso!"
+
+
+#: ⁨xdeb-gui.sh⁩:183
+msgid "Error downloading shlibs."
+msgstr "Erro ao baixar shlibs."
+
+
+#: ⁨xdeb-gui.sh⁩:202
+msgid "Conversion with dependencies completed successfully!"
+msgstr "Conversão com dependências concluída com sucesso!"
+
+
+#: ⁨xdeb-gui.sh⁩:204
+msgid "Error converting with dependencies."
+msgstr "Erro na conversão com dependências."
+
+
+#: ⁨xdeb-gui.sh⁩:211
+msgid "Select the directory with the files"
+msgstr "Selecione o diretório com os arquivos"
+
+
+#: ⁨xdeb-gui.sh⁩:223
+msgid "Direct build completed successfully!"
+msgstr "Build direto concluído com sucesso!"
+
+
+#: ⁨xdeb-gui.sh⁩:225
+msgid "Error running direct build."
+msgstr "Erro ao executar o build direto."
+
+
+#: ⁨xdeb-gui.sh⁩:244
+msgid "Conversion completed (no record in repository)."
+msgstr "Conversão concluída (sem registro no repositório)."
+
+
+#: ⁨xdeb-gui.sh⁩:246
+msgid "Error converting with -R."
+msgstr "Erro na conversão com -R."
+
+
+#: ⁨xdeb-gui.sh⁩:265
+msgid "Empty directories removed successfully!"
+msgstr "Diretórios vazios removidos com sucesso!"
+
+
+#: ⁨xdeb-gui.sh⁩:267
+msgid "Error removing empty directories."
+msgstr "Erro ao remover diretórios vazios."
+
+
+#: ⁨xdeb-gui.sh⁩:286
+msgid "Dependencies"
+msgstr "Dependências"
+
+
+#: ⁨xdeb-gui.sh⁩:286
+msgid "Enter dependencies (e.g. tar>0, gzip, etc.)"
+msgstr "Digite as dependências (ex: tar>0, gzip, etc)"
+
+
+#: ⁨xdeb-gui.sh⁩:314
+msgid "Extraction completed successfully!"
+msgstr "Extração concluída com sucesso!"
+
+
+#: ⁨xdeb-gui.sh⁩:316
+msgid "Error extracting package."
+msgstr "Erro na extração do pacote."
+
+
+#: ⁨xdeb-gui.sh⁩:325
+msgid "Temporary files removed successfully!"
+msgstr "Arquivos temporários removidos com sucesso!"
+
+
+#: ⁨xdeb-gui.sh⁩:327
+msgid "Error removing temporary files."
+msgstr "Erro ao remover arquivos temporários."
+
+
+#: ⁨xdeb-gui.sh⁩:334
+msgid "Repodata removed successfully."
+msgstr "Repodata removida com sucesso."
+
+
+#: ⁨xdeb-gui.sh⁩:336
+msgid "Error removing repodata."
+msgstr "Erro ao remover repodata."
+
+
+#: ⁨xdeb-gui.sh⁩:379
+msgid "Installation completed successfully!"
+msgstr "Instalação concluída com sucesso!"
+
+
+#: ⁨xdeb-gui.sh⁩:381
+msgid "Error installing package."
+msgstr "Erro na instalação do pacote."
+
+
+#: ⁨xdeb-gui.sh⁩:389
+msgid "xdeb help"
+msgstr "Ajuda do xdeb"
+
+
+#: ⁨xdeb-gui.sh⁩:394
+msgid "Leaving..."
+msgstr "Saindo..."
+
+
+#: ⁨xdeb-gui.sh⁩:448
+msgid "xdeb manual"
+msgstr "Manual do xdeb"
+
+
+
+
+#: ⁨xdeb-gui.sh⁩
+msgid "OK"
+msgstr "OK"
+
+
+#: ⁨xdeb-gui.sh⁩
+msgid "Converts using the most commonly used option (xdeb -Sde)"
+msgstr "Converte usando a opção mais usada (xdeb -Sde)"
+
+
+
+#: xdeb-gui.sh
+msgid ""
+"\\nIMPORTANT NOTICE:\\n\\nUsing xdeb to convert .deb packages in Void Linux "
+"can cause serious system problems.\\nVoid Linux is not compatible with "
+"Debian/Ubuntu packages. Libraries, paths, and dependencies may be different "
+"or non-existent.\\n\\nPossible consequences:\\n\\n- Broken packages and "
+"system dependencies\\n- Library incompatibility\\n- Failures in future "
+"updates\\n- Compromised system stability\\nUse xdeb only in specific cases "
+"and with simple, non-critical packages.\\n\\nRecommendation:\\n\\nPrefer to "
+"install software directly from the official Void repositories (xbps), use "
+"Flatpak/AppImage, or compile from source code.\\nAre you aware of the risks?"
+
+
+msgstr ""
+"AVISO IMPORTANTE:\\n\\nO uso do xdeb para converter pacotes .deb no Void "
+"Linux pode causar sérios problemas ao sistema.\\nVoid Linux não é compatível "
+"com os pacotes do Debian/Ubuntu. Bibliotecas, caminhos e dependências podem "
+"ser diferentes ou inexistentes.\\n\\nConsequências possíveis:\\n\\n- Quebra "
+"de pacotes e dependências do sistema\\n- Incompatibilidade de "
+"bibliotecas\\n- Falhas em atualizações futuras\\n- Comprometimento da "
+"estabilidade do sistema\\n\\nUse xdeb apenas em casos específicos e com "
+"pacotes simples e não-críticos.\\n\\nRecomendação:\\n\\nPrefira instalar "
+"softwares diretamente dos repositórios oficiais do Void (xbps), usar Flatpak/"
+"AppImage, ou compilar do código-fonte.\\n\\nVocê está ciente dos riscos?"
+
+
+
+
+msgid "Cancel"
+msgstr "Cancelar"
+
+
+#: ⁨xdeb-gui.sh⁩
+#: instalador.sh
+msgid "Missing dependencies"
+msgstr "Dependências ausentes"
+
+
+#: ⁨xdeb-gui.sh⁩
+msgid "Close"
+msgstr "Fechar"
+
+
+#: ⁨xdeb-gui.sh⁩
+msgid "The log file will be saved to:\n\n%s\n\nIt is recommended to check after each package conversion."
+msgstr "O arquivo de log será salvo em:\n\n%s\n\nÉ recomendável verificar após cada conversão de pacote."
+
+
+#: ⁨xdeb-gui.sh⁩
+msgid "The following commands are not installed:\n\n%s\n\nYou can install them with:\n\n sudo xbps-install -Sy %s"
+msgstr "Os seguintes comandos não estão instalados:\n\n%s\n\nVocê pode instalá-los com:\n\n  sudo xbps-install -Sy %s"
+
+
+#: ⁨xdeb-gui.sh⁩
+msgid "xdeb version: %s"
+msgstr "Versão do xdeb: %s"
+
+
+
+#: ⁨xdeb
+msgid "grep does NOT support -P."
+msgstr "grep NÃO tem suporte a -P."
+
+#: ⁨xdeb
+msgid "This script requires bash. Exiting..."
+msgstr "Este script requer bash. Saindo..."
+
+#: ⁨xdeb
+msgid "Error: Destination directory '%s' already exists and is NOT empty."
+msgstr "Erro: diretório de destino '%s' já existe e NÃO está vazio."
+
+
+#: ⁨xdeb
+msgid "Error: No read/write permission on: %s\n\nTip: Run the command with administrator privileges (e.g. using sudo), or change the directory permissions:\n"
+msgstr "Erro: Sem permissão de leitura/gravação em: %s\n\nDica: Execute o comando com privilégios de administrador (por exemplo, usando sudo) ou altere as permissões do diretório:\n"
+
+#: ⁨xdeb
+msgid "or"
+msgstr "ou"
+
+
+#: ⁨xdeb-gui.sh⁩
+msgid "Man page for xdeb not found."
+msgstr "Página de manual para xdeb não encontrada."
+
+
+
+
+#: instalador.sh
+
+msgid "Yad is not installed...\n\nInstall with: sudo xbps-install -Sy yad"
+msgstr "O yad não esta instalado...\n\nInstale com: sudo xbps-install -Sy yad"
+
+#: instalador.sh
+
+msgid "The following commands are not installed:\n\n%s\n\nPlease install them before continuing."
+msgstr "Os seguintes comandos não estão instalados:\n\n%s\n\nPor favor, instale-os antes de continuar."
+
+
+#: instalador.sh
+
+msgid "Installing files to %s..."
+msgstr "Instalando arquivos em %s..."
+
+
+#: instalador.sh
+
+msgid "Installation complete."
+msgstr "Instalação concluída."
+
+
+#: instalador.sh
+
+msgid "Uninstaller"
+msgstr "Desinstalador"
+
+
+#: instalador.sh
+
+msgid "Removing file %s..."
+msgstr "Removendo arquivo %s..."
+
+
+#: instalador.sh
+
+msgid "Uninstallation complete."
+msgstr "Desinstalação concluída."
+
+
+#: instalador.sh
+
+msgid "Usage: %s {install|uninstall}"
+msgstr "Uso: %s {instalar|desinstalar}"
+
+
+#: ⁨xdeb
+msgid "No internet connection. Unable to sync shlibs."
+msgstr "Sem conexão com a internet. Não foi possível sincronizar shlibs."
+
+
+
+#: ⁨xdeb
+msgid "Errors occurred earlier. Aborting before package creation or installation."
+msgstr "Erros ocorreram anteriormente. Interrupção antes da criação ou instalação do pacote."
+
+
+#: ⁨xdeb
+msgid "Warning:"
+msgstr "Aviso:"
+
+#: ⁨xdeb
+msgid "One or more required shared libraries are missing."
+msgstr "Uma ou mais bibliotecas compartilhadas obrigatórias estão ausentes."
+
+#: ⁨xdeb
+msgid "You may need to install the appropriate packages or adjust your dependencies."
+msgstr "Você pode precisar instalar os pacotes apropriados ou ajustar suas dependências."
+
+#: ⁨xdeb
+msgid "Use `--deps=...` or install missing libraries before proceeding."
+msgstr "Use `--deps=...` ou instale as bibliotecas ausentes antes de continuar."
+
+#: ⁨xdeb
+msgid "Missing libraries found. Aborting package creation to avoid broken installs."
+msgstr "Bibliotecas ausentes encontradas. Abortando a criação do pacote para evitar instalações interrompidas."
+
+
+
+
+#: ⁨xdeb
+msgid "Error installing package: %s"
+msgstr "Erro ao instalar o pacote: %s"
+
+
+#: ⁨xdeb
+msgid "Missing library:"
+msgstr "Biblioteca ausente:"
+
+
+
+#: ⁨xdeb
+msgid "not found"
+msgstr "não encontrado"
+
+
+
+#: ⁨xdeb
+msgid "in binary"
+msgstr "em binário"
+
+
+#: ⁨xdeb
+msgid ""
+"🧩 Workarounds:\n"
+"\n"
+" * Repackage the program as a Void package (.xbps) with adjusted dependencies.\n"
+"\n"
+"\n"
+"In Void Linux, you have several ways to install programs, each with its own advantages depending on your usage style and needs. Here are the main ones:\n"
+"\n"
+"\n"
+"1. Using the xbps package manager\n"
+"\n"
+"xbps-install -S package-name\n"
+"\n"
+"\n"
+"2. Compiling with xtools (build from source)\n"
+"\n"
+"xbps-install -S xtools\n"
+"\n"
+"git clone https://github.com/void-linux/void-packages\n"
+"cd void-packages\n"
+"./xbps-src binary-bootstrap\n"
+"\n"
+"./xbps-src pkg package-name\n"
+"xbps-install --repository=hostdir/binpkgs package-name\n"
+"\n"
+"\n"
+"3. Install .xbps packages manually using xbps-install\n"
+"\n"
+"If you have a local .xbps package.\n"
+"\n"
+"\n"
+"4. Flatpak (sandboxed apps)\n"
+"\n"
+"Flatpak works well in Void and allows you to install universal apps:\n"
+"\n"
+"xbps-install -S flatpak\n"
+"\n"
+"flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo\n"
+"\n"
+"flatpak install flathub name.of.app\n"
+"\n"
+"5. Docker (containers)\n"
+"\n"
+"xbps-install -S docker\n"
+"\n"
+"\n"
+"6.AppImage\n"
+"\n"
+"chmod +x program.AppImage\n"
+"./programa.AppImage\n"
+"\n"
+"\n"
+"7. Manual: compile from source\n"
+"\n"
+"git clone https://github.com/algo/projeto.git\n"
+"project cd\n"
+"make && sudo make install"
+
+msgstr ""
+"🧩 Soluções alternativas:\n"
+"\n"
+"   * Reempacotar o programa como um pacote Void (.xbps) com dependências ajustadas.\n"
+"\n"
+"\n"
+"No Void Linux, você tem várias formas de instalar programas, cada uma com suas vantagens dependendo do seu estilo de uso e necessidade. Aqui estão as principais:\n"
+"\n"
+"\n"
+"1. Usando o gerenciador de pacotes xbps\n"
+"\n"
+"xbps-install -S nome-do-pacote\n"
+"\n"
+"\n"
+"2. Compilando com xtools (build do source)\n"
+"\n"
+"xbps-install -S xtools\n"
+"\n"
+"git clone https://github.com/void-linux/void-packages\n"
+"cd void-packages\n"
+"./xbps-src binary-bootstrap\n"
+"\n"
+"./xbps-src pkg nome-do-pacote\n"
+"xbps-install --repository=hostdir/binpkgs nome-do-pacote\n"
+"\n"
+"\n"
+"3. Instalar pacotes .xbps manualmente usando o xbps-install\n"
+"\n"
+"Se você tiver um pacote .xbps local.\n"
+"\n"
+"\n"
+"4. Flatpak (sandboxed apps)\n"
+"\n"
+"Flatpak funciona bem no Void e permite instalar apps universais:\n"
+"\n"
+"xbps-install -S flatpak\n"
+"\n"
+"flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo\n"
+"\n"
+"flatpak install flathub nome.do.app\n"
+"\n"
+"5. Docker (containers)\n"
+"\n"
+"xbps-install -S docker\n"
+"\n"
+"\n"
+"6. AppImage\n"
+"\n"
+"chmod +x programa.AppImage\n"
+"./programa.AppImage\n"
+"\n"
+"\n"
+"7. Manual: compilar do código-fonte\n"
+"\n"
+"git clone https://github.com/algo/projeto.git\n"
+"cd projeto\n"
+"make && sudo make install"
+
+
+
+
+#: ⁨instalador.sh
+msgid "Error removing"
+msgstr "Erro ao remover"
+
+
+#: instalador.sh
+msgid "Successfully removed"
+msgstr "Removido com sucesso"
+
+#: instalador.sh
+msgid "No lock file found in"
+msgstr "Nenhum arquivo de lock encontrado em"
+
+#: instalador.sh
+msgid "Ending LibreOffice processes..."
+msgstr "Finalizando processos do LibreOffice..."
+
+#: ⁨instalador.sh
+msgid "Lock file(s) found at %s"
+msgstr "Arquivo(s) de lock encontrado(s) em %s"
+
+#: instalador.sh
+msgid "Removendo lock file: %s"
+msgstr "Removendo arquivo de bloqueio: %s"
+
+
+#: xdeb-gui.sh
+msgid "Debian Packages"
+msgstr "Pacotes Debian"
+
+
+#: xdeb
+msgid "Error: Package name not found in control file."
+msgstr "Erro: Nome do pacote não encontrado no arquivo control."
+
+
+#: xdeb
+msgid "Missing or incorrectly formatted 'Version' field. Valid example: Version: 1.0"
+msgstr "Campo 'Version' ausente ou mal formatado. Exemplo válido: Version: 1.0"
+
+
+
+#: xdeb
+msgid "Error: Field 'Architecture' not found in control file."
+msgstr "Erro: Campo 'Architecture' não encontrado no arquivo control."
+
+
+#: xdeb
+msgid "Invalid 'Architecture' value:"
+msgstr "Valor de 'Architecture' inválido:"
+
+
+
+#: xdeb
+msgid "Use one of the following: all, amd64, i386, arm64, armhf."
+msgstr "Use um dos seguintes: all, amd64, i386, arm64, armhf."
+
+
+
+#: xdeb
+msgid "Error: Field 'Maintainer' not found or empty in control file."
+msgstr "Erro: Campo 'Maintainer' não encontrado ou vazio no arquivo control."
+
+
+#: xdeb
+msgid "Invalid 'Maintainer' format. Use: Name <email@domain>"
+msgstr "Formato de 'Maintainer' inválido. Use: Nome <email@dominio>"
+
+
+
+
+#: xdeb-gui.sh
+msgid "The selected file does not appear to be a valid .deb package."
+msgstr "O arquivo selecionado não parece ser um pacote .deb válido."
+
+
+#: xdeb-gui.sh
+msgid ".deb file appears valid."
+msgstr "Arquivo .deb parece válido."
+
+
+#: xdeb-gui.sh
+msgid "Invalid .deb file!"
+msgstr "Arquivo .deb inválido!"
+
+
+
+
