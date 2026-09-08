@@ -40,6 +40,7 @@ log_crit() {
 }
 
 sync_shlibs() {
+	mkdir -p "$(dirname -- "${XDEB_SHLIBS}")"
 	curl \
 		-s "https://raw.githubusercontent.com/void-linux/void-packages/master/common/shlibs" \
 		-o "${XDEB_SHLIBS}" \
