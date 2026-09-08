@@ -337,13 +337,7 @@ esac
 	fix_conflict usr/lib/python3/dist-packages "usr/lib/python${python3_version}" site-packages
 
 	find "${XDEB_DESTDIR}/usr/lib" -maxdepth 1 -type d -iname "*-linux-*" | while read -r f; do
-		arch_name="${f##*/}"
-		case "${arch_name}" in
-			*unknown*) ;;
-			*) arch_name="${arch_name%%-*}-unknown-${arch_name#*-}"
-		esac
-
-		fix_conflict "${f#"${XDEB_DESTDIR}/"}" "usr/${arch_name}" lib
+		fix_conflict "${f#"${XDEB_DESTDIR}/"}" "usr/${f##*/}/usr" lib
 	done
 }
 
